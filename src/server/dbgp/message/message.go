@@ -1,4 +1,8 @@
 
+/**
+ * Turn DBGp messages into usable data structures.
+ */
+
 package message
 
 import (
@@ -8,9 +12,6 @@ import (
 
 /**
  * Parse dbgp XML message.
- *
- * @param string xmlResponse
- * @return map
  */
 func Decode(xmlContent string) (message Message, err error) {
 
@@ -40,7 +41,7 @@ func Decode(xmlContent string) (message Message, err error) {
 }
 
 /**
- * Prepare a message based on Xdebug's initialization attempt.
+ * Prepare a message structure based on DBGp engine's initialization attempt.
  */
 func prepareInitMessage(init Init) (message Message) {
 
@@ -52,7 +53,7 @@ func prepareInitMessage(init Init) (message Message) {
 }
 
 /**
- * Prepare a message based on the Xdebug response.
+ * Prepare a message structure based on DBGp engine's response.
  */
 func prepareResponseMessage(response Response) (message Message) {
 

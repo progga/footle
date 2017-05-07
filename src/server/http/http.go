@@ -1,4 +1,10 @@
 
+/**
+ * Provides the HTTP user interface for the debugger.
+ *
+ * *** Unimplemented. ***
+ */
+
 package http
 
 import (

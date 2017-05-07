@@ -1,4 +1,10 @@
 
+/**
+ * Decode a DBGp message which is in XML format.
+ *
+ * Once decoded, we are able to access individual components of each message.
+ */
+
 package message
 
 import (
@@ -9,10 +15,7 @@ import (
 )
 
 /**
- * Parses XDebug's XML responses.
- *
- * @param string xmlResponse
- * @return Response
+ * Decodes XML response from DBGp engine.
  */
 func decodeResponse(xmlResponse string) (Response, error) {
 
@@ -33,10 +36,7 @@ func decodeResponse(xmlResponse string) (Response, error) {
 }
 
 /**
- * Parses XDebug's XML initialization message.
- *
- * @param string xmlResponse
- * @return Response
+ * Decodes XML initialization message from DBGp engine.
  */
 func decodeInit(xmlInit string) (Init, error) {
 

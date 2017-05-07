@@ -1,4 +1,8 @@
 
+/**
+ * Functions for DBGp command preparation.
+ */
+
 package command
 
 import (
@@ -29,37 +33,40 @@ var lastTxId int
  * @return string xdebug_cmd
  * @return error err
  */
-func Prepare(cmd string, args []string) (xdebug_cmd string, err error) {
+func Prepare(cmd string, args []string) (xdebugCmd string, err error) {
 
   TxId := fetchNextTxId()
 
   switch strings.ToLower(cmd) {
     case "breakpoint", "b":
-      xdebug_cmd, err = prepareBreakpointCmd(args, TxId)
+      xdebugCmd, err = prepareBreakpointCmd(args, TxId)
 
     case "status", "s":
-      xdebug_cmd, err = prepareCmdNoArgs("status", TxId)
+      xdebugCmd, err = prepareCmdNoArgs("status", TxId)
 
     case "run", "r":
-      xdebug_cmd, err = prepareCmdNoArgs("run", TxId)
+      xdebugCmd, err = prepareCmdNoArgs("run", TxId)
+
+    case "stop", "st":
+      xdebugCmd, err = prepareCmdNoArgs("stop", TxId)
 
     case "step_into", "si":
-      xdebug_cmd, err = prepareCmdNoArgs("step_into", TxId)
+      xdebugCmd, err = prepareCmdNoArgs("step_into", TxId)
 
     case "step_out", "so":
-      xdebug_cmd, err = prepareCmdNoArgs("step_out", TxId)
+      xdebugCmd, err = prepareCmdNoArgs("step_out", TxId)
 
     case "step_over", "sov", "sv":
-      xdebug_cmd, err = prepareCmdNoArgs("step_over", TxId)
+      xdebugCmd, err = prepareCmdNoArgs("step_over", TxId)
 
     case "eval", "ev":
-      xdebug_cmd, err = prepareEvalCmd(args, TxId)
+      xdebugCmd, err = prepareEvalCmd(args, TxId)
 
     default:
-      xdebug_cmd, err = "", fmt.Errorf("Unknown command: %s", cmd)
+      xdebugCmd, err = "", fmt.Errorf("Unknown command: %s", cmd)
   }
 
-  return xdebug_cmd, err
+  return xdebugCmd, err
 }
 
 /**
@@ -79,10 +86,6 @@ func fetchNextTxId() (nextTxId int) {
 
 /**
  * The full xdebug breakpoint command.
- *
- * @param []string args
- * @param int TxId
- * @return string
  */
 func prepareBreakpointCmd(args []string, TxId int) (xdebug_cmd string, err error) {
 
@@ -99,82 +102,7 @@ func prepareBreakpointCmd(args []string, TxId int) (xdebug_cmd string, err error
 }
 
 /**
- * Xdebug status command.
- *
- * @param int TxId
- * @return string xdebug_cmd
- * @return error err
- */
-func prepareStatusCmd(TxId int) (xdebug_cmd string, err error) {
-
-  xdebug_cmd = fmt.Sprintf("status -i %d\x00", TxId)
-
-  return xdebug_cmd, err
-}
-
-/**
- * Xdebug run command.
- *
- * @param int TxId
- * @return string xdebug_cmd
- * @return error err
- */
-func prepareRunCmd(TxId int) (xdebug_cmd string, err error) {
-
-  xdebug_cmd = fmt.Sprintf("run -i %d\x00", TxId)
-
-  return xdebug_cmd, err
-}
-
-/**
- * Xdebug step_into command.
- *
- * @param int TxId
- * @return string xdebug_cmd
- * @return error err
- */
-func prepareStepIntoCmd(TxId int) (xdebug_cmd string, err error) {
-
-  xdebug_cmd = fmt.Sprintf("step_into -i %d\x00", TxId)
-
-  return xdebug_cmd, err
-}
-
-/**
- * Xdebug step_out command.
- *
- * @param int TxId
- * @return string xdebug_cmd
- * @return error err
- */
-func prepareStepOutCmd(TxId int) (xdebug_cmd string, err error) {
-
-  xdebug_cmd = fmt.Sprintf("step_out -i %d\x00", TxId)
-
-  return xdebug_cmd, err
-}
-
-/**
- * Xdebug step_over command.
- *
- * @param int TxId
- * @return string xdebug_cmd
- * @return error err
- */
-func prepareStepOverCmd(TxId int) (xdebug_cmd string, err error) {
-
-  xdebug_cmd = fmt.Sprintf("step_over -i %d\x00", TxId)
-
-  return xdebug_cmd, err
-}
-
-/**
  * Xdebug eval command.
- *
- * @param []string args
- * @param int TxId
- * @return string xdebug_cmd
- * @return error err
  */
 func prepareEvalCmd(args []string, TxId int) (xdebug_cmd string, err error) {
 
@@ -188,7 +116,9 @@ func prepareEvalCmd(args []string, TxId int) (xdebug_cmd string, err error) {
 }
 
 /**
+ * Any Xdebug command that does not take any argument other than the TX ID.
  *
+ * Example: run, stop, etc.
  */
 func prepareCmdNoArgs(cmd string, TxId int) (xdebugCmd string, err error) {
 

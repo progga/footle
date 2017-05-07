@@ -1,4 +1,10 @@
 
+/**
+ * Structure declarations that correspond to DBGp XML messages.
+ *
+ * These structures are used for decoding the XML messages into usable values.
+ */
+
 package message
 
 import "encoding/xml"

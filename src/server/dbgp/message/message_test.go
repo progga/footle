@@ -1,4 +1,8 @@
 
+/**
+ * Tests for DBGp message decoding.
+ */
+
 package message
 
 import "testing"

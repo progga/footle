@@ -1,4 +1,10 @@
 
+/**
+ * Tests for command validation.
+ *
+ * These commands come from the command line user interface.
+ */
+
 package cmdline
 
 import "testing"

@@ -1,4 +1,12 @@
 
+/**
+ * Validate commands entered from the user interface.
+ *
+ * Commands coming from the user interface are shorter versions of the actual
+ * DBGp commands.  This affords ease of use.  Here we verify these shorter
+ * commands so that we can later prepare the full DBGp commands.
+ */
+
 package cmdline
 
 import (
@@ -7,7 +15,7 @@ import (
 )
 
 /**
- *
+ * Wrapper for validating any command coming from the interface.
  */
 func Validate(cmd string, args []string) (err error) {
 
@@ -20,6 +28,9 @@ func Validate(cmd string, args []string) (err error) {
 
     case "run", "r":
       err = validateCmdWithNoArg("run", args)
+
+    case "stop", "st":
+      err = validateCmdWithNoArg("stop", args)
 
     case "status", "s":
       err = validateCmdWithNoArg("status", args)
@@ -41,7 +52,7 @@ func Validate(cmd string, args []string) (err error) {
 }
 
 /**
- *
+ * Validate the Breakpoint command.
  */
 func validateBreakpointArgs(args []string) (err error) {
 
@@ -59,7 +70,9 @@ func validateBreakpointArgs(args []string) (err error) {
 }
 
 /**
+ * Validate any command that does not take any argument except TX ID.
  *
+ * Example: run, stop, etc.
  */
 func validateCmdWithNoArg(cmd string, args []string) (err error) {
 

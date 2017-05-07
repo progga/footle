@@ -1,4 +1,8 @@
 
+/**
+ * Tests for DBGp command preparation.
+ */
+
 package command
 
 import "testing"
