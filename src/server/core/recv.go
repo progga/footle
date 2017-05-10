@@ -6,11 +6,9 @@
 package core
 
 import (
-  "bytes"
-  "fmt"
   "log"
-  "io"
   "net"
+  "../dbgp"
   "../dbgp/message"
 )
 
@@ -23,7 +21,7 @@ func RecvMsgsFromDBGpEngine(sock net.Listener, activeDBGpConnection *net.Conn, M
     *activeDBGpConnection = StartTalkingToDBGpEngine(sock)
 
     for {
-      msg, err := ReadMsgFromDBGpEngine(*activeDBGpConnection)
+      msg, err := dbgp.Read(*activeDBGpConnection)
       if len(msg) == 0 || nil != err {
         break
       }
@@ -48,40 +46,6 @@ func StartTalkingToDBGpEngine(sock net.Listener) (connection net.Conn) {
   }
 
   return connection
-}
-
-/**
- * Read message from DBGp engine over a network connection.
- *
- * Xdebug message format: Int Null XML-Snippet NULL
- */
-func ReadMsgFromDBGpEngine(connection net.Conn) (msg string, err error) {
-
-  var DBGpMsg bytes.Buffer
-  var msgSize int
-
-  count, err := fmt.Fscanf(connection, "%d\x00", &msgSize)
-  if nil != err {
-    log.Fatal(err)
-  }
-  if 0 == count {
-    return msg, err
-  }
-
-  copyCount, err := io.CopyN(&DBGpMsg, connection, int64(msgSize))
-  if 0 == copyCount || io.EOF == err {
-    return msg, err
-  } else if nil != err {
-    log.Fatal(err)
-  }
-
-  count, err = fmt.Fscanf(connection, "\x00") // Read null byte.
-  if nil != err {
-    log.Fatal(err)
-  }
-
-  msg = DBGpMsg.String()
-  return msg, err
 }
 
 /**

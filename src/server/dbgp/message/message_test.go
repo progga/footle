@@ -42,7 +42,7 @@ func TestDecode(t *testing.T) {
   status="break"
   reason="ok">
   <xdebug:message
-    filename="file:///home/ju/drupal/drupal8/index.php"
+    filename="file:///srv/www/drupal/drupal8/index.php"
     lineno="14">
   </xdebug:message>
 </response>`
