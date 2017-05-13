@@ -6,6 +6,7 @@
 package cmdline
 
 import (
+  "encoding/base64"
   "fmt"
   "log"
   "strings"
@@ -60,6 +61,13 @@ func RunUI(out chan<- string, bye chan struct{}) {
       // First, display all messages stored in the queue.
       for _, msg := range incomingMsgQueue {
         fmt.Println(msg)
+
+        // Some commands such as "source" send XML character data
+        // as inner XML content.
+        decoded, err := base64.StdEncoding.DecodeString(msg.Content)
+        if nil == err && 0 < len(decoded) {
+          fmt.Printf("%s", string(decoded))
+        }
       }
       incomingMsgQueue = incomingMsgQueue[:0]
     }
@@ -72,7 +80,7 @@ func RunUI(out chan<- string, bye chan struct{}) {
 
     cmd = strings.TrimSpace(cmd)
 
-    if "bye" == cmd {
+    if "bye" == cmd || "quit" == cmd || "q" == cmd {
       close(bye)
 
       return

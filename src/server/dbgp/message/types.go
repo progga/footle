@@ -14,6 +14,7 @@ type Message struct {
   State string
   Properties Properties
   Context Context
+  Content string
 }
 
 type Properties struct {
@@ -32,7 +33,7 @@ type Context struct {
 }
 
 type Variable struct {
-  Var_type string
+  VarType string
   Literal string
   List []Variable
 }
@@ -58,6 +59,7 @@ type Response struct {
   Id int `xml:"id"`
   Message ResponseMessage
   Error Error `xml:"error"`
+  Content string `xml:",chardata"`
 }
 
 type ResponseMessage struct {

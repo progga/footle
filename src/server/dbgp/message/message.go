@@ -59,6 +59,7 @@ func prepareResponseMessage(response Response) (message Message) {
 
   message.Message_type             = "response"
   message.State                    = response.Status
+  message.Content                  = response.Content
   message.Properties.Filename      = response.Message.Filename
   message.Properties.Line_number   = response.Message.LineNo
   message.Properties.Error_message = response.Error.Message
