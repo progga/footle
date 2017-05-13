@@ -7,7 +7,7 @@
  * commands so that we can later prepare the full DBGp commands.
  */
 
-package cmdline
+package command
 
 import (
   "fmt"

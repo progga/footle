@@ -87,7 +87,7 @@ func RunUI(out chan<- string, bye chan struct{}) {
 
     footleCmd := cmdParts[0]
     cmdArgs   := cmdParts[1:]
-    if err = Validate(footleCmd, cmdArgs); nil != err {
+    if err = command.Validate(footleCmd, cmdArgs); nil != err {
       fmt.Println(err)
       continue
     }

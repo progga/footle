@@ -5,7 +5,7 @@
  * These commands come from the command line user interface.
  */
 
-package cmdline
+package command
 
 import "testing"
 
