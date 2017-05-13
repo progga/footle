@@ -8,11 +8,12 @@ package command
 import (
   "fmt"
   "math"
+  "strconv"
   "strings"
 )
 
 /**
- * Xdebug transaction ID.  Its value was last used for the xdebug command's
+ * DBGp transaction ID.  Its value was last used for the DBGp command's
  * transaction ID.
  *
  * @see fetchNextTxId()
@@ -20,57 +21,55 @@ import (
 var lastTxId int
 
 /**
- * Prepare xdebug command from the given values.
+ * Prepare DBGp command from the given values.
  *
- * The arguments for this function can be considered a short form of the xdebug
+ * The arguments for this function can be considered a short form of the DBGp
  * commands.  Here the short forms are expanded to their full forms.
  *
  * Example: "b /home/foo/php/bar.php 9" becomes
  * "breakpoint_set -i 1 -t line -f /home/foo/php/bar.php -n 9"
- *
- * @param string cmd
- * @param []string args
- * @return string xdebug_cmd
- * @return error err
  */
-func Prepare(cmd string, args []string) (xdebugCmd string, err error) {
+func Prepare(cmd string, args []string) (DBGpCmd string, err error) {
 
   TxId := fetchNextTxId()
 
   switch strings.ToLower(cmd) {
     case "breakpoint", "b":
-      xdebugCmd, err = prepareBreakpointCmd(args, TxId)
-
-    case "status", "s":
-      xdebugCmd, err = prepareCmdNoArgs("status", TxId)
-
-    case "run", "r":
-      xdebugCmd, err = prepareCmdNoArgs("run", TxId)
-
-    case "stop", "st":
-      xdebugCmd, err = prepareCmdNoArgs("stop", TxId)
-
-    case "step_into", "si":
-      xdebugCmd, err = prepareCmdNoArgs("step_into", TxId)
-
-    case "step_out", "so":
-      xdebugCmd, err = prepareCmdNoArgs("step_out", TxId)
-
-    case "step_over", "sov", "sv":
-      xdebugCmd, err = prepareCmdNoArgs("step_over", TxId)
+      DBGpCmd, err = prepareBreakpointCmd(args, TxId)
 
     case "eval", "ev":
-      xdebugCmd, err = prepareEvalCmd(args, TxId)
+      DBGpCmd, err = prepareEvalCmd(args, TxId)
+
+    case "run", "r":
+      DBGpCmd, err = prepareCmdNoArgs("run", TxId)
+
+    case "source", "src", "sr":
+      DBGpCmd, err = prepareSourceCmd(args, TxId)
+
+    case "status", "s":
+      DBGpCmd, err = prepareCmdNoArgs("status", TxId)
+
+    case "stop", "st":
+      DBGpCmd, err = prepareCmdNoArgs("stop", TxId)
+
+    case "step_into", "si":
+      DBGpCmd, err = prepareCmdNoArgs("step_into", TxId)
+
+    case "step_out", "so":
+      DBGpCmd, err = prepareCmdNoArgs("step_out", TxId)
+
+    case "step_over", "sov", "sv":
+      DBGpCmd, err = prepareCmdNoArgs("step_over", TxId)
 
     default:
-      xdebugCmd, err = "", fmt.Errorf("Unknown command: %s", cmd)
+      DBGpCmd, err = "", fmt.Errorf("Unknown command: %s", cmd)
   }
 
-  return xdebugCmd, err
+  return DBGpCmd, err
 }
 
 /**
- * Determine the transaction ID for the next xdebug command.
+ * Determine the transaction ID for the next DBGp command.
  *
  * @return int
  */
@@ -85,52 +84,71 @@ func fetchNextTxId() (nextTxId int) {
 }
 
 /**
- * The full xdebug breakpoint command.
+ * The DBGp Breakpoint command.
  */
-func prepareBreakpointCmd(args []string, TxId int) (xdebug_cmd string, err error) {
+func prepareBreakpointCmd(args []string, TxId int) (DBGpCmd string, err error) {
 
   if 2 > len(args) {
-    return xdebug_cmd, fmt.Errorf("Need at least two args for preparing breakpoint cmd.")
+    return DBGpCmd, fmt.Errorf("Need at least two args for preparing breakpoint cmd.")
   }
 
-  filepath    := args[0]
-  line_number := args[1]
+  filepath   := args[0]
+  lineNumber := args[1]
 
-  xdebug_cmd = fmt.Sprintf("breakpoint_set -i %d -t line -f %s -n %s\x00", TxId, filepath, line_number)
+  DBGpCmd = fmt.Sprintf("breakpoint_set -i %d -t line -f %s -n %s\x00", TxId, filepath, lineNumber)
 
-  return xdebug_cmd, err
+  return DBGpCmd, err
 }
 
 /**
- * Xdebug eval command.
+ * DBGp Eval command.
  */
-func prepareEvalCmd(args []string, TxId int) (xdebug_cmd string, err error) {
+func prepareEvalCmd(args []string, TxId int) (DBGpCmd string, err error) {
 
   if 0 == len(args) {
-    return xdebug_cmd, fmt.Errorf("Unsufficient number of args for eval.")
+    return DBGpCmd, fmt.Errorf("Unsufficient number of args for eval.")
   }
 
-  xdebug_cmd = fmt.Sprintf("eval -i %d -- %s\x00", TxId, args[0])
+  DBGpCmd = fmt.Sprintf("eval -i %d -- %s\x00", TxId, args[0])
 
-  return xdebug_cmd, err
+  return DBGpCmd, err
 }
 
 /**
- * Any Xdebug command that does not take any argument other than the TX ID.
+ * DBGp Source command.
+ */
+func prepareSourceCmd(args []string, TxId int) (DBGpCmd string, err error) {
+
+  if 2 != len(args) {
+    err = fmt.Errorf("Unsufficient number of args for source.")
+    return DBGpCmd, err
+  }
+
+  beginLine, err := strconv.ParseInt(args[0], 10, 64)
+  lineCount, err := strconv.ParseInt(args[1], 10, 64)
+  endLine        := beginLine + lineCount
+
+  DBGpCmd = fmt.Sprintf("source -i %d -b %d -e %d\x00", TxId, beginLine, endLine)
+
+  return DBGpCmd, err
+}
+
+/**
+ * Any DBGp command that does not take any argument other than the TX ID.
  *
  * Example: run, stop, etc.
  */
-func prepareCmdNoArgs(cmd string, TxId int) (xdebugCmd string, err error) {
+func prepareCmdNoArgs(cmd string, TxId int) (DBGpCmd string, err error) {
 
   cmd = strings.TrimSpace(cmd)
 
   if "" == cmd {
     err = fmt.Errorf("Command cannot be empty.")
 
-    return xdebugCmd, err
+    return DBGpCmd, err
   }
 
-  xdebugCmd = fmt.Sprintf("%s -i %d\x00", cmd, TxId)
+  DBGpCmd = fmt.Sprintf("%s -i %d\x00", cmd, TxId)
 
-  return xdebugCmd, err
+  return DBGpCmd, err
 }

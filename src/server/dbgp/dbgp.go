@@ -15,7 +15,7 @@ import (
 /**
  * Read message from DBGp engine over a network connection.
  *
- * Xdebug message format: Int Null XML-Snippet NULL
+ * DBGp message format: Int Null XML-Snippet NULL
  */
 func Read(connection io.Reader) (msg string, err error) {
 

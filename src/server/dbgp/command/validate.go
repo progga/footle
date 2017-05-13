@@ -26,8 +26,14 @@ func Validate(cmd string, args []string) (err error) {
     case "breakpoint_set", "b":
       err = validateBreakpointArgs(args)
 
+    case "eval", "ev":
+      err = validateCmdWithNoArg("eval", args)
+
     case "run", "r":
       err = validateCmdWithNoArg("run", args)
+
+    case "source", "src", "sr":
+      err = validateSourceArgs(args)
 
     case "stop", "st":
       err = validateCmdWithNoArg("stop", args)
@@ -43,9 +49,6 @@ func Validate(cmd string, args []string) (err error) {
 
     case "step_over", "sov", "sv":
       err = validateCmdWithNoArg("step_over", args)
-
-    case "eval", "ev":
-      err = validateCmdWithNoArg("eval", args)
   }
 
   return err
@@ -78,6 +81,34 @@ func validateCmdWithNoArg(cmd string, args []string) (err error) {
 
   if 0 != len(args) {
     err = fmt.Errorf("The \"%s\" command does not take any argument.", cmd)
+  }
+
+  return err
+}
+
+/**
+ * Validate the Source command.
+ *
+ * Valid format: source line-number line-count
+ * Example: source 14 5
+ *   This should return 5 lines starting at line number 14.
+ */
+func validateSourceArgs(args []string) (err error) {
+
+  if 2 != len(args) {
+    err = fmt.Errorf("The \"source\" command takes two numbers as argument.")
+    return err
+  }
+
+  lineNumber, err := strconv.ParseInt(args[0], 10, 64)
+  lineCount, err  := strconv.ParseInt(args[1], 10, 64)
+
+  if lineNumber < 1 {
+    err = fmt.Errorf("Invalid line number.")
+  }
+
+  if lineCount < 1 {
+    err = fmt.Errorf("Invalid line count.")
   }
 
   return err

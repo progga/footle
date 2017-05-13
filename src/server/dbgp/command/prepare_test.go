@@ -65,7 +65,7 @@ func TestPrepareEvalCmd(t *testing.T) {
 
   expected := "eval -i 4 -- $a = 2 + 2\x00"
   if expected != cmd {
-    t.Errorf("Eval command preparation failed.")
+    t.Error("Eval command preparation failed.")
   }
 
   // Fail case.
@@ -79,6 +79,20 @@ func TestPrepareEvalCmd(t *testing.T) {
 }
 
 /**
+ * Tests for prepareSourceCmd().
+ */
+func TestPrepareSourceCmd(t *testing.T) {
+
+  TxId := 4
+  cmd, _ := prepareSourceCmd([]string {"10", "2"}, TxId)
+
+  expected := "source -i 4 -b 10 -e 12\x00"
+  if expected != cmd {
+    t.Errorf("Source command preparation failed. Expected: %s, got: %s", expected, cmd)
+  }
+}
+
+/**
  * Tests for prepareCmdNoArgs().
  */
 func TestPrepareCmdNoArgs(t *testing.T) {
@@ -86,10 +100,10 @@ func TestPrepareCmdNoArgs(t *testing.T) {
   // Pass case.
   cmd  := "foo"
   TxId := 33
-  xdebugCmd, _ := prepareCmdNoArgs(cmd, TxId)
+  DBGpCmd, _ := prepareCmdNoArgs(cmd, TxId)
 
   expected := "foo -i 33\x00"
-  if expected != xdebugCmd {
+  if expected != DBGpCmd {
     t.Error("prepareCmdNoArgs(foo, 33) != foo -i 33")
   }
 
