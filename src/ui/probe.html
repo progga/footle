@@ -1,0 +1,54 @@
+<!docroot html>
+<html>
+  <head>
+    <title>Probe for the DBGp debugger.</title>
+
+    <link rel="stylesheet" href="style/css/probe.css" />
+  </head>
+
+  <body>
+    <div class="command-post">
+      <form>
+        <label class="form-label" for="msg">Command:</label>
+        <input type="text" name="msg" placeholder="Message" autofocus="true" required />
+
+        <button id="send-btn">Send</button>
+      </form>
+    </div>
+
+    <div class="responses">
+    </div>
+
+    <script type="text/javascript" src="libs/bower_components/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript">
+      jQuery(function() {
+        jQuery('#send-btn').click(function(e) {
+          e.preventDefault();
+
+          var msg = jQuery('input[name="msg"]').val();
+
+          jQuery.ajax({
+            url: "steering-wheel",
+            method: "POST",
+            data: {
+              "msg": msg,
+            }
+          });
+        });
+
+        var sse = new EventSource("/message-stream");
+        jQuery(sse).on('message', function(event) {
+          jQuery('.responses').prepend('<p class="msg">' + event.originalEvent.data + '</p>');
+        });
+        jQuery(sse).on('close', function(event) {
+          jQuery('.responses').prepend('<p class="msg">The end.</p>');
+          sse.close();
+        });
+        jQuery(sse).on('error', function(event) {
+          jQuery('.responses').prepend('<p class="msg">The error.</p>');
+          sse.close();
+        });
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,19 @@
+
+@import "../../libs/bower_components/uikit/scss/uikit-mixins.scss";
+
+.command-post {
+  margin: 1.5rem 0.5rem 1rem;
+  max-width: 30rem;
+  border-bottom: solid thin #222;
+}
+.responses {
+  margin: 1.5rem 0.5rem 1rem;
+  max-width: 30rem;
+}
+.msg {
+  padding: .1rem .5rem;
+  border-radius: 3px;
+  background-color: #EFEFEF;
+}
+
+@import "../../libs/bower_components/uikit/scss/uikit.scss";
