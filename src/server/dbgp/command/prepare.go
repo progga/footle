@@ -29,7 +29,7 @@ var lastTxId int
  * Example: "b /home/foo/php/bar.php 9" becomes
  * "breakpoint_set -i 1 -t line -f /home/foo/php/bar.php -n 9"
  */
-func Prepare(cmd string, args []string) (DBGpCmd string, err error) {
+func PrepareDBGpCmd(cmd string, args []string) (DBGpCmd string, err error) {
 
   TxId := fetchNextTxId()
 

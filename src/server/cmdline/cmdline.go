@@ -9,13 +9,10 @@ import (
   "encoding/base64"
   "fmt"
   "log"
-  "strings"
   "github.com/chzyer/readline"
   "../dbgp/command"
   "../dbgp/message"
 )
-
-const space = " "
 
 /**
  * Stored DBGp messages.
@@ -78,9 +75,13 @@ func RunUI(out chan<- string, bye chan struct{}) {
       continue
     }
 
-    cmd = strings.TrimSpace(cmd)
+    shortCmd, cmdArgs, err := command.Break(cmd)
+    if nil != err {
+      fmt.Println(err)
+      continue
+    }
 
-    if "bye" == cmd || "quit" == cmd || "q" == cmd {
+    if "bye" == shortCmd || "quit" == shortCmd || "q" == shortCmd {
       close(bye)
 
       return
@@ -88,19 +89,7 @@ func RunUI(out chan<- string, bye chan struct{}) {
       continue
     }
 
-    cmdParts := strings.Split(cmd, space)
-    if len(cmdParts) < 1 {
-      continue
-    }
-
-    footleCmd := cmdParts[0]
-    cmdArgs   := cmdParts[1:]
-    if err = command.Validate(footleCmd, cmdArgs); nil != err {
-      fmt.Println(err)
-      continue
-    }
-
-    DBGpCmd, err := command.Prepare(footleCmd, cmdArgs)
+    DBGpCmd, err := command.Prepare(shortCmd, cmdArgs)
     if nil != err {
       fmt.Println(err)
       continue
