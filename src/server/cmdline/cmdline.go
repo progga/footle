@@ -1,4 +1,3 @@
-
 /**
  * Command line user interface for a DBGp debugger.
  */
@@ -6,12 +5,12 @@
 package cmdline
 
 import (
-  "encoding/base64"
-  "fmt"
-  "log"
-  "github.com/chzyer/readline"
-  "../dbgp/command"
-  "../dbgp/message"
+	"../dbgp/command"
+	"../dbgp/message"
+	"encoding/base64"
+	"fmt"
+	"github.com/chzyer/readline"
+	"log"
 )
 
 /**
@@ -48,55 +47,55 @@ var incomingMsgQueue []message.Message
  */
 func RunUI(out chan<- string, bye chan struct{}) {
 
-  rl, err := readline.New("> ")
-  if nil != err {
-    log.Fatal(err)
-  }
+	rl, err := readline.New("> ")
+	if nil != err {
+		log.Fatal(err)
+	}
 
-  for {
-    if len(incomingMsgQueue) > 0 {
-      // First, display all messages stored in the queue.
-      for _, msg := range incomingMsgQueue {
-        fmt.Println(msg)
+	for {
+		if len(incomingMsgQueue) > 0 {
+			// First, display all messages stored in the queue.
+			for _, msg := range incomingMsgQueue {
+				fmt.Println(msg)
 
-        // Some commands such as "source" send XML character data
-        // as inner XML content.
-        decoded, err := base64.StdEncoding.DecodeString(msg.Content)
-        if nil == err && 0 < len(decoded) {
-          fmt.Printf("%s", string(decoded))
-        }
-      }
-      incomingMsgQueue = incomingMsgQueue[:0]
-    }
+				// Some commands such as "source" send XML character data
+				// as inner XML content.
+				decoded, err := base64.StdEncoding.DecodeString(msg.Content)
+				if nil == err && 0 < len(decoded) {
+					fmt.Printf("%s", string(decoded))
+				}
+			}
+			incomingMsgQueue = incomingMsgQueue[:0]
+		}
 
-    cmd, err := rl.Readline()
-    if nil != err {
-      fmt.Println(err)
-      continue
-    }
+		cmd, err := rl.Readline()
+		if nil != err {
+			fmt.Println(err)
+			continue
+		}
 
-    shortCmd, cmdArgs, err := command.Break(cmd)
-    if nil != err {
-      fmt.Println(err)
-      continue
-    }
+		shortCmd, cmdArgs, err := command.Break(cmd)
+		if nil != err {
+			fmt.Println(err)
+			continue
+		}
 
-    if "bye" == shortCmd || "quit" == shortCmd || "q" == shortCmd {
-      close(bye)
+		if "bye" == shortCmd || "quit" == shortCmd || "q" == shortCmd {
+			close(bye)
 
-      return
-    } else if "refresh" == cmd || "" == cmd {
-      continue
-    }
+			return
+		} else if "refresh" == cmd || "" == cmd {
+			continue
+		}
 
-    DBGpCmd, err := command.Prepare(shortCmd, cmdArgs)
-    if nil != err {
-      fmt.Println(err)
-      continue
-    }
+		DBGpCmd, err := command.Prepare(shortCmd, cmdArgs)
+		if nil != err {
+			fmt.Println(err)
+			continue
+		}
 
-    out <- DBGpCmd
-  }
+		out <- DBGpCmd
+	}
 }
 
 /**
@@ -106,8 +105,8 @@ func RunUI(out chan<- string, bye chan struct{}) {
  */
 func UpdateUIStatus(in <-chan message.Message) {
 
-  for msg := range in {
-    // @todo Lock the queue before updating.
-    incomingMsgQueue = append(incomingMsgQueue, msg)
-  }
+	for msg := range in {
+		// @todo Lock the queue before updating.
+		incomingMsgQueue = append(incomingMsgQueue, msg)
+	}
 }

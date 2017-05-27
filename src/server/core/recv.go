@@ -1,4 +1,3 @@
-
 /**
  * Functions for receiving messages from DBGp engine.
  */
@@ -6,10 +5,10 @@
 package core
 
 import (
-  "log"
-  "net"
-  "../dbgp"
-  "../dbgp/message"
+	"../dbgp"
+	"../dbgp/message"
+	"log"
+	"net"
 )
 
 /**
@@ -17,22 +16,22 @@ import (
  */
 func RecvMsgsFromDBGpEngine(sock net.Listener, activeDBGpConnection *net.Conn, MsgsForCmdLineUI, MsgsForHTTPUI chan<- message.Message) {
 
-  for {
-    *activeDBGpConnection = StartTalkingToDBGpEngine(sock)
+	for {
+		*activeDBGpConnection = StartTalkingToDBGpEngine(sock)
 
-    for {
-      msg, err := dbgp.Read(*activeDBGpConnection)
-      if len(msg) == 0 || nil != err {
-        break
-      }
+		for {
+			msg, err := dbgp.Read(*activeDBGpConnection)
+			if len(msg) == 0 || nil != err {
+				break
+			}
 
-      if parsedMsg, err := message.Decode(msg); nil == err {
-        BroadcastMsgToUIs(parsedMsg, MsgsForCmdLineUI, MsgsForHTTPUI)
-      }
-    }
+			if parsedMsg, err := message.Decode(msg); nil == err {
+				BroadcastMsgToUIs(parsedMsg, MsgsForCmdLineUI, MsgsForHTTPUI)
+			}
+		}
 
-    (*activeDBGpConnection).Close()
-  }
+		(*activeDBGpConnection).Close()
+	}
 }
 
 /**
@@ -40,12 +39,12 @@ func RecvMsgsFromDBGpEngine(sock net.Listener, activeDBGpConnection *net.Conn, M
  */
 func StartTalkingToDBGpEngine(sock net.Listener) (connection net.Conn) {
 
-  connection, err := sock.Accept();
-  if nil != err {
-    log.Fatal(err)
-  }
+	connection, err := sock.Accept()
+	if nil != err {
+		log.Fatal(err)
+	}
 
-  return connection
+	return connection
 }
 
 /**
@@ -55,11 +54,11 @@ func StartTalkingToDBGpEngine(sock net.Listener) (connection net.Conn) {
  */
 func BroadcastMsgToUIs(msg message.Message, toCmdLine, toHTTP chan<- message.Message) {
 
-  if nil != toCmdLine {
-    toCmdLine <- msg
-  }
+	if nil != toCmdLine {
+		toCmdLine <- msg
+	}
 
-  if nil != toHTTP {
-    toHTTP    <- msg
-  }
+	if nil != toHTTP {
+		toHTTP <- msg
+	}
 }

@@ -1,4 +1,3 @@
-
 /**
  * Tests for command validation.
  *
@@ -14,24 +13,24 @@ import "testing"
  */
 func TestValidateBreakpointArgs(t *testing.T) {
 
-  // Pass case.
-  err := validateBreakpointArgs([]string {
-    "/home/foo/bar.php",
-    "28",
-  })
+	// Pass case.
+	err := validateBreakpointArgs([]string{
+		"/home/foo/bar.php",
+		"28",
+	})
 
-  if nil != err {
-    t.Error(err)
-  }
+	if nil != err {
+		t.Error(err)
+	}
 
-  // Fail case.
-  err = validateBreakpointArgs([]string{
-    "/home/foo/bar.php",
-  })
+	// Fail case.
+	err = validateBreakpointArgs([]string{
+		"/home/foo/bar.php",
+	})
 
-  if nil == err {
-    t.Error("Failed to spot missing argument for the breakpoint_set command.")
-  }
+	if nil == err {
+		t.Error("Failed to spot missing argument for the breakpoint_set command.")
+	}
 }
 
 /**
@@ -39,21 +38,20 @@ func TestValidateBreakpointArgs(t *testing.T) {
  */
 func TestValidateCmdWithNoArg(t *testing.T) {
 
-  err := validateCmdWithNoArg("run", []string {
-  })
+	err := validateCmdWithNoArg("run", []string{})
 
-  if nil != err {
-    t.Error(err)
-  }
+	if nil != err {
+		t.Error(err)
+	}
 
-  err = validateCmdWithNoArg("run", []string {
-    "foo",
-    "bar",
-  })
+	err = validateCmdWithNoArg("run", []string{
+		"foo",
+		"bar",
+	})
 
-  if nil == err {
-    t.Error("Failed to spot non-zero arguments for the \"run\" command.")
-  }
+	if nil == err {
+		t.Error("Failed to spot non-zero arguments for the \"run\" command.")
+	}
 }
 
 /**
@@ -61,24 +59,24 @@ func TestValidateCmdWithNoArg(t *testing.T) {
  */
 func TestValidateSourceArgs(t *testing.T) {
 
-  // Pass case.
-  err := validateSourceArgs([]string { "10", "5" })
+	// Pass case.
+	err := validateSourceArgs([]string{"10", "5"})
 
-  if nil != err {
-    t.Error(err)
-  }
+	if nil != err {
+		t.Error(err)
+	}
 
-  // Fail case.
-  err = validateSourceArgs([]string {})
+	// Fail case.
+	err = validateSourceArgs([]string{})
 
-  if nil == err {
-    t.Error("Failed to spot lack of arguments.")
-  }
+	if nil == err {
+		t.Error("Failed to spot lack of arguments.")
+	}
 
-  // Fail case.
-  err = validateSourceArgs([]string {"1"})
+	// Fail case.
+	err = validateSourceArgs([]string{"1"})
 
-  if nil == err {
-    t.Error("Failed to spot insufficient number of arguments.")
-  }
+	if nil == err {
+		t.Error("Failed to spot insufficient number of arguments.")
+	}
 }

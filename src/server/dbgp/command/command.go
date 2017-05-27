@@ -1,4 +1,3 @@
-
 /**
  * Command pkg.  Turns short commands into full blown DBGp commands.
  */
@@ -6,8 +5,8 @@
 package command
 
 import (
-  "fmt"
-  "strings"
+	"fmt"
+	"strings"
 )
 
 const space = " "
@@ -26,20 +25,20 @@ const space = " "
  */
 func Break(cmd string) (shortCmd string, cmdArgs []string, err error) {
 
-  trimmedCmd := strings.TrimSpace(cmd)
+	trimmedCmd := strings.TrimSpace(cmd)
 
-  cmdParts := strings.Split(trimmedCmd, space)
+	cmdParts := strings.Split(trimmedCmd, space)
 
-  if len(cmdParts) < 1 {
-    err = fmt.Errorf("Cannot break short command %s", cmd)
+	if len(cmdParts) < 1 {
+		err = fmt.Errorf("Cannot break short command %s", cmd)
 
-    return shortCmd, cmdArgs, err
-  }
+		return shortCmd, cmdArgs, err
+	}
 
-  shortCmd = cmdParts[0]
-  cmdArgs  = cmdParts[1:]
+	shortCmd = cmdParts[0]
+	cmdArgs = cmdParts[1:]
 
-  return shortCmd, cmdArgs, err
+	return shortCmd, cmdArgs, err
 }
 
 /**
@@ -50,11 +49,11 @@ func Break(cmd string) (shortCmd string, cmdArgs []string, err error) {
  */
 func Prepare(shortCmd string, cmdArgs []string) (DBGpCmd string, err error) {
 
-  if err = Validate(shortCmd, cmdArgs); nil != err {
-    return DBGpCmd, err
-  }
+	if err = Validate(shortCmd, cmdArgs); nil != err {
+		return DBGpCmd, err
+	}
 
-  DBGpCmd, err = PrepareDBGpCmd(shortCmd, cmdArgs)
+	DBGpCmd, err = PrepareDBGpCmd(shortCmd, cmdArgs)
 
-  return DBGpCmd, err
+	return DBGpCmd, err
 }

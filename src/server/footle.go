@@ -1,4 +1,3 @@
-
 /**
  * Footle the DBGp debugger.
  *
@@ -9,12 +8,12 @@
 package main
 
 import (
-  "flag"
-  "net"
-  "./cmdline"
-  "./core"
-  "./http"
-  "./dbgp/message"
+	"./cmdline"
+	"./core"
+	"./dbgp/message"
+	"./http"
+	"flag"
+	"net"
 )
 
 /**
@@ -26,38 +25,38 @@ import (
  */
 func main() {
 
-  // Setup command line flags and arguments.
-  docroot, hasCmdLine, hasHTTP := getFlagsAndArgs()
+	// Setup command line flags and arguments.
+	docroot, hasCmdLine, hasHTTP := getFlagsAndArgs()
 
-  // Initializations.
-  var activeDBGpConnection net.Conn
+	// Initializations.
+	var activeDBGpConnection net.Conn
 
-  var MsgsForCmdLineUI, MsgsForHTTPUI chan message.Message
+	var MsgsForCmdLineUI, MsgsForHTTPUI chan message.Message
 
-  CmdsFromUI := make(chan string)
-  bye        := make(chan struct{})
+	CmdsFromUI := make(chan string)
+	bye := make(chan struct{})
 
-  // Launch all interfaces.
-  if hasCmdLine {
-    MsgsForCmdLineUI = make(chan message.Message)
+	// Launch all interfaces.
+	if hasCmdLine {
+		MsgsForCmdLineUI = make(chan message.Message)
 
-    go cmdline.RunUI(CmdsFromUI, bye)
-    go cmdline.UpdateUIStatus(MsgsForCmdLineUI)
-  }
+		go cmdline.RunUI(CmdsFromUI, bye)
+		go cmdline.UpdateUIStatus(MsgsForCmdLineUI)
+	}
 
-  if hasHTTP {
-    MsgsForHTTPUI = make(chan message.Message)
+	if hasHTTP {
+		MsgsForHTTPUI = make(chan message.Message)
 
-    go http.Listen(docroot, CmdsFromUI)
-    go http.Tell(MsgsForHTTPUI)
-  }
+		go http.Listen(docroot, CmdsFromUI)
+		go http.Tell(MsgsForHTTPUI)
+	}
 
-  // Talk to DBGp engine.
-  sock := core.ListenForDBGpEngine()
-  go core.RecvMsgsFromDBGpEngine(sock, &activeDBGpConnection, MsgsForCmdLineUI, MsgsForHTTPUI)
-  go core.SendCmdsToDBGpEngine(&activeDBGpConnection, CmdsFromUI)
+	// Talk to DBGp engine.
+	sock := core.ListenForDBGpEngine()
+	go core.RecvMsgsFromDBGpEngine(sock, &activeDBGpConnection, MsgsForCmdLineUI, MsgsForHTTPUI)
+	go core.SendCmdsToDBGpEngine(&activeDBGpConnection, CmdsFromUI)
 
-  <- bye
+	<-bye
 }
 
 /**
@@ -74,15 +73,15 @@ func main() {
  */
 func getFlagsAndArgs() (docroot string, hasCmdLine, hasHTTP bool) {
 
-  docrootArg     := flag.String("docroot", "", "Path of directory whose code you want to debug; e.g. /var/www/html/")
-  hasCmdLineFlag := flag.Bool("cmdline", false, "Launch command line debugger.")
-  noHTTPFlag     := flag.Bool("nohttp", false, "Do *not* launch HTTP interface of the debugger.")
+	docrootArg := flag.String("docroot", "", "Path of directory whose code you want to debug; e.g. /var/www/html/")
+	hasCmdLineFlag := flag.Bool("cmdline", false, "Launch command line debugger.")
+	noHTTPFlag := flag.Bool("nohttp", false, "Do *not* launch HTTP interface of the debugger.")
 
-  flag.Parse()
+	flag.Parse()
 
-  docroot    = *docrootArg
-  hasCmdLine = *hasCmdLineFlag
-  hasHTTP    = ! *noHTTPFlag
+	docroot = *docrootArg
+	hasCmdLine = *hasCmdLineFlag
+	hasHTTP = !*noHTTPFlag
 
-  return docroot, hasCmdLine, hasHTTP
+	return docroot, hasCmdLine, hasHTTP
 }

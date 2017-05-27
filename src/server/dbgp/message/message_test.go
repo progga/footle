@@ -1,4 +1,3 @@
-
 /**
  * Tests for DBGp message decoding.
  */
@@ -12,8 +11,8 @@ import "testing"
  */
 func TestDecode(t *testing.T) {
 
-  xml :=
-`<?xml version="1.0" encoding="iso-8859-1"?>
+	xml :=
+		`<?xml version="1.0" encoding="iso-8859-1"?>
 <init xmlns="urn:debugger_protocol_v1" xmlns:xdebug="http://xdebug.org/dbgp/xdebug"
   fileuri="file:///srv/www/drupal/drupal8/index.php"
   language="PHP"
@@ -25,17 +24,17 @@ func TestDecode(t *testing.T) {
   <copyright><![CDATA[Copyright (c) 2002-2014 by Derick Rethans]]></copyright>
 </init>`
 
-  message, err := Decode(xml)
-  if nil != err {
-    t.Error(err)
-  }
+	message, err := Decode(xml)
+	if nil != err {
+		t.Error(err)
+	}
 
-  if nil != err && "init" != message.Message_type {
-    t.Error("Missed Init message.")
-  }
+	if nil != err && "init" != message.Message_type {
+		t.Error("Missed Init message.")
+	}
 
-  xml =
-`<?xml version="1.0" encoding="iso-8859-1"?>
+	xml =
+		`<?xml version="1.0" encoding="iso-8859-1"?>
 <response xmlns="urn:debugger_protocol_v1" xmlns:xdebug="http://xdebug.org/dbgp/xdebug"
   command="run"
   transaction_id="3"
@@ -47,33 +46,33 @@ func TestDecode(t *testing.T) {
   </xdebug:message>
 </response>`
 
-  message, err = Decode(xml)
-  if nil != err {
-    t.Error(err)
-  }
+	message, err = Decode(xml)
+	if nil != err {
+		t.Error(err)
+	}
 
-  if nil != err && "response" != message.Message_type {
-    t.Error("Missed Response message.")
-  }
+	if nil != err && "response" != message.Message_type {
+		t.Error("Missed Response message.")
+	}
 
-  if nil != err && 14 != message.Properties.Line_number {
-    t.Error("Missed line number.")
-  }
+	if nil != err && 14 != message.Properties.Line_number {
+		t.Error("Missed line number.")
+	}
 
-  xml =
-`<foo
+	xml =
+		`<foo
   command="run"
   transaction_id="3"
   status="break"
   reason="ok">
 </foo>`
 
-  message, err = Decode(xml)
-  if nil == err {
-    t.Error("Missed unknown message.")
-  } else {
-    t.Log(err)
-  }
+	message, err = Decode(xml)
+	if nil == err {
+		t.Error("Missed unknown message.")
+	} else {
+		t.Log(err)
+	}
 }
 
 /**
@@ -81,8 +80,8 @@ func TestDecode(t *testing.T) {
  */
 func TestDecodeInit(t *testing.T) {
 
-  xml :=
-`<?xml version="1.0" encoding="iso-8859-1"?>
+	xml :=
+		`<?xml version="1.0" encoding="iso-8859-1"?>
 <init xmlns="urn:debugger_protocol_v1" xmlns:xdebug="http://xdebug.org/dbgp/xdebug"
   fileuri="file:///srv/www/drupal/drupal8/index.php"
   language="PHP"
@@ -94,14 +93,14 @@ func TestDecodeInit(t *testing.T) {
   <copyright><![CDATA[Copyright (c) 2002-2014 by Derick Rethans]]></copyright>
 </init>`
 
-  init, err := decodeInit(xml)
-  if nil != err {
-    t.Error(err)
-  }
+	init, err := decodeInit(xml)
+	if nil != err {
+		t.Error(err)
+	}
 
-  if "file:///srv/www/drupal/drupal8/index.php" != init.FileURI {
-    t.Error(`parseInit(<init ... fileuri="file:///srv/www/drupal/drupal8/index.php""...>...</init>) cannot find file URI.`)
-  }
+	if "file:///srv/www/drupal/drupal8/index.php" != init.FileURI {
+		t.Error(`parseInit(<init ... fileuri="file:///srv/www/drupal/drupal8/index.php""...>...</init>) cannot find file URI.`)
+	}
 }
 
 /**
@@ -109,8 +108,8 @@ func TestDecodeInit(t *testing.T) {
  */
 func TestDecodeResponse(t *testing.T) {
 
-  xml :=
-`<?xml version="1.0" encoding="iso-8859-1"?>
+	xml :=
+		`<?xml version="1.0" encoding="iso-8859-1"?>
 <init xmlns="urn:debugger_protocol_v1" xmlns:xdebug="http://xdebug.org/dbgp/xdebug"
   fileuri="file:///srv/www/drupal/drupal8/index.php"
   language="PHP"
@@ -122,12 +121,12 @@ func TestDecodeResponse(t *testing.T) {
   <copyright><![CDATA[Copyright (c) 2002-2014 by Derick Rethans]]></copyright>
 </init>`
 
-  if _, err := decodeResponse(xml); nil == err {
-    t.Error(err)
-  }
+	if _, err := decodeResponse(xml); nil == err {
+		t.Error(err)
+	}
 
-  xml =
-`<?xml version="1.0" encoding="iso-8859-1"?>
+	xml =
+		`<?xml version="1.0" encoding="iso-8859-1"?>
 <response xmlns="urn:debugger_protocol_v1" xmlns:xdebug="http://xdebug.org/dbgp/xdebug"
   command="status"
   transaction_id="0"
@@ -135,12 +134,12 @@ func TestDecodeResponse(t *testing.T) {
   reason="ok">
 </response>`
 
-  response, err := decodeResponse(xml);
-  if nil != err {
-    t.Error(err)
-  }
+	response, err := decodeResponse(xml)
+	if nil != err {
+		t.Error(err)
+	}
 
-  if "status" != response.Command {
-    t.Error(`parseResponse(<response ... command="status"...></response>): Command is not "status"`)
-  }
+	if "status" != response.Command {
+		t.Error(`parseResponse(<response ... command="status"...></response>): Command is not "status"`)
+	}
 }

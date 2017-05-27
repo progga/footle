@@ -1,4 +1,3 @@
-
 /**
  * Functions for sending DBGp commands to DBGp engine.
  */
@@ -6,9 +5,9 @@
 package core
 
 import (
-  "net"
-  "log"
-  "fmt"
+	"fmt"
+	"log"
+	"net"
 )
 
 /**
@@ -16,20 +15,20 @@ import (
  */
 func SendCmdsToDBGpEngine(conn *net.Conn, in <-chan string) {
 
-  for DBGpCmd := range in {
-    connection := *conn
+	for DBGpCmd := range in {
+		connection := *conn
 
-    if isActiveConnection(connection) {
-      writeCount, err := connection.Write([]byte(DBGpCmd))
-      _ = writeCount
+		if isActiveConnection(connection) {
+			writeCount, err := connection.Write([]byte(DBGpCmd))
+			_ = writeCount
 
-      if nil != err {
-        log.Fatal(err)
-      }
-    } else {
-      fmt.Println("Inactive connection.")
-    }
-  }
+			if nil != err {
+				log.Fatal(err)
+			}
+		} else {
+			fmt.Println("Inactive connection.")
+		}
+	}
 }
 
 /**
@@ -39,16 +38,16 @@ func SendCmdsToDBGpEngine(conn *net.Conn, in <-chan string) {
  */
 func isActiveConnection(connection net.Conn) bool {
 
-  ignore := []byte{}
+	ignore := []byte{}
 
-  if nil == connection {
-    return false
-  }
+	if nil == connection {
+		return false
+	}
 
-  if readCount, err := connection.Write(ignore); nil != err {
-    _ = readCount
-    return false
-  }
+	if readCount, err := connection.Write(ignore); nil != err {
+		_ = readCount
+		return false
+	}
 
-  return true
+	return true
 }

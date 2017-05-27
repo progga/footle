@@ -1,4 +1,3 @@
-
 /**
  * Tests for DBGp command preparation.
  */
@@ -12,20 +11,20 @@ import "testing"
  */
 func TestFetchNextTxId(t *testing.T) {
 
-  TxId := fetchNextTxId()
-  if 1 != TxId {
-    t.Errorf("Expected TxId value of 1, got %q", TxId)
-  }
+	TxId := fetchNextTxId()
+	if 1 != TxId {
+		t.Errorf("Expected TxId value of 1, got %q", TxId)
+	}
 
-  TxId = fetchNextTxId()
-  if 2 != TxId {
-    t.Errorf("Expected TxId value of 2, got %q", TxId)
-  }
+	TxId = fetchNextTxId()
+	if 2 != TxId {
+		t.Errorf("Expected TxId value of 2, got %q", TxId)
+	}
 
-  TxId = fetchNextTxId()
-  if 3 != TxId {
-    t.Errorf("Expected TxId value of 3, got %q", TxId)
-  }
+	TxId = fetchNextTxId()
+	if 3 != TxId {
+		t.Errorf("Expected TxId value of 3, got %q", TxId)
+	}
 }
 
 /**
@@ -33,22 +32,22 @@ func TestFetchNextTxId(t *testing.T) {
  */
 func TestPrepareBreakpointCmd(t *testing.T) {
 
-  // Pass case.
-  cmd, _ := prepareBreakpointCmd([]string {
-    "/home/foo/code/php/bar.php",
-    "9",
-  }, 5)
+	// Pass case.
+	cmd, _ := prepareBreakpointCmd([]string{
+		"/home/foo/code/php/bar.php",
+		"9",
+	}, 5)
 
-  expected_cmd := "breakpoint_set -i 5 -t line -f /home/foo/code/php/bar.php -n 9\x00"
-  if cmd != expected_cmd {
-    t.Errorf("Incorrect breakpoint command. Expected %q, got %q.", expected_cmd, cmd)
-  }
+	expected_cmd := "breakpoint_set -i 5 -t line -f /home/foo/code/php/bar.php -n 9\x00"
+	if cmd != expected_cmd {
+		t.Errorf("Incorrect breakpoint command. Expected %q, got %q.", expected_cmd, cmd)
+	}
 
-  // Fail case.
-  cmd, err := prepareBreakpointCmd([]string {"foo"}, 3)
-  if nil == err {
-    t.Error("Missed insufficient number of args.")
-  }
+	// Fail case.
+	cmd, err := prepareBreakpointCmd([]string{"foo"}, 3)
+	if nil == err {
+		t.Error("Missed insufficient number of args.")
+	}
 }
 
 /**
@@ -58,24 +57,24 @@ func TestPrepareBreakpointCmd(t *testing.T) {
  */
 func TestPrepareEvalCmd(t *testing.T) {
 
-  // Pass case.
-  args := []string {"$a = 2 + 2"}
-  TxId := 4
-  cmd, err := prepareEvalCmd(args, TxId)
+	// Pass case.
+	args := []string{"$a = 2 + 2"}
+	TxId := 4
+	cmd, err := prepareEvalCmd(args, TxId)
 
-  expected := "eval -i 4 -- $a = 2 + 2\x00"
-  if expected != cmd {
-    t.Error("Eval command preparation failed.")
-  }
+	expected := "eval -i 4 -- $a = 2 + 2\x00"
+	if expected != cmd {
+		t.Error("Eval command preparation failed.")
+	}
 
-  // Fail case.
-  args = []string {}
-  TxId = 4
-  _, err = prepareEvalCmd(args, TxId)
+	// Fail case.
+	args = []string{}
+	TxId = 4
+	_, err = prepareEvalCmd(args, TxId)
 
-  if nil == err {
-    t.Error("Missed insufficient number of args.")
-  }
+	if nil == err {
+		t.Error("Missed insufficient number of args.")
+	}
 }
 
 /**
@@ -83,13 +82,13 @@ func TestPrepareEvalCmd(t *testing.T) {
  */
 func TestPrepareSourceCmd(t *testing.T) {
 
-  TxId := 4
-  cmd, _ := prepareSourceCmd([]string {"10", "2"}, TxId)
+	TxId := 4
+	cmd, _ := prepareSourceCmd([]string{"10", "2"}, TxId)
 
-  expected := "source -i 4 -b 10 -e 12\x00"
-  if expected != cmd {
-    t.Errorf("Source command preparation failed. Expected: %s, got: %s", expected, cmd)
-  }
+	expected := "source -i 4 -b 10 -e 12\x00"
+	if expected != cmd {
+		t.Errorf("Source command preparation failed. Expected: %s, got: %s", expected, cmd)
+	}
 }
 
 /**
@@ -97,21 +96,21 @@ func TestPrepareSourceCmd(t *testing.T) {
  */
 func TestPrepareCmdNoArgs(t *testing.T) {
 
-  // Pass case.
-  cmd  := "foo"
-  TxId := 33
-  DBGpCmd, _ := prepareCmdNoArgs(cmd, TxId)
+	// Pass case.
+	cmd := "foo"
+	TxId := 33
+	DBGpCmd, _ := prepareCmdNoArgs(cmd, TxId)
 
-  expected := "foo -i 33\x00"
-  if expected != DBGpCmd {
-    t.Error("prepareCmdNoArgs(foo, 33) != foo -i 33")
-  }
+	expected := "foo -i 33\x00"
+	if expected != DBGpCmd {
+		t.Error("prepareCmdNoArgs(foo, 33) != foo -i 33")
+	}
 
-  // Fail case.
-  cmd = " "
-  _, err := prepareCmdNoArgs(cmd, TxId)
+	// Fail case.
+	cmd = " "
+	_, err := prepareCmdNoArgs(cmd, TxId)
 
-  if nil == err {
-    t.Error("Failed to spot empty command string.")
-  }
+	if nil == err {
+		t.Error("Failed to spot empty command string.")
+	}
 }

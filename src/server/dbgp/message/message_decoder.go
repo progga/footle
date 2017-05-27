@@ -1,4 +1,3 @@
-
 /**
  * Decode a DBGp message which is in XML format.
  *
@@ -8,10 +7,10 @@
 package message
 
 import (
-  "encoding/xml"
-  "golang.org/x/net/html/charset"
-  "log"
-  "strings"
+	"encoding/xml"
+	"golang.org/x/net/html/charset"
+	"log"
+	"strings"
 )
 
 /**
@@ -19,20 +18,20 @@ import (
  */
 func decodeResponse(xmlResponse string) (Response, error) {
 
-  strReader := strings.NewReader(xmlResponse)
+	strReader := strings.NewReader(xmlResponse)
 
-  decoder := xml.NewDecoder(strReader)
-  // @see http://stackoverflow.com/questions/6002619/unmarshal-an-iso-8859-1-xml-input-in-go#answer-32224438
-  // @see http://blog.tristanmedia.com/2014/10/using-go-to-parse-non-utf8-xml-feeds/
-  decoder.CharsetReader = charset.NewReaderLabel
+	decoder := xml.NewDecoder(strReader)
+	// @see http://stackoverflow.com/questions/6002619/unmarshal-an-iso-8859-1-xml-input-in-go#answer-32224438
+	// @see http://blog.tristanmedia.com/2014/10/using-go-to-parse-non-utf8-xml-feeds/
+	decoder.CharsetReader = charset.NewReaderLabel
 
-  var response Response
-  err := decoder.Decode(&response)
-  if (nil != err) {
-    log.Print(err)
-  }
+	var response Response
+	err := decoder.Decode(&response)
+	if nil != err {
+		log.Print(err)
+	}
 
-  return response, err
+	return response, err
 }
 
 /**
@@ -40,16 +39,16 @@ func decodeResponse(xmlResponse string) (Response, error) {
  */
 func decodeInit(xmlInit string) (Init, error) {
 
-  strReader := strings.NewReader(xmlInit)
+	strReader := strings.NewReader(xmlInit)
 
-  decoder := xml.NewDecoder(strReader)
-  decoder.CharsetReader = charset.NewReaderLabel
+	decoder := xml.NewDecoder(strReader)
+	decoder.CharsetReader = charset.NewReaderLabel
 
-  var init Init
-  err := decoder.Decode(&init)
-  if (nil != err) {
-    log.Print(err)
-  }
+	var init Init
+	err := decoder.Decode(&init)
+	if nil != err {
+		log.Print(err)
+	}
 
-  return init, err
+	return init, err
 }

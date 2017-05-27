@@ -1,4 +1,3 @@
-
 /**
  * Package for talking to the DBGp engine.
  */
@@ -6,8 +5,8 @@
 package core
 
 import (
-  "log"
-  "net"
+	"log"
+	"net"
 )
 
 /**
@@ -15,10 +14,10 @@ import (
  */
 func ListenForDBGpEngine() (sock net.Listener) {
 
-  sock, err := net.Listen("tcp", "127.0.0.1:9000");
-  if  nil != err {
-    log.Fatal(err)
-  }
+	sock, err := net.Listen("tcp", "127.0.0.1:9000")
+	if nil != err {
+		log.Fatal(err)
+	}
 
-  return sock
+	return sock
 }
