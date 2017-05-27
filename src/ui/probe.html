@@ -8,12 +8,14 @@
 
   <body>
     <div class="command-post">
-      <form>
+      <form class="controls">
         <label class="form-label" for="msg">Command:</label>
         <input type="text" name="msg" placeholder="Message" autofocus="true" required />
 
         <button id="send-btn">Send</button>
       </form>
+
+      <div class="feedback"></div>
     </div>
 
     <div class="responses">
@@ -33,6 +35,8 @@
             data: {
               "msg": msg,
             }
+          }).done(function(feedbackMsg) {
+            jQuery(".feedback").html('<small class="feedback-msg uk-animation-shake">' + feedbackMsg + "</small>");
           });
         });
 
