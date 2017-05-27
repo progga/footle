@@ -55,6 +55,11 @@ func StartTalkingToDBGpEngine(sock net.Listener) (connection net.Conn) {
  */
 func BroadcastMsgToUIs(msg message.Message, toCmdLine, toHTTP chan<- message.Message) {
 
-  toCmdLine <- msg
-  toHTTP    <- msg
+  if nil != toCmdLine {
+    toCmdLine <- msg
+  }
+
+  if nil != toHTTP {
+    toHTTP    <- msg
+  }
 }
