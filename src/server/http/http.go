@@ -7,7 +7,9 @@ package http
 import (
 	"../dbgp/command"
 	"../dbgp/message"
+	"./file"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -34,16 +36,17 @@ func init() {
 /**
  * Setup HTTP server.
  *
- * Four handlers are used:
+ * Five handlers are used:
  *   - HTTP interface for Footle.
  *   - A file browser for selecting files that will be debugged.
+ *   - File content rendered as HTML.
  *   - Debugging command receiver.  This is supposed to be called over Ajax.
  *   - Debugging output sender.  This is supposed to be consumed using
  *     Server sent events.
  *
  * Uses global variable "clientList."
  */
-func Listen(codeDir string, out chan string) {
+func Listen(codeDir string, port int, out chan string) {
 
 	uiPath, err := determineUIPath()
 	if nil != err {
@@ -57,11 +60,14 @@ func Listen(codeDir string, out chan string) {
 	http.Handle("/", http.FileServer(http.Dir(uiPath)))
 	// Serve the files that will be debugged.
 	http.Handle("/files/", http.StripPrefix("/files/", http.FileServer(http.Dir(codeDir))))
+	// HTML markup for the same files.
+	http.HandleFunc("/formatted-file/", makeFormattedFileHandler(port))
 
 	http.HandleFunc("/steering-wheel", makeReceiveHandler(out))
 	http.HandleFunc("/message-stream", makeTransmitHandler(arrival, departure))
 
-	http.ListenAndServe(":9090", nil)
+	address := fmt.Sprintf(":%d", port)
+	http.ListenAndServe(address, nil)
 }
 
 /**
@@ -179,6 +185,36 @@ func transmit(writeStream http.ResponseWriter, request *http.Request, arrival, d
 
 	// Only relevant when myEar has closed before writeStream.
 	fmt.Fprintf(writeStream, "event: close\ndata: The end\n\n")
+}
+
+/**
+ * Prepare handler for displaying a file as HTML.
+ *
+ * Split a file into its lines and display them as individual HTML element.
+ * Example:
+ * <div class="lines">
+ *   <pre class="line line__0">&lt?php</pre>
+ *   <pre class="line line__1">use Drupal\Core\DrupalKernel;</pre>
+ *   <pre class="line line__1">$autoloader = require_once &#39;autoload.php&#39;;</pre>
+ *   ...
+ * </div>
+ */
+func makeFormattedFileHandler(port int) http.HandlerFunc {
+
+	return func(writeStream http.ResponseWriter, request *http.Request) {
+
+		filePath := request.URL.Path[len("/formatted-file/"):]
+
+		output, err := file.GrabIt(filePath, port)
+
+		if nil != err {
+			http.Error(writeStream, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		writeStream.Header().Set("Content-Type", "text/html")
+		io.WriteString(writeStream, output)
+	}
 }
 
 /**
