@@ -9,8 +9,11 @@
 
 package file
 
-var fileTemplate string = `<div class="lines">
+var fileTemplate string = `<table class="lines">
   {{- range $key, $value := . }}
-  <pre class="line line__{{ $key }}">{{ . }}</pre>
+  <tr class="line line__{{ $key }}">
+    <td class="line__number">{{ $key }}</td>
+    <td class="line__code">{{ . }}</td>
+  </tr>
   {{- end }}
-</div>`
+</table>`
