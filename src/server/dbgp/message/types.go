@@ -9,20 +9,20 @@ package message
 import "encoding/xml"
 
 type Message struct {
-	Message_type string
-	State        string
-	Properties   Properties
-	Context      Context
-	Content      string
+	MessageType string
+	State       string
+	Properties  Properties
+	Context     Context
+	Content     string
 }
 
 type Properties struct {
-	Command       string
-	Error_code    int
-	Error_message string
-	Filename      string
-	Line_number   int
-	TxId          int
+	Command      string
+	ErrorCode    int
+	ErrorMessage string
+	Filename     string
+	LineNumber   int
+	TxId         int
 }
 
 type Context struct {
@@ -50,15 +50,15 @@ type Init struct {
 }
 
 type Response struct {
-	XMLName        xml.Name `xml:"response"`
-	Command        string   `xml:"command,attr"`
-	Transaction_id int      `xml:"transaction_id,attr"`
-	Status         string   `xml:"status,attr"`
-	Reason         string   `xml:"reason,attr"`
-	Id             int      `xml:"id"`
-	Message        ResponseMessage
-	Error          Error  `xml:"error"`
-	Content        string `xml:",chardata"`
+	XMLName       xml.Name `xml:"response"`
+	Command       string   `xml:"command,attr"`
+	TransactionId int      `xml:"transaction_id,attr"`
+	Status        string   `xml:"status,attr"`
+	Reason        string   `xml:"reason,attr"`
+	Id            int      `xml:"id"`
+	Message       ResponseMessage
+	Error         Error  `xml:"error"`
+	Content       string `xml:",chardata"`
 }
 
 type ResponseMessage struct {

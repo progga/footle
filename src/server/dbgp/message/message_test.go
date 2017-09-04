@@ -29,7 +29,7 @@ func TestDecode(t *testing.T) {
 		t.Error(err)
 	}
 
-	if nil != err && "init" != message.Message_type {
+	if nil != err && "init" != message.MessageType {
 		t.Error("Missed Init message.")
 	}
 
@@ -51,11 +51,11 @@ func TestDecode(t *testing.T) {
 		t.Error(err)
 	}
 
-	if nil != err && "response" != message.Message_type {
+	if nil != err && "response" != message.MessageType {
 		t.Error("Missed Response message.")
 	}
 
-	if nil != err && 14 != message.Properties.Line_number {
+	if nil != err && 14 != message.Properties.LineNumber {
 		t.Error("Missed line number.")
 	}
 

@@ -44,7 +44,7 @@ func Decode(xmlContent string) (message Message, err error) {
  */
 func prepareInitMessage(init Init) (message Message) {
 
-	message.Message_type = "init"
+	message.MessageType = "init"
 	message.State = "starting"
 	message.Properties.Filename = init.FileURI
 
@@ -56,14 +56,14 @@ func prepareInitMessage(init Init) (message Message) {
  */
 func prepareResponseMessage(response Response) (message Message) {
 
-	message.Message_type = "response"
+	message.MessageType = "response"
 	message.State = response.Status
 	message.Content = response.Content
 	message.Properties.Filename = response.Message.Filename
-	message.Properties.Line_number = response.Message.LineNo
-	message.Properties.Error_message = response.Error.Message
-	message.Properties.Error_code = response.Error.Code
-	message.Properties.TxId = response.Transaction_id
+	message.Properties.LineNumber = response.Message.LineNo
+	message.Properties.ErrorMessage = response.Error.Message
+	message.Properties.ErrorCode = response.Error.Code
+	message.Properties.TxId = response.TransactionId
 	message.Properties.Command = response.Command
 
 	return message
