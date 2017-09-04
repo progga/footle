@@ -48,7 +48,7 @@ func main() {
 		MsgsForHTTPUI = make(chan message.Message)
 
 		go http.Listen(docroot, port, CmdsFromUI)
-		go http.Tell(MsgsForHTTPUI)
+		go http.TellBrowsers(docroot, MsgsForHTTPUI)
 	}
 
 	// Talk to DBGp engine.

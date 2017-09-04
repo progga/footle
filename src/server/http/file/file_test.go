@@ -22,20 +22,20 @@ func TestFormatFile(t *testing.T) {
 
 	expectedOutput :=
 		`<table class="lines">
-  <tr class="line line__0">
-    <td class="line__number">0</td>
-    <td class="line__code">foo</td>
-  </tr>
   <tr class="line line__1">
     <td class="line__number">1</td>
-    <td class="line__code">bar</td>
+    <td class="line__code">foo</td>
   </tr>
   <tr class="line line__2">
     <td class="line__number">2</td>
-    <td class="line__code">buz</td>
+    <td class="line__code">bar</td>
   </tr>
   <tr class="line line__3">
     <td class="line__number">3</td>
+    <td class="line__code">buz</td>
+  </tr>
+  <tr class="line line__4">
+    <td class="line__number">4</td>
     <td class="line__code">qux</td>
   </tr>
 </table>`

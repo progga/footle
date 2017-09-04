@@ -8,6 +8,7 @@ import (
 	"../dbgp/command"
 	"../dbgp/message"
 	"./file"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -75,10 +76,16 @@ func Listen(codeDir string, port int, out chan string) {
  *
  * Uses global variable "clientList."
  */
-func Tell(in <-chan message.Message) {
+func TellBrowsers(codeDir string, in <-chan message.Message) {
 
 	for msg := range in {
-		broadcast(fmt.Sprint(msg), clientList)
+		adjustFilepath(&msg, codeDir)
+
+		jsonMsg, err := json.Marshal(msg)
+
+		if nil == err {
+			broadcast(string(jsonMsg), clientList)
+		}
 	}
 }
 
@@ -265,4 +272,30 @@ func determineUIPath() (uiPath string, err error) {
 	uiPath = realBinPath + "/" + DOCROOT_PATH
 
 	return uiPath, err
+}
+
+/**
+ * Set filepath relative to codebase.
+ *
+ * HTTP clients are always given relative filepaths whereas the DBGp engine
+ * deals with absolute filepaths.  Here we convert absolute filepaths to
+ * relative.
+ */
+func adjustFilepath(response *message.Message, codeDir string) {
+
+	codeDirUri := "file://" + codeDir
+
+	// @todo filepath.HasPrefix() is deprecated.  Replace when a suitable
+	// replacement is found.
+	hasFilename := filepath.HasPrefix(response.Properties.Filename, codeDirUri)
+
+	if !hasFilename {
+		return
+	}
+
+	relativePath, err := filepath.Rel(codeDirUri, response.Properties.Filename)
+
+	if nil == err {
+		response.Properties.Filename = relativePath
+	}
 }

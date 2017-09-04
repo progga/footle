@@ -19,7 +19,14 @@ const FILE_TEMPLATE = "file.html"
 
 func init() {
 
-	fileTpl = template.Must(template.New(FILE_TEMPLATE).Parse(fileTemplate))
+	// In DBGp, the line number for the first line is one rather than zero.
+	funcMap := template.FuncMap{
+		"plusone": func(arg int) int {
+			return arg + 1
+		},
+	}
+
+	fileTpl = template.Must(template.New(FILE_TEMPLATE).Funcs(funcMap).Parse(fileTemplate))
 }
 
 /**
