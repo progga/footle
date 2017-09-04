@@ -11,10 +11,14 @@
 "use strict";
 
 /**
- * List of files and their corresponding tab element.
+ * Onload event handler.
+ *
+ * Does the following:
+ *   - Sets up click handlers on file links in the file browser.
+ *   - Sets up click handlers on tab close links.
+ *   - Creates a Server-sent-event handler to listen to the data stream from the
+ *     Footle server.
  */
-var fileTabMapping = {}
-
 jQuery(function() {
 
   /* We have missed the very first "load" event for the iframe.  So we
@@ -32,6 +36,14 @@ jQuery(function() {
 
     removeTabForFile(this.offsetParent.id)
   });
+
+  var sse = new EventSource("/message-stream");
+  jQuery(sse).on('message', function(event) {
+    var msg = JSON.parse(event.originalEvent.data);
+    console.log(msg);
+
+    processMsg(msg);
+  });
 })
 
 /**
@@ -44,121 +56,22 @@ function clickSetter(ignoredEvent) {
 
   /* Directory names end in a slash, filenames do not. */
   jQuery("pre :not(a[href$=\"/\"])", window.file_browser.document).on("click", function(event) {
-    addTab(this.pathname);
+
+    var relativeFilepath = this.pathname.replace("/files/", "");
+    addTab(relativeFilepath);
 
     event.preventDefault();
   });
 }
 
 /**
- * Add file content inside a tab.
+ * Update UI based on debugging status.
  *
- * @param string filepath
+ * @param object msg
  */
-function addTab(filepath) {
+function processMsg(msg) {
 
-  var filename = filepath.split(/[\\/]/).pop();
-  var formattedFilepath = filepath.replace("/files/", "/formatted-file/");
-  var filepathRelativeToDocroot = filepath.replace("/files/", "");
-
-  if (hasFileTabMapping(filepathRelativeToDocroot)) {
-    return;
-  }
-
-  jQuery.get(formattedFilepath, function(data) {
-
-    /* Tab link */
-    var tabLink = jQuery("<li " + "id=\"" + filepathRelativeToDocroot + "\" class=\"tab-selector\"><a href=\"#\">" + filename + "<span class=\"tab-closer\">X</span></a></li>");
-    jQuery(".tab-nav").append(tabLink);
-
-    /* Tab content. */
-    jQuery("#tab-content-wrapper").append("<li class=\"tab-content\"><div class=\"file-content\">" + data + "</div></li>");
-
-    /* Record the presence of a tab for this file. */
-    addFileTabMapping(filepathRelativeToDocroot, tabLink);
-
-    /* Activate tab. */
-    activateTabForFile(filepathRelativeToDocroot);
-  });
-}
-
-/**
- * Note down a file and its associated tab element.
- *
- * @param string filepath
- * @param object tabElement
- *    jQuery object for a tab.
- */
-function addFileTabMapping(filepath, tabElement) {
-
-  fileTabMapping[filepath] = tabElement;
-}
-
-/**
- * Remove association record between a file and its tab element.
- *
- * @param string filepath
- */
-function removeFileTabMapping(filepath) {
-
-  if (!hasFileTabMapping(filepath)) {
-    return;
-  }
-
-  delete fileTabMapping[filepath];
-}
-
-/**
- * Is there a tab for the given file?
- *
- * Returns the tab element when a tab is present.
- */
-function hasFileTabMapping(filepath) {
-
-  if (fileTabMapping.hasOwnProperty(filepath)) {
-    return fileTabMapping[filepath];
-  }
-
-  return false;
-}
-
-/**
- * Open the tab for the given file.
- */
-function activateTabForFile(filepath) {
-
-  if (!hasFileTabMapping(filepath)) {
-    return;
-  }
-
-  fileTabMapping[filepath].click();
-}
-
-/**
- * Manage tab closing.
- *
- * - Close the tab.
- * - Remove association between a file and its tab element.
- * - When the current tab is closed, go back to the file browser.
- */
-function removeTabForFile(filepath) {
-
-  var tabElement;
-
-  if (!(tabElement = hasFileTabMapping(filepath))) {
-    return;
-  }
-
-  /* Delete tab and its content */
-  var tabIndex = tabElement.index();
-  jQuery(".tab-content").get(tabIndex).remove();
-  tabElement.remove();
-
-  removeFileTabMapping(filepath);
-
-  /* When we are closing the active tab, return to file browser in first tab. */
-  var isActiveTab = tabElement.hasClass("uk-active");
-  if (isActiveTab) {
-    jQuery(".tab-selector").get(0).click();
+  if ("response" === msg.MessageType && "break" === msg.State) {
+    processBreakpoint(msg.Properties);
   }
 }
