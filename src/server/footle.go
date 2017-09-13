@@ -75,7 +75,7 @@ func main() {
 func getFlagsAndArgs() (docroot string, port int, hasCmdLine, hasHTTP bool) {
 
 	docrootArg := flag.String("docroot", "", "Path of directory whose code you want to debug; e.g. /var/www/html/")
-	portArg := flag.Int("port", 9090, "Network port for Footle's Web interface.  Default is 9090.")
+	portArg := flag.Int("port", 9090, "Network port for Footle's Web interface.")
 	hasCmdLineFlag := flag.Bool("cmdline", false, "Launch command line debugger.")
 	noHTTPFlag := flag.Bool("nohttp", false, "Do *not* launch HTTP interface of the debugger.")
 
