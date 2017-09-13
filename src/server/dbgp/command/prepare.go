@@ -33,8 +33,14 @@ func PrepareDBGpCmd(cmd string, args []string) (DBGpCmd string, err error) {
 	TxId := fetchNextTxId()
 
 	switch strings.ToLower(cmd) {
-	case "breakpoint", "b":
+	case "breakpoint_set", "b":
 		DBGpCmd, err = prepareBreakpointCmd(args, TxId)
+
+	case "breakpoint_list", "bl":
+		DBGpCmd, err = prepareCmdNoArgs("breakpoint_list", TxId)
+
+	case "breakpoint_get", "bg":
+		DBGpCmd, err = prepareBreakpointGetCmd(args, TxId)
 
 	case "eval", "ev":
 		DBGpCmd, err = prepareEvalCmd(args, TxId)
@@ -83,7 +89,7 @@ func fetchNextTxId() (nextTxId int) {
 }
 
 /**
- * The DBGp Breakpoint command.
+ * The DBGp Breakpoint set command.
  */
 func prepareBreakpointCmd(args []string, TxId int) (DBGpCmd string, err error) {
 
@@ -95,6 +101,22 @@ func prepareBreakpointCmd(args []string, TxId int) (DBGpCmd string, err error) {
 	lineNumber := args[1]
 
 	DBGpCmd = fmt.Sprintf("breakpoint_set -i %d -t line -f %s -n %s\x00", TxId, filepath, lineNumber)
+
+	return DBGpCmd, err
+}
+
+/**
+ * The DBGp Breakpoint get command.
+ */
+func prepareBreakpointGetCmd(args []string, TxId int) (DBGpCmd string, err error) {
+
+	if 1 > len(args) {
+		return DBGpCmd, fmt.Errorf("Need at least one argument for preparing the breakpoint get cmd.")
+	}
+
+	breakpointId := args[0]
+
+	DBGpCmd = fmt.Sprintf("breakpoint_get -i %d -d %s\x00", TxId, breakpointId)
 
 	return DBGpCmd, err
 }

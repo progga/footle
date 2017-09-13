@@ -51,6 +51,26 @@ func TestPrepareBreakpointCmd(t *testing.T) {
 }
 
 /**
+ * Tests for prepareBreakpointGetCmd().
+ */
+func TestPrepareBreakpointGetCmd(t *testing.T) {
+
+	// Pass case.
+	cmd, _ := prepareBreakpointGetCmd([]string{"9"}, 5)
+
+	expected_cmd := "breakpoint_get -i 5 -d 9\x00"
+	if cmd != expected_cmd {
+		t.Errorf("Incorrect breakpoint command. Expected %q, got %q.", expected_cmd, cmd)
+	}
+
+	// Fail case.
+	cmd, err := prepareBreakpointGetCmd([]string{}, 3)
+	if nil == err {
+		t.Error("Missed insufficient number of args.")
+	}
+}
+
+/**
  * Tests for prepareEvalCmd().
  *
  * prepareEvalCmd() itself is incomplete at the moment.  So this test evolve.

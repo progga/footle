@@ -14,6 +14,7 @@ type Message struct {
 	Properties  Properties
 	Context     Context
 	Content     string
+	Breakpoints map[int]Breakpoint
 }
 
 type Properties struct {
@@ -22,6 +23,7 @@ type Properties struct {
 	ErrorMessage string
 	Filename     string
 	LineNumber   int
+	BreakpointId int
 	TxId         int
 }
 
@@ -55,16 +57,27 @@ type Response struct {
 	TransactionId int      `xml:"transaction_id,attr"`
 	Status        string   `xml:"status,attr"`
 	Reason        string   `xml:"reason,attr"`
-	Id            int      `xml:"id"`
+	Id            int      `xml:"id,attr"`
 	Message       ResponseMessage
-	Error         Error  `xml:"error"`
-	Content       string `xml:",chardata"`
+	Breakpoints   []Breakpoint `xml:"breakpoint"`
+	Error         Error        `xml:"error"`
+	Content       string       `xml:",chardata"`
 }
 
 type ResponseMessage struct {
 	XMLName  xml.Name `xml:"http://xdebug.org/dbgp/xdebug message"`
 	Filename string   `xml:"filename,attr"`
 	LineNo   int      `xml:"lineno,attr"`
+}
+
+type Breakpoint struct {
+	Filename string `xml:"filename,attr"`
+	LineNo   int    `xml:"lineno,attr"`
+	Type     string `xml:"type,attr"`
+	State    string `xml:"state,attr"`
+	HitCount int    `xml:"hit_count,attr"`
+	HitValue int    `xml:"hit_value,attr"`
+	Id       int    `xml:"id,attr"`
 }
 
 type Error struct {

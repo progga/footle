@@ -25,6 +25,12 @@ func Validate(cmd string, args []string) (err error) {
 	case "breakpoint_set", "b":
 		err = validateBreakpointArgs(args)
 
+	case "breakpoint_get", "bg":
+		err = validateBreakpointGetArgs(args)
+
+	case "breakpoint_list", "bl":
+		err = validateCmdWithNoArg("breakpoint_list", args)
+
 	case "eval", "ev":
 		err = validateCmdWithNoArg("eval", args)
 
@@ -64,8 +70,26 @@ func validateBreakpointArgs(args []string) (err error) {
 	}
 
 	line_number, err := strconv.ParseInt(args[1], 10, 64)
-	if nil != err || !(0 < line_number) {
+	if nil != err || line_number < 1 {
 		err = fmt.Errorf("Expecting line number as the second argument. %s given.", args[1])
+	}
+
+	return err
+}
+
+/**
+ * Validate the Breakpoint get command.
+ */
+func validateBreakpointGetArgs(args []string) (err error) {
+
+	if len(args) != 1 {
+		err = fmt.Errorf("Usage: breakpoint_get breakpoint-id")
+		return err
+	}
+
+	breakpointId, err := strconv.ParseInt(args[0], 10, 64)
+	if nil != err || breakpointId < 1 {
+		err = fmt.Errorf("Expecting breakpoint ID as the first argument. %s given.", args[0])
 	}
 
 	return err

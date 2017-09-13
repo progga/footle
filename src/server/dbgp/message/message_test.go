@@ -99,7 +99,7 @@ func TestDecodeInit(t *testing.T) {
 	}
 
 	if "file:///srv/www/drupal/drupal8/index.php" != init.FileURI {
-		t.Error(`parseInit(<init ... fileuri="file:///srv/www/drupal/drupal8/index.php""...>...</init>) cannot find file URI.`)
+		t.Error(`decodeInit(<init ... fileuri="file:///srv/www/drupal/drupal8/index.php""...>...</init>) cannot find file URI.`)
 	}
 }
 
@@ -108,6 +108,7 @@ func TestDecodeInit(t *testing.T) {
  */
 func TestDecodeResponse(t *testing.T) {
 
+	// Fail case.
 	xml :=
 		`<?xml version="1.0" encoding="iso-8859-1"?>
 <init xmlns="urn:debugger_protocol_v1" xmlns:xdebug="http://xdebug.org/dbgp/xdebug"
@@ -125,6 +126,7 @@ func TestDecodeResponse(t *testing.T) {
 		t.Error(err)
 	}
 
+	// DBGP "status" command.
 	xml =
 		`<?xml version="1.0" encoding="iso-8859-1"?>
 <response xmlns="urn:debugger_protocol_v1" xmlns:xdebug="http://xdebug.org/dbgp/xdebug"
@@ -140,6 +142,38 @@ func TestDecodeResponse(t *testing.T) {
 	}
 
 	if "status" != response.Command {
-		t.Error(`parseResponse(<response ... command="status"...></response>): Command is not "status"`)
+		t.Error(`decodeResponse(<response ... command="status"...></response>): Command is not "status"`)
+	}
+
+	// DBGP "breakpoint_get" command.
+	xml =
+		`<?xml version="1.0" encoding="iso-8859-1"?>
+<response xmlns="urn:debugger_protocol_v1" xmlns:xdebug="http://xdebug.org/dbgp/xdebug" command="breakpoint_get" transaction_id="2">
+  <breakpoint
+    type="line"
+    filename="file:///srv/www/drupal/drupal8/index.php"
+    lineno="14"
+    state="enabled"
+    hit_count="0"
+    hit_value="0"
+    id="68310001">
+  </breakpoint>
+</response>`
+
+	response, err = decodeResponse(xml)
+	if nil != err {
+		t.Error(err)
+	}
+
+	if "breakpoint_get" != response.Command {
+		t.Error(`decodeResponse(<response ... command="status"...></response>): Command is not "status"`)
+	}
+
+	if 14 != response.Breakpoints[0].LineNo {
+		t.Errorf("Failed to spot Line number. %d given.", response.Breakpoints[0].LineNo)
+	}
+
+	if 68310001 != response.Breakpoints[0].Id {
+		t.Errorf("Failed to spot Breakpoint ID. %d given.", response.Breakpoints[0].Id)
 	}
 }

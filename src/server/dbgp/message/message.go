@@ -65,6 +65,15 @@ func prepareResponseMessage(response Response) (message Message) {
 	message.Properties.ErrorCode = response.Error.Code
 	message.Properties.TxId = response.TransactionId
 	message.Properties.Command = response.Command
+	message.Properties.BreakpointId = response.Id
+
+	if len(response.Breakpoints) > 0 {
+		message.Breakpoints = make(map[int]Breakpoint)
+
+		for _, Breakpoint := range response.Breakpoints {
+			message.Breakpoints[Breakpoint.Id] = Breakpoint
+		}
+	}
 
 	return message
 }

@@ -79,9 +79,9 @@ func Listen(codeDir string, port int, out chan string) {
 func TellBrowsers(codeDir string, in <-chan message.Message) {
 
 	for msg := range in {
-		adjustFilepath(&msg, codeDir)
+		adjustedMsg := adjustFilepath(msg, codeDir)
 
-		jsonMsg, err := json.Marshal(msg)
+		jsonMsg, err := json.Marshal(adjustedMsg)
 
 		if nil == err {
 			broadcast(string(jsonMsg), clientList)
@@ -280,22 +280,47 @@ func determineUIPath() (uiPath string, err error) {
  * HTTP clients are always given relative filepaths whereas the DBGp engine
  * deals with absolute filepaths.  Here we convert absolute filepaths to
  * relative.
+ *
+ * Filepaths are present in:
+ *  - response.Properties.Filename
+ *  - response.Breakpoints
  */
-func adjustFilepath(response *message.Message, codeDir string) {
+func adjustFilepath(response message.Message, codeDir string) message.Message {
 
 	codeDirUri := "file://" + codeDir
 
 	// @todo filepath.HasPrefix() is deprecated.  Replace when a suitable
 	// replacement is found.
 	hasFilename := filepath.HasPrefix(response.Properties.Filename, codeDirUri)
+	hasBreakpoints := len(response.Breakpoints) > 0
 
-	if !hasFilename {
-		return
+	if hasFilename {
+		relativePath, err := filepath.Rel(codeDirUri, response.Properties.Filename)
+
+		if nil == err {
+			response.Properties.Filename = relativePath
+		}
 	}
 
-	relativePath, err := filepath.Rel(codeDirUri, response.Properties.Filename)
-
-	if nil == err {
-		response.Properties.Filename = relativePath
+	// Modify a *copy* of the breakpoint list.  Otherwise it will modify the
+	// original message too.  This is because the breakpoint list is a map
+	// *reference* and not a copy.
+	var adjustedBreakpoints map[int]message.Breakpoint
+	if hasBreakpoints {
+		adjustedBreakpoints = make(map[int]message.Breakpoint)
+	} else {
+		return response
 	}
+
+	for breakpointId, breakpoint := range response.Breakpoints {
+		relativePath, err := filepath.Rel(codeDirUri, breakpoint.Filename)
+
+		if nil == err {
+			breakpoint.Filename = relativePath
+			adjustedBreakpoints[breakpointId] = breakpoint
+		}
+	}
+	response.Breakpoints = adjustedBreakpoints
+
+	return response
 }

@@ -34,6 +34,30 @@ func TestValidateBreakpointArgs(t *testing.T) {
 }
 
 /**
+ * Tests for validateBreakpointGetArgs()
+ */
+func TestValidateBreakpointGetArgs(t *testing.T) {
+
+	// Pass case.
+	err := validateBreakpointGetArgs([]string{"28"})
+	if nil != err {
+		t.Error(err)
+	}
+
+	// Fail case.
+	err = validateBreakpointGetArgs([]string{})
+	if nil == err {
+		t.Error("Failed to spot missing argument for the breakpoint_get command.")
+	}
+
+	// Another fail case.  Invalid breakpoint ID.
+	err = validateBreakpointGetArgs([]string{"0"})
+	if nil == err {
+		t.Error("Failed to spot invalid breakpoint ID for the breakpoint_get command.")
+	}
+}
+
+/**
  * Tests for validateCmdWithNoArg().
  */
 func TestValidateCmdWithNoArg(t *testing.T) {
