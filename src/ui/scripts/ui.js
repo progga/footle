@@ -8,7 +8,7 @@
  * in another tab.  This tab will contain the HTML formatted file content.
  */
 
-"use strict";
+'use strict'
 
 /**
  * Onload event handler.
@@ -19,31 +19,30 @@
  *   - Creates a Server-sent-event handler to listen to the data stream from the
  *     Footle server.
  */
-jQuery(function() {
-
+jQuery(function () {
   /* We have missed the very first "load" event for the iframe.  So we
      need to explicitely call clickSetter() for setting up the click
      handlers on the file links inside the file browser. */
-  clickSetter();
+  clickSetter()
 
   /* iframe is loaded again when a directory is opened. */
-  jQuery("iframe").on("load", clickSetter);
+  jQuery('iframe').on('load', clickSetter)
 
   /* Close a tab when its close link is clicked. */
-  jQuery(".tab-nav").on("click", ".tab-closer", function(event) {
-    event.preventDefault();
-    event.stopPropagation();
+  jQuery('.tab-nav').on('click', '.tab-closer', function (event) {
+    event.preventDefault()
+    event.stopPropagation()
 
     removeTabForFile(this.offsetParent.id)
-  });
+  })
 
-  var sse = new EventSource("/message-stream");
-  jQuery(sse).on('message', function(event) {
-    var msg = JSON.parse(event.originalEvent.data);
-    console.log(msg);
+  var sse = new EventSource('/message-stream')
+  jQuery(sse).on('message', function (event) {
+    var msg = JSON.parse(event.originalEvent.data)
+    console.log(msg)
 
-    processMsg(msg);
-  });
+    processMsg(msg)
+  })
 })
 
 /**
@@ -52,16 +51,14 @@ jQuery(function() {
  * @param object ignoredEvent
  *    Optional, it is okay to call a Javascript function without its arguments.
  */
-function clickSetter(ignoredEvent) {
-
+function clickSetter (ignoredEvent) {
   /* Directory names end in a slash, filenames do not. */
-  jQuery("pre :not(a[href$=\"/\"])", window.file_browser.document).on("click", function(event) {
+  jQuery('pre :not(a[href$="/"])', window.file_browser.document).on('click', function (event) {
+    var relativeFilepath = this.pathname.replace('/files/', '')
+    addTab(relativeFilepath)
 
-    var relativeFilepath = this.pathname.replace("/files/", "");
-    addTab(relativeFilepath);
-
-    event.preventDefault();
-  });
+    event.preventDefault()
+  })
 }
 
 /**
@@ -69,9 +66,14 @@ function clickSetter(ignoredEvent) {
  *
  * @param object msg
  */
-function processMsg(msg) {
-
-  if ("response" === msg.MessageType && "break" === msg.State) {
-    processBreakpoint(msg.Properties);
+function processMsg (msg) {
+  if (msg.MessageType === 'response' && msg.State === 'break' && msg.Properties.Filename) {
+    updateBreak(msg.Properties.Filename, msg.Properties.LineNumber)
+  } else if (msg.MessageType === 'response' && msg.Properties.Command === 'breakpoint_set') {
+  } else if (msg.MessageType === 'response' && msg.Properties.Command === 'breakpoint_list') {
+    refreshBreakpoints(msg.Breakpoints)
+  } else if (msg.MessageType === 'response' && msg.State === 'stopped') {
+    removePreviousBreak()
+  } else if (msg.MessageType === 'init') {
   }
 }
