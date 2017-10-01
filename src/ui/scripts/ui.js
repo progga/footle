@@ -21,12 +21,14 @@
  */
 jQuery(function () {
   /* We have missed the very first "load" event for the iframe.  So we
-     need to explicitely call clickSetter() for setting up the click
+     need to explicitely call setupFileLinks() for setting up the click
      handlers on the file links inside the file browser. */
-  clickSetter()
+  setupFileLinks()
 
   /* iframe is loaded again when a directory is opened. */
-  jQuery('iframe').on('load', clickSetter)
+  jQuery('iframe').on('load', setupFileLinks)
+
+  setupContinuationControls()
 
   /* Close a tab when its close link is clicked. */
   jQuery('.tab-nav').on('click', '.tab-closer', function (event) {
@@ -51,7 +53,7 @@ jQuery(function () {
  * @param object ignoredEvent
  *    Optional, it is okay to call a Javascript function without its arguments.
  */
-function clickSetter (ignoredEvent) {
+function setupFileLinks(ignoredEvent) {
   /* Directory names end in a slash, filenames do not. */
   jQuery('pre :not(a[href$="/"])', window.file_browser.document).on('click', function (event) {
     var relativeFilepath = this.pathname.replace('/files/', '')
