@@ -27,11 +27,7 @@ function setupContinuationControls () {
     jQuery(selector).click(command, function (event) {
       event.preventDefault()
 
-      jQuery.post('steering-wheel', {
-        'msg': event.data
-      }).fail(function (jqXHR, textStatus, errorThrown) {
-        console.log(errorThrown)
-      })
+      sendCommand(event.data)
     })
   }
 }
