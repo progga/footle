@@ -16,6 +16,8 @@
  * Does the following:
  *   - Sets up click handlers on file links in the file browser.
  *   - Sets up click handlers on tab close links.
+ *   - Adds buttons for Run and Step commands.
+ *   - Sets up new breakpoint trigger.
  *   - Creates a Server-sent-event handler to listen to the data stream from the
  *     Footle server.
  */
@@ -25,19 +27,14 @@ jQuery(function () {
      handlers on the file links inside the file browser. */
   setupFileLinks()
 
-  /* iframe is loaded again when a directory is opened. */
+  // iframe is loaded again when a directory is opened.
   jQuery('iframe').on('load', setupFileLinks)
 
+  setupTabCloser()
   setupContinuationControls()
+  setupBreakpointTrigger()
 
-  /* Close a tab when its close link is clicked. */
-  jQuery('.tab-nav').on('click', '.tab-closer', function (event) {
-    event.preventDefault()
-    event.stopPropagation()
-
-    removeTabForFile(this.offsetParent.id)
-  })
-
+  // Process responses from the server.
   var sse = new EventSource('/message-stream')
   jQuery(sse).on('message', function (event) {
     var msg = JSON.parse(event.originalEvent.data)
@@ -53,7 +50,7 @@ jQuery(function () {
  * @param object ignoredEvent
  *    Optional, it is okay to call a Javascript function without its arguments.
  */
-function setupFileLinks(ignoredEvent) {
+function setupFileLinks (ignoredEvent) {
   /* Directory names end in a slash, filenames do not. */
   jQuery('pre :not(a[href$="/"])', window.file_browser.document).on('click', function (event) {
     var relativeFilepath = this.pathname.replace('/files/', '')

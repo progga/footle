@@ -31,12 +31,14 @@ function addTab (filepath, postTabOpenAction) {
   }
 
   jQuery.get(formattedFilepath, function (data) {
-    /* Tab link */
-    var tabLink = jQuery('<li id="' + filepath + '" class="tab-selector"><a href="#">' + filename + '<span class="tab-closer">X</span></a></li>')
+    /* Tab link. */
+    var tabLink = jQuery('<li id="' + filepath + '" class="tab-selector" data-filepath="' + filepath + '"><a href="#">' + filename + '<span class="tab-closer">X</span></a></li>')
+    // Make sure to add a jQuery object instead of plain markup so that we can
+    // use the object later.
     jQuery('.tab-nav').append(tabLink)
 
     /* Tab content. */
-    var tabContent = '<li id="body-of-' + filepath + '" class="tab-content"><div class="file-content">' + data + '</div></li>'
+    var tabContent = '<li id="body-of-' + filepath + '" class="tab-content" data-filepath="' + filepath + '"><div class="file-content">' + data + '</div></li>'
     jQuery('#tab-content-wrapper').append(tabContent)
 
     /* Record the presence of a tab for this file. */
@@ -48,6 +50,18 @@ function addTab (filepath, postTabOpenAction) {
     if (postTabOpenAction) {
       postTabOpenAction()
     }
+  })
+}
+
+/**
+ * Close a tab when its close link is clicked.
+ */
+function setupTabCloser () {
+  jQuery('.tab-nav').on('click', '.tab-closer', function (event) {
+    event.preventDefault()
+    event.stopPropagation()
+
+    removeTabForFile(this.offsetParent.id)
   })
 }
 

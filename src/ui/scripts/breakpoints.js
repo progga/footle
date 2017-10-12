@@ -20,6 +20,25 @@
 var fileBreakpointMapping = {}
 
 /**
+ * Click handler for creating new breakpoints.
+ *
+ * When a line number is clicked, a breakpoint is added for that line.
+ */
+function setupBreakpointTrigger () {
+  jQuery('.tab').on('click', '.tab-content', function (event) {
+    // event.currentTarget is the tab element for a file.
+    var filepath = jQuery(event.currentTarget).data('filepath')
+
+    if (event.target.classList.contains('line__number')) {
+      // event.target is the line number element which received the click.
+      var lineNumber = event.target.innerText
+
+      sendCommand('breakpoint_set', [filepath, lineNumber])
+    }
+  })
+}
+
+/**
  * Highlight new ones, remove deleted ones.
  *
  * @todo Remove deleted breakpoints.
