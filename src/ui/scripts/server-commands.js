@@ -1,16 +1,18 @@
 
 /**
  * @file
- * Manage commands for the backend.
+ * Manage commands sent to the Footle server.
  */
 
 /**
- * Send command to the backend.
+ * Send command to the Footle server.
  *
  * @param string command
  *   Example: breakpoint_set, breakpoint_list, step_over, etc.
  * @param array args
  *   [Optional] Any arguments needed by the command above.
+ *
+ * Example *Footle* command: breakpoint_set index.php 16
  */
 function sendCommand (command, args) {
   args = args || []
