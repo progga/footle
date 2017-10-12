@@ -9,10 +9,10 @@ package main
 
 import (
 	"./cmdline"
+	"./config"
 	"./core"
 	"./dbgp/message"
 	"./http"
-	"flag"
 	"net"
 )
 
@@ -26,7 +26,7 @@ import (
 func main() {
 
 	// Setup command line flags and arguments.
-	docroot, port, hasCmdLine, hasHTTP := getFlagsAndArgs()
+	config := config.Get()
 
 	// Initializations.
 	var activeDBGpConnection net.Conn
@@ -37,18 +37,18 @@ func main() {
 	bye := make(chan struct{})
 
 	// Launch all interfaces.
-	if hasCmdLine {
+	if config.HasCmdLine() {
 		MsgsForCmdLineUI = make(chan message.Message)
 
 		go cmdline.RunUI(CmdsFromUI, bye)
 		go cmdline.UpdateUIStatus(MsgsForCmdLineUI)
 	}
 
-	if hasHTTP {
+	if config.HasHTTP() {
 		MsgsForHTTPUI = make(chan message.Message)
 
-		go http.Listen(docroot, port, CmdsFromUI)
-		go http.TellBrowsers(docroot, MsgsForHTTPUI)
+		go http.Listen(CmdsFromUI, config)
+		go http.TellBrowsers(MsgsForHTTPUI, config)
 	}
 
 	// Talk to DBGp engine.
@@ -57,34 +57,4 @@ func main() {
 	go core.SendCmdsToDBGpEngine(&activeDBGpConnection, CmdsFromUI)
 
 	<-bye
-}
-
-/**
- * Setup command line flags and arguments.
- *
- * Return the values of these flags and arguments.
- *
- * Arg:
- *  - docroot : Docroot of code that will be debugged.
- *  - port: Network port of the HTTP interface.
- *
- * Flag:
- *  - cmdline : We want the command line.
- *  - nohttp  : No HTTP.
- */
-func getFlagsAndArgs() (docroot string, port int, hasCmdLine, hasHTTP bool) {
-
-	docrootArg := flag.String("docroot", "", "Path of directory whose code you want to debug; e.g. /var/www/html/")
-	portArg := flag.Int("port", 9090, "Network port for Footle's Web interface.")
-	hasCmdLineFlag := flag.Bool("cmdline", false, "Launch command line debugger.")
-	noHTTPFlag := flag.Bool("nohttp", false, "Do *not* launch HTTP interface of the debugger.")
-
-	flag.Parse()
-
-	docroot = *docrootArg
-	port = *portArg
-	hasCmdLine = *hasCmdLineFlag
-	hasHTTP = !*noHTTPFlag
-
-	return docroot, port, hasCmdLine, hasHTTP
 }

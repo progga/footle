@@ -76,7 +76,9 @@ func PrepareDBGpCmd(cmd string, args []string) (DBGpCmd string, err error) {
 /**
  * Determine the transaction ID for the next DBGp command.
  *
- * @return int
+ * Uses global variable "lastTxId"
+ *
+ * @todo Make it goroutine safe by wrapping it in a lock.
  */
 func fetchNextTxId() (nextTxId int) {
 

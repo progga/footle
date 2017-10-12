@@ -5,6 +5,7 @@
 package http
 
 import (
+	"../config"
 	"../dbgp/command"
 	"../dbgp/message"
 	"./file"
@@ -47,7 +48,10 @@ func init() {
  *
  * Uses global variable "clientList."
  */
-func Listen(codeDir string, port int, out chan string) {
+func Listen(out chan string, config config.Config) {
+
+	codeDir := config.GetDocroot()
+	port := config.GetHTTPPort()
 
 	uiPath, err := determineUIPath()
 	if nil != err {
@@ -76,8 +80,9 @@ func Listen(codeDir string, port int, out chan string) {
  *
  * Uses global variable "clientList."
  */
-func TellBrowsers(codeDir string, in <-chan message.Message) {
+func TellBrowsers(in <-chan message.Message, config config.Config) {
 
+	codeDir := config.GetDocroot()
 	for msg := range in {
 		adjustedMsg := adjustFilepath(msg, codeDir)
 
