@@ -32,10 +32,11 @@ func Get() Config {
 	config.flags = make(map[string]bool)
 
 	// Now load the configuration passed from the command line.
-	docroot, verbosity, port, hasCmdLine, hasHTTP := getFlagsAndArgs()
+	docroot, verbosity, httpPort, DBGpPort, hasCmdLine, hasHTTP := getFlagsAndArgs()
 
 	config.SetArg("docroot", docroot)
-	config.SetArg("port", strconv.Itoa(port))
+	config.SetArg("http-port", strconv.Itoa(httpPort))
+	config.SetArg("dbgp-port", strconv.Itoa(DBGpPort))
 	config.SetArg("verbosity", verbosity)
 
 	if hasCmdLine {
@@ -60,28 +61,31 @@ func Get() Config {
  *
  * Arg:
  *  - docroot : Docroot of code that will be debugged.
- *  - port: Network port of the HTTP interface.
+ *  - HTTP port: Network port of the HTTP interface.
+ *  - DBGp port: Network port to listen for the DBGp server.
  *
  * Flag:
  *  - cmdline: We want the command line.
  *  - nohttp : No HTTP.
  *  - v, vv, vvv: Verbosity level.
  */
-func getFlagsAndArgs() (docroot, verbosity string, port int, hasCmdLine, hasHTTP bool) {
+func getFlagsAndArgs() (docroot, verbosity string, httpPort, DBGpPort int, hasCmdLine, hasHTTP bool) {
 
 	docrootArg := flag.String("docroot", "", "Path of directory whose code you want to debug; e.g. /var/www/html/")
-	portArg := flag.Int("port", 9090, "Network port for Footle's Web interface.")
-	hasCmdLineFlag := flag.Bool("cmdline", false, "Launch command line debugger.")
-	noHTTPFlag := flag.Bool("nohttp", false, "Do *not* launch HTTP interface of the debugger.")
+	httpPortArg := flag.Int("http-port", 9090, "[Optional] Network port for Footle's Web interface.")
+	DBGpPortArg := flag.Int("dbgp-port", 9000, "[Optional] Network port to listen for the DBGp server.")
+	hasCmdLineFlag := flag.Bool("cmdline", false, "[Optional] Launch command line debugger.")
+	noHTTPFlag := flag.Bool("nohttp", false, "[Optional] Do *not* launch HTTP interface of the debugger.")
 
-	LowVerbosityFlag := flag.Bool("v", false, "Low verbosity.  Unused.")
-	MediumVerbosityFlag := flag.Bool("vv", false, "Medium verbosity.  Unused.")
-	HighVerbosityFlag := flag.Bool("vvv", false, "High verbosity.  Include communication with DBGp server.")
+	LowVerbosityFlag := flag.Bool("v", false, "[Optional] Low verbosity.  Unused.")
+	MediumVerbosityFlag := flag.Bool("vv", false, "[Optional] Medium verbosity.  Unused.")
+	HighVerbosityFlag := flag.Bool("vvv", false, "[Optional] High verbosity.  Include communication with DBGp server.")
 
 	flag.Parse()
 
 	docroot = *docrootArg
-	port = *portArg
+	httpPort = *httpPortArg
+	DBGpPort = *DBGpPortArg
 	hasCmdLine = *hasCmdLineFlag
 	hasHTTP = !*noHTTPFlag
 

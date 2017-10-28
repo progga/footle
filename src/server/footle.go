@@ -52,7 +52,7 @@ func main() {
 	}
 
 	// Talk to DBGp engine.
-	sock := core.ListenForDBGpEngine()
+	sock := core.ListenForDBGpEngine(config)
 	go core.RecvMsgsFromDBGpEngine(sock, &activeDBGpConnection, MsgsForCmdLineUI, MsgsForHTTPUI)
 	go core.SendCmdsToDBGpEngine(&activeDBGpConnection, CmdsFromUI)
 

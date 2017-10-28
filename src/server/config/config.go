@@ -28,14 +28,32 @@ func (c Config) GetDocroot() string {
  */
 func (c Config) GetHTTPPort() int {
 
-	port := c.GetArg("port")
-	portNumber, err := strconv.Atoi(port)
+	return c.getInt("http-port")
+}
+
+/**
+ * Getter for network port to listen for DBGp server.
+ */
+func (c Config) GetDBGpPort() int {
+
+	return c.getInt("dbgp-port")
+}
+
+/**
+ * Return value of configuration item as an integer.
+ *
+ * Useful for fetching numeric configurations such as port number.
+ */
+func (c Config) getInt(item string) int {
+
+	value := c.GetArg(item)
+	number, err := strconv.Atoi(value)
 
 	if err != nil {
 		return -1
 	}
 
-	return portNumber
+	return number
 }
 
 /**
