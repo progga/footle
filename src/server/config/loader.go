@@ -32,9 +32,10 @@ func Get() Config {
 	config.flags = make(map[string]bool)
 
 	// Now load the configuration passed from the command line.
-	docroot, verbosity, httpPort, DBGpPort, hasCmdLine, hasHTTP := getFlagsAndArgs()
+	docroot, remoteDocroot, verbosity, httpPort, DBGpPort, hasCmdLine, hasHTTP := getFlagsAndArgs()
 
 	config.SetArg("docroot", docroot)
+	config.SetArg("remote-docroot", remoteDocroot)
 	config.SetArg("http-port", strconv.Itoa(httpPort))
 	config.SetArg("dbgp-port", strconv.Itoa(DBGpPort))
 	config.SetArg("verbosity", verbosity)
@@ -69,11 +70,12 @@ func Get() Config {
  *  - nohttp : No HTTP.
  *  - v, vv, vvv: Verbosity level.
  */
-func getFlagsAndArgs() (docroot, verbosity string, httpPort, DBGpPort int, hasCmdLine, hasHTTP bool) {
+func getFlagsAndArgs() (docroot, remoteDocroot, verbosity string, httpPort, DBGpPort int, hasCmdLine, hasHTTP bool) {
 
-	docrootArg := flag.String("docroot", "", "Path of directory whose code you want to debug; e.g. /var/www/html/")
-	httpPortArg := flag.Int("http-port", 9090, "[Optional] Network port for Footle's Web interface.")
-	DBGpPortArg := flag.Int("dbgp-port", 9000, "[Optional] Network port to listen for the DBGp server.")
+	docrootArg := flag.String("docroot", "", "[Needed] Path of directory whose code you want to debug; e.g. /var/www/html/")
+	remoteDocrootArg := flag.String("docroot-remote", "", "[Optional] When Footle and the DBGp server (e.g. xdebug) are in different machines, this is the path of the source code directory in the remote machine.  This scenario is *not* recommended.  Try as a last resort.")
+	DBGpPortArg := flag.Int("port-dbgp", 9000, "[Optional] Network port to listen for the DBGp server.")
+	httpPortArg := flag.Int("port-http", 9090, "[Optional] Network port for Footle's Web interface.")
 	hasCmdLineFlag := flag.Bool("cmdline", false, "[Optional] Launch command line debugger.")
 	noHTTPFlag := flag.Bool("nohttp", false, "[Optional] Do *not* launch HTTP interface of the debugger.")
 
@@ -84,6 +86,7 @@ func getFlagsAndArgs() (docroot, verbosity string, httpPort, DBGpPort int, hasCm
 	flag.Parse()
 
 	docroot = *docrootArg
+	remoteDocroot = *remoteDocrootArg
 	httpPort = *httpPortArg
 	DBGpPort = *DBGpPortArg
 	hasCmdLine = *hasCmdLineFlag
