@@ -5,6 +5,7 @@
 package core
 
 import (
+	"../config"
 	"../dbgp"
 	"../dbgp/message"
 	"log"
@@ -15,6 +16,8 @@ import (
  * Receive message from DBGp engine and pass it to user interfaces.
  */
 func RecvMsgsFromDBGpEngine(sock net.Listener, activeDBGpConnection *net.Conn, MsgsForCmdLineUI, MsgsForHTTPUI chan<- message.Message) {
+
+	config := config.Get()
 
 	for {
 		*activeDBGpConnection = StartTalkingToDBGpEngine(sock)
@@ -27,6 +30,10 @@ func RecvMsgsFromDBGpEngine(sock net.Listener, activeDBGpConnection *net.Conn, M
 
 			if parsedMsg, err := message.Decode(msg); nil == err {
 				BroadcastMsgToUIs(parsedMsg, MsgsForCmdLineUI, MsgsForHTTPUI)
+			}
+
+			if config.IsVerbose() {
+				log.Println(msg)
 			}
 		}
 

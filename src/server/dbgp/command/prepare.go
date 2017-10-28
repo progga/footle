@@ -152,7 +152,7 @@ func prepareEvalCmd(args []string, TxId int) (DBGpCmd string, err error) {
 func prepareRawDBGpCmd(args []string, TxId int) (DBGpCmdWTxId string, err error) {
 
 	if len(args) < 1 {
-		return DBGpCmd, fmt.Errorf("No raw DBGp command given.")
+		return DBGpCmdWTxId, fmt.Errorf("No raw DBGp command given.")
 	}
 
 	rawDBGpCmd := strings.Join(args, " ")

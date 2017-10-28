@@ -5,6 +5,7 @@
 package cmdline
 
 import (
+	"../config"
 	"../dbgp/command"
 	"../dbgp/message"
 	"encoding/base64"
@@ -52,6 +53,8 @@ func RunUI(out chan<- string, bye chan struct{}) {
 		log.Fatal(err)
 	}
 
+	config := config.Get()
+
 	for {
 		if len(incomingMsgQueue) > 0 {
 			// First, display all messages stored in the queue.
@@ -85,6 +88,12 @@ func RunUI(out chan<- string, bye chan struct{}) {
 
 			return
 		} else if "refresh" == cmd || "" == cmd {
+			continue
+		} else if cmd == "verbose" {
+			config.GoVerbose()
+			continue
+		} else if cmd == "no-verbose" {
+			config.GoSilent()
 			continue
 		}
 

@@ -20,7 +20,7 @@ type Config struct {
  */
 func (c Config) GetDocroot() string {
 
-	return c.getArg("docroot")
+	return c.GetArg("docroot")
 }
 
 /**
@@ -28,7 +28,7 @@ func (c Config) GetDocroot() string {
  */
 func (c Config) GetHTTPPort() int {
 
-	port := c.getArg("port")
+	port := c.GetArg("port")
 	portNumber, err := strconv.Atoi(port)
 
 	if err != nil {
@@ -43,7 +43,7 @@ func (c Config) GetHTTPPort() int {
  */
 func (c Config) HasCmdLine() bool {
 
-	return c.getFlag("has-http")
+	return c.GetFlag("has-cmdline")
 }
 
 /**
@@ -51,13 +51,44 @@ func (c Config) HasCmdLine() bool {
  */
 func (c Config) HasHTTP() bool {
 
-	return c.getFlag("has-http")
+	return c.GetFlag("has-http")
+}
+
+/**
+ * Predicate for determine verbosity.
+ *
+ * The "high" verbose mode displays all incoming and outgoing communication with
+ * DBGp server.  The "low" and "medium" verbose modes are unused at the moment.
+ *
+ * By default, there is no verbosity.
+ */
+func (c Config) IsVerbose() bool {
+
+	verbosityLevel := c.GetArg("verbosity")
+
+	return (verbosityLevel == "high")
+}
+
+/**
+ * Turn on verbose mode.
+ */
+func (c Config) GoVerbose() {
+
+	c.SetArg("verbosity", "high")
+}
+
+/**
+ * Turn off verbose mode.
+ */
+func (c Config) GoSilent() {
+
+	c.SetArg("verbosity", "")
 }
 
 /**
  * Get any command line argument.
  */
-func (c Config) getArg(item string) string {
+func (c Config) GetArg(item string) string {
 
 	value, itemPresent := c.args[item]
 
@@ -71,7 +102,7 @@ func (c Config) getArg(item string) string {
 /**
  * Get any command line flag.
  */
-func (c Config) getFlag(item string) bool {
+func (c Config) GetFlag(item string) bool {
 
 	value, itemPresent := c.flags[item]
 
@@ -80,4 +111,28 @@ func (c Config) getFlag(item string) bool {
 	} else {
 		return false
 	}
+}
+
+/**
+ * Set flag to true.
+ */
+func (c Config) SetFlag(item string) {
+
+	c.flags[item] = true
+}
+
+/**
+ * Set flag to false.
+ */
+func (c Config) UnsetFlag(item string) {
+
+	c.flags[item] = false
+}
+
+/**
+ * Setter for argument.
+ */
+func (c Config) SetArg(item string, value string) {
+
+	c.args[item] = value
 }

@@ -5,7 +5,7 @@
 package core
 
 import (
-	"fmt"
+	"../config"
 	"log"
 	"net"
 )
@@ -15,10 +15,16 @@ import (
  */
 func SendCmdsToDBGpEngine(conn *net.Conn, in <-chan string) {
 
+	config := config.Get()
+
 	for DBGpCmd := range in {
 		connection := *conn
 
 		if isActiveConnection(connection) {
+			if config.IsVerbose() {
+				log.Println(DBGpCmd)
+			}
+
 			writeCount, err := connection.Write([]byte(DBGpCmd))
 			_ = writeCount
 
@@ -26,7 +32,7 @@ func SendCmdsToDBGpEngine(conn *net.Conn, in <-chan string) {
 				log.Fatal(err)
 			}
 		} else {
-			fmt.Println("Inactive connection.")
+			log.Println("Inactive connection.")
 		}
 	}
 }
