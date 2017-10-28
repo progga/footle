@@ -9,6 +9,26 @@ package command
 import "testing"
 
 /**
+ * Tests for Validate().
+ */
+func TestValidate(t *testing.T) {
+
+  // The "dbgp" command.
+  err := Validate("dbgp", []string{"foo", "bar"})
+
+  if err != nil {
+    t.Error(err)
+  }
+
+  // The "run" command.
+  err = Validate("run", []string{})
+
+  if err != nil {
+    t.Error(err)
+  }
+}
+
+/**
  * Tests for validateBreakpointArgs()
  */
 func TestValidateBreakpointArgs(t *testing.T) {
@@ -103,4 +123,24 @@ func TestValidateSourceArgs(t *testing.T) {
 	if nil == err {
 		t.Error("Failed to spot insufficient number of arguments.")
 	}
+}
+
+/**
+ * Tests for validateRawDBGpArgs().
+ */
+func TestValidateRawDBGpArgs(t *testing.T) {
+
+  // Pass case.
+  err := validateRawDBGpArgs([]string{"foo"})
+
+  if nil != err {
+    t.Error(err)
+  }
+
+  // Fail case.  The "DBGp" command expects at least one argument.
+  err = validateRawDBGpArgs([]string{})
+
+  if nil == err {
+    t.Error(err)
+  }
 }

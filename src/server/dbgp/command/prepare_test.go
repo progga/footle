@@ -134,3 +134,38 @@ func TestPrepareCmdNoArgs(t *testing.T) {
 		t.Error("Failed to spot empty command string.")
 	}
 }
+
+/**
+ * Tests for prepareRawDBGpCmd().
+ */
+func TestPrepareRawDBGpCmd(t *testing.T) {
+
+  // Pass case.
+  args := []string{"breakpoint_list"}
+	TxId := 4
+	cmd, _ := prepareRawDBGpCmd(args, TxId)
+
+	expected := "breakpoint_list -i 4\x00"
+	if expected != cmd {
+		t.Errorf("Raw DBGp command preparation failed. Expected: %s, got: %s", expected, cmd)
+	}
+
+  // Pass case.
+  args = []string{"property_get", "-n", "foo"}
+	TxId = 5
+	cmd, _ = prepareRawDBGpCmd(args, TxId)
+
+	expected = "property_get -n foo -i 5\x00"
+	if expected != cmd {
+		t.Errorf("Raw DBGp command preparation failed. Expected: %s, got: %s", expected, cmd)
+	}
+
+  // Fail case.
+  args = []string{}
+	TxId = 6
+	_, err := prepareRawDBGpCmd(args, TxId)
+
+  if err == nil {
+		t.Errorf("Raw DBGp command preparation failed to spot empty argument.")
+  }
+}

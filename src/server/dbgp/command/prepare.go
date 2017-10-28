@@ -48,6 +48,9 @@ func PrepareDBGpCmd(cmd string, args []string) (DBGpCmd string, err error) {
 	case "run", "r":
 		DBGpCmd, err = prepareCmdNoArgs("run", TxId)
 
+	case "dbgp":
+		DBGpCmd, err = prepareRawDBGpCmd(args, TxId)
+
 	case "source", "src", "sr":
 		DBGpCmd, err = prepareSourceCmd(args, TxId)
 
@@ -135,6 +138,27 @@ func prepareEvalCmd(args []string, TxId int) (DBGpCmd string, err error) {
 	DBGpCmd = fmt.Sprintf("eval -i %d -- %s\x00", TxId, args[0])
 
 	return DBGpCmd, err
+}
+
+/**
+ * Any DBGp command.
+ *
+ * Raw DBGp commands are passed to the DBGp engine without further validation.
+ * This is useful for troubleshooting Footle.
+ *
+ * There is no need to provide the transaction ID as part of the raw command as
+ * we add it here.
+ */
+func prepareRawDBGpCmd(args []string, TxId int) (DBGpCmdWTxId string, err error) {
+
+	if len(args) < 1 {
+		return DBGpCmd, fmt.Errorf("No raw DBGp command given.")
+	}
+
+	rawDBGpCmd := strings.Join(args, " ")
+	DBGpCmdWTxId = fmt.Sprintf("%s -i %d\x00", rawDBGpCmd, TxId)
+
+	return DBGpCmdWTxId, err
 }
 
 /**

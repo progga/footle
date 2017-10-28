@@ -37,6 +37,9 @@ func Validate(cmd string, args []string) (err error) {
 	case "run", "r":
 		err = validateCmdWithNoArg("run", args)
 
+	case "dbgp":
+		err = validateRawDBGpArgs(args)
+
 	case "source", "src", "sr":
 		err = validateSourceArgs(args)
 
@@ -135,4 +138,21 @@ func validateSourceArgs(args []string) (err error) {
 	}
 
 	return err
+}
+
+/**
+ * Validate the Raw DBGp command.
+ *
+ * Valid format: dbgp dbgp-command [dbgp-command-args]
+ * Example: dbgp breakpoint_list
+ *   This should execute the breakpoint_list command without validation.
+ */
+func validateRawDBGpArgs(args []string) (err error) {
+
+  if len(args) < 1 {
+    err = fmt.Errorf("The \"dbgp\" command expects at least one argument.")
+    return err
+  }
+
+  return err
 }
