@@ -36,7 +36,7 @@ type Context struct {
 type Variable struct {
 	VarType string
 	Literal string
-	List    []Variable
+	List    map[string]Variable
 }
 
 type Init struct {
@@ -59,9 +59,10 @@ type Response struct {
 	Reason        string   `xml:"reason,attr"`
 	Id            int      `xml:"id,attr"`
 	Message       ResponseMessage
-	Breakpoints   []Breakpoint `xml:"breakpoint"`
-	Error         Error        `xml:"error"`
-	Content       string       `xml:",chardata"`
+	Breakpoints   []Breakpoint      `xml:"breakpoint"`
+	Error         Error             `xml:"error"`
+	Variables     []VariableDetails `xml:"property"`
+	Content       string            `xml:",chardata"`
 }
 
 type ResponseMessage struct {
@@ -83,4 +84,23 @@ type Breakpoint struct {
 type Error struct {
 	Code    int    `xml:"code,attr"`
 	Message string `xml:"message"`
+}
+
+type VariableDetails struct {
+	Name        string            `xml:"name,attr"`
+	Fullname    string            `xml:"fullname,attr"`
+	VarType     string            `xml:"type,attr"`
+	Facet       string            `xml:"facet,attr"` // public, private, etc.
+	Classname   string            `xml:"classname,attr"`
+	Constant    int               `xml:"constant,attr"`
+	Children    int               `xml:"children,attr"`
+	Size        int               `xml:"size,attr"`
+	Page        int               `xml:"page,attr"`
+	Pagesize    int               `xml:"pagesize,attr"`
+	Address     int               `xml:"address,attr"`
+	Key         string            `xml:"key,attr"`
+	Encoding    string            `xml:"encoding,attr"`
+	NumChildren int               `xml:"numchildren,attr"`
+	Value       string            `xml:",chardata"`
+	Variables   []VariableDetails `xml:"property"`
 }

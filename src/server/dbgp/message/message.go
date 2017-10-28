@@ -75,5 +75,27 @@ func prepareResponseMessage(response Response) (message Message) {
 		}
 	}
 
+	message.Context.Local = prepareVariables(response.Variables)
+
 	return message
+}
+
+/**
+ * Extract variable values.
+ */
+func prepareVariables(vars []VariableDetails) (variables map[string]Variable) {
+
+	if len(vars) == 0 {
+		return
+	}
+
+	variables = make(map[string]Variable)
+
+	for _, varDetails := range vars {
+		children := prepareVariables(varDetails.Variables)
+
+		variables[varDetails.Fullname] = Variable{varDetails.VarType, varDetails.Value, children}
+	}
+
+	return
 }
