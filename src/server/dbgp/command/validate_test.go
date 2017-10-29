@@ -13,19 +13,19 @@ import "testing"
  */
 func TestValidate(t *testing.T) {
 
-  // The "dbgp" command.
-  err := Validate("dbgp", []string{"foo", "bar"})
+	// The "dbgp" command.
+	err := Validate("dbgp", []string{"foo", "bar"})
 
-  if err != nil {
-    t.Error(err)
-  }
+	if err != nil {
+		t.Error(err)
+	}
 
-  // The "run" command.
-  err = Validate("run", []string{})
+	// The "run" command.
+	err = Validate("run", []string{})
 
-  if err != nil {
-    t.Error(err)
-  }
+	if err != nil {
+		t.Error(err)
+	}
 }
 
 /**
@@ -130,17 +130,47 @@ func TestValidateSourceArgs(t *testing.T) {
  */
 func TestValidateRawDBGpArgs(t *testing.T) {
 
-  // Pass case.
-  err := validateRawDBGpArgs([]string{"foo"})
+	// Pass case.
+	err := validateRawDBGpArgs([]string{"foo"})
 
-  if nil != err {
-    t.Error(err)
-  }
+	if nil != err {
+		t.Error(err)
+	}
 
-  // Fail case.  The "DBGp" command expects at least one argument.
-  err = validateRawDBGpArgs([]string{})
+	// Fail case.  The "DBGp" command expects at least one argument.
+	err = validateRawDBGpArgs([]string{})
 
-  if nil == err {
-    t.Error(err)
-  }
+	if nil == err {
+		t.Error(err)
+	}
+}
+
+/**
+ * Tests for validatePropertyGetArgs().
+ *
+ * We expect just one argument (a variable name) to prepare the
+ * property_get command.
+ */
+func TestValidatePropertyGetArgs(t *testing.T) {
+
+	// Pass case.
+	err := validatePropertyGetArgs([]string{"foo"})
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	// Fail case.  No argument.
+	err = validatePropertyGetArgs([]string{})
+
+	if err == nil {
+		t.Error("Failed to spot lack of arguments.")
+	}
+
+	// Fail case.  Too many arguments.
+	err = validatePropertyGetArgs([]string{"foo", "bar"})
+
+	if err == nil {
+		t.Error("Failed to spot incorrect number of arguments.")
+	}
 }

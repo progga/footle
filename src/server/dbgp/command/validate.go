@@ -43,6 +43,9 @@ func Validate(cmd string, args []string) (err error) {
 	case "dbgp":
 		err = validateRawDBGpArgs(args)
 
+	case "property_get", "var":
+		err = validatePropertyGetArgs(args)
+
 	case "source", "src", "sr":
 		err = validateSourceArgs(args)
 
@@ -154,6 +157,19 @@ func validateRawDBGpArgs(args []string) (err error) {
 
 	if len(args) < 1 {
 		err = fmt.Errorf("The \"dbgp\" command expects at least one argument.")
+		return err
+	}
+
+	return err
+}
+
+/**
+ * Validate the property_get command.
+ */
+func validatePropertyGetArgs(args []string) (err error) {
+
+	if len(args) != 1 {
+		err = fmt.Errorf("The \"property_get\" command takes a variable name as an argument.")
 		return err
 	}
 

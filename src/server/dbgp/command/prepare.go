@@ -184,6 +184,26 @@ func prepareSourceCmd(args []string, TxId int) (DBGpCmd string, err error) {
 }
 
 /**
+ * DBGp property_get command.
+ *
+ * It fetches the value of a single variable.
+ *
+ * Example: property_get -i 9 -n foo
+ */
+func preparePropertyGetCmd(args []string, TxId int) (DBGpCmd string, err error) {
+
+	if len(args) != 1 {
+		err = fmt.Errorf("Unsufficient number of args for property_get.")
+		return DBGpCmd, err
+	}
+
+	variableName := args[0]
+	DBGpCmd = fmt.Sprintf("property_get -i %d -n %s\x00", TxId, variableName)
+
+	return DBGpCmd, err
+}
+
+/**
  * Any DBGp command that does not take any argument other than the TX ID.
  *
  * Example: run, stop, etc.

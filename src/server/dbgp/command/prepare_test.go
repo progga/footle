@@ -140,8 +140,8 @@ func TestPrepareCmdNoArgs(t *testing.T) {
  */
 func TestPrepareRawDBGpCmd(t *testing.T) {
 
-  // Pass case.
-  args := []string{"breakpoint_list"}
+	// Pass case.
+	args := []string{"breakpoint_list"}
 	TxId := 4
 	cmd, _ := prepareRawDBGpCmd(args, TxId)
 
@@ -150,8 +150,8 @@ func TestPrepareRawDBGpCmd(t *testing.T) {
 		t.Errorf("Raw DBGp command preparation failed. Expected: %s, got: %s", expected, cmd)
 	}
 
-  // Pass case.
-  args = []string{"property_get", "-n", "foo"}
+	// Pass case.
+	args = []string{"property_get", "-n", "foo"}
 	TxId = 5
 	cmd, _ = prepareRawDBGpCmd(args, TxId)
 
@@ -160,12 +160,40 @@ func TestPrepareRawDBGpCmd(t *testing.T) {
 		t.Errorf("Raw DBGp command preparation failed. Expected: %s, got: %s", expected, cmd)
 	}
 
-  // Fail case.
-  args = []string{}
+	// Fail case.
+	args = []string{}
 	TxId = 6
 	_, err := prepareRawDBGpCmd(args, TxId)
 
-  if err == nil {
+	if err == nil {
 		t.Errorf("Raw DBGp command preparation failed to spot empty argument.")
-  }
+	}
+}
+
+/**
+ * Tests for preparePropertyGetCmd().
+ *
+ * The preparePropertyGetCmd() expects a variable name as well as the
+ * transaction Id.
+ */
+func TestPreparePropertyGetCmd(t *testing.T) {
+
+	// Pass case.
+	args := []string{"foo"}
+	TxId := 4
+	cmd, _ := preparePropertyGetCmd(args, TxId)
+
+	expected := "property_get -i 4 -n foo\x00"
+	if cmd != expected {
+		t.Errorf("property_get command preparation failed.  Expected: %s, got: %s", expected, cmd)
+	}
+
+	// Fail case.
+	args = []string{}
+	TxId = 5
+	_, err := preparePropertyGetCmd(args, TxId)
+
+	if err == nil {
+		t.Error("Failed to spot lack of a variable name.")
+	}
 }
