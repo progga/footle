@@ -31,6 +31,9 @@ func Validate(cmd string, args []string) (err error) {
 	case "breakpoint_list", "bl":
 		err = validateCmdWithNoArg("breakpoint_list", args)
 
+	case "context_get", "vl":
+		err = validateCmdWithNoArg("context_get", args)
+
 	case "eval", "ev":
 		err = validateCmdWithNoArg("eval", args)
 
@@ -149,10 +152,10 @@ func validateSourceArgs(args []string) (err error) {
  */
 func validateRawDBGpArgs(args []string) (err error) {
 
-  if len(args) < 1 {
-    err = fmt.Errorf("The \"dbgp\" command expects at least one argument.")
-    return err
-  }
+	if len(args) < 1 {
+		err = fmt.Errorf("The \"dbgp\" command expects at least one argument.")
+		return err
+	}
 
-  return err
+	return err
 }

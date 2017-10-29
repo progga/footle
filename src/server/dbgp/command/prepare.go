@@ -42,6 +42,9 @@ func PrepareDBGpCmd(cmd string, args []string) (DBGpCmd string, err error) {
 	case "breakpoint_get", "bg":
 		DBGpCmd, err = prepareBreakpointGetCmd(args, TxId)
 
+	case "context_get", "vl":
+		DBGpCmd, err = prepareCmdNoArgs("context_get", TxId)
+
 	case "eval", "ev":
 		DBGpCmd, err = prepareEvalCmd(args, TxId)
 
