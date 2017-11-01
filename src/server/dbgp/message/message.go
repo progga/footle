@@ -94,7 +94,21 @@ func prepareVariables(vars []VariableDetails) (variables map[string]Variable) {
 	for _, varDetails := range vars {
 		children := prepareVariables(varDetails.Variables)
 
-		variables[varDetails.Fullname] = Variable{varDetails.VarType, varDetails.Value, children}
+		hasLoadedChildren := false
+		if varDetails.HasChildren {
+			// Note: for empty arrays, we always say that we have loaded the children.
+			hasLoadedChildren = (varDetails.NumChildren == 0 || len(children) > 0)
+		}
+
+		variables[varDetails.Fullname] = Variable{
+			VarType:           varDetails.VarType,
+			Value:             varDetails.Value, // Useful for basic types only.
+			AccessModifier:    varDetails.Facet,
+			IsCompositeType:   varDetails.HasChildren,
+			Children:          children,
+			ChildCount:        varDetails.NumChildren,
+			HasLoadedChildren: hasLoadedChildren,
+		}
 	}
 
 	return

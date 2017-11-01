@@ -34,9 +34,13 @@ type Context struct {
 }
 
 type Variable struct {
-	VarType string
-	Literal string
-	List    map[string]Variable
+	VarType           string
+	Value             string // Only for basic types such as int, float, string, etc.
+	AccessModifier    string // private, protected, public, etc.
+	IsCompositeType   bool   // Is it an array, object, structure, etc.?
+	Children          map[string]Variable
+	ChildCount        int
+	HasLoadedChildren bool // DBGp servers return children upto a certain depth.
 }
 
 type Init struct {
@@ -93,7 +97,7 @@ type VariableDetails struct {
 	Facet       string            `xml:"facet,attr"` // public, private, etc.
 	Classname   string            `xml:"classname,attr"`
 	Constant    int               `xml:"constant,attr"`
-	Children    int               `xml:"children,attr"`
+	HasChildren bool              `xml:"children,attr"`
 	Size        int               `xml:"size,attr"`
 	Page        int               `xml:"page,attr"`
 	Pagesize    int               `xml:"pagesize,attr"`
