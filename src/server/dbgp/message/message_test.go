@@ -177,3 +177,53 @@ func TestDecodeResponse(t *testing.T) {
 		t.Errorf("Failed to spot Breakpoint ID. %d given.", response.Breakpoints[0].Id)
 	}
 }
+
+/**
+ * Tests for extractVariableValue().
+ */
+func TestExtractVariableValue(t *testing.T) {
+
+	// Text value.  Should be decoded.
+	varDetails := VariableDetails{
+		Encoding: "base64",
+		Value:    "Zm9v", // "foo"
+	}
+
+	value, isBase64 := extractVariableValue(varDetails)
+
+	if value != "foo" {
+		t.Errorf("Failed to extract value of the variable.  Expecting \"foo\", got \"%s\"", value)
+	}
+
+	if isBase64 {
+		t.Error("Should have decoded Base64 content.")
+	}
+
+	// Binary value.  Should not be decoded.
+	varDetails = VariableDetails{
+		Encoding: "base64",
+		Value:    "Zm9vAGJhcg==", // "foo\x00bar"
+	}
+
+	value, isBase64 = extractVariableValue(varDetails)
+
+	if !isBase64 {
+		t.Error("Failed to spot binary content.")
+	}
+
+	// Base64 encoding is not always used for plain content.
+	varDetails = VariableDetails{
+		Encoding: "none",
+		Value:    "99.99",
+	}
+
+	value, isBase64 = extractVariableValue(varDetails)
+
+	if value != "99.99" {
+		t.Errorf("Variable value was not encoded.  Expected \"99.99\", got \"%s\"", value)
+	}
+
+	if isBase64 {
+		t.Error("Failed to spot plain encoding.")
+	}
+}

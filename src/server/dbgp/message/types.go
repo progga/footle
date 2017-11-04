@@ -41,6 +41,7 @@ type Variable struct {
 	Children          map[string]Variable
 	ChildCount        int
 	HasLoadedChildren bool // DBGp servers return children upto a certain depth.
+	IsBase64          bool
 }
 
 type Init struct {

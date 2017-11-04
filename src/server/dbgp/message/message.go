@@ -5,7 +5,9 @@
 package message
 
 import (
+	"encoding/base64"
 	"fmt"
+	"net/http"
 	"strings"
 )
 
@@ -100,16 +102,48 @@ func prepareVariables(vars []VariableDetails) (variables map[string]Variable) {
 			hasLoadedChildren = (varDetails.NumChildren == 0 || len(children) > 0)
 		}
 
+		varValue, isBase64 := extractVariableValue(varDetails)
+
 		variables[varDetails.Fullname] = Variable{
 			VarType:           varDetails.VarType,
-			Value:             varDetails.Value, // Useful for basic types only.
+			Value:             varValue, // Useful for basic types only.
 			AccessModifier:    varDetails.Facet,
 			IsCompositeType:   varDetails.HasChildren,
 			Children:          children,
 			ChildCount:        varDetails.NumChildren,
 			HasLoadedChildren: hasLoadedChildren,
+			IsBase64:          isBase64,
 		}
 	}
 
 	return
+}
+
+/**
+ * Determine variable value and its encoding.
+ */
+func extractVariableValue(varDetails VariableDetails) (varValue string, isBase64 bool) {
+
+	varValue = varDetails.Value
+	isBase64 = (varDetails.Encoding == "base64")
+
+	if !isBase64 {
+		return
+	}
+
+	decoded, err := base64.StdEncoding.DecodeString(varDetails.Value)
+
+	if err != nil {
+		return
+	}
+
+	mimeType := http.DetectContentType(decoded)
+	isText := len(mimeType) > 4 && mimeType[0:4] == "text"
+
+	if isText {
+		varValue = string(decoded)
+		isBase64 = false
+	}
+
+	return varValue, isBase64
 }
