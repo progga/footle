@@ -34,6 +34,7 @@ type Context struct {
 }
 
 type Variable struct {
+	DisplayName       string // Short name is useful for display purposes.
 	VarType           string
 	Value             string // Only for basic types such as int, float, string, etc.
 	AccessModifier    string // private, protected, public, etc.

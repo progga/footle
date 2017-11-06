@@ -105,6 +105,7 @@ func prepareVariables(vars []VariableDetails) (variables map[string]Variable) {
 		varValue, isBase64 := extractVariableValue(varDetails)
 
 		variables[varDetails.Fullname] = Variable{
+			DisplayName:       varDetails.Name,
 			VarType:           varDetails.VarType,
 			Value:             varValue, // Useful for basic types only.
 			AccessModifier:    varDetails.Facet,
