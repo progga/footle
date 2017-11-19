@@ -1,0 +1,49 @@
+
+/**
+ * @file
+ * Variable tree display.
+ */
+
+/**
+ * Wrapper for variable tree display.
+ *
+ * Variables are displayed to the left-hand side of all tabs.
+ */
+.variables
+  position: fixed
+  top: 33vh
+  left: 66vw
+  width: 34vw
+  max-height: 67vh
+  overflow: scroll
+
+  &:empty
+    display: none
+
+.variable
+  // The variable name, type, and value must be displayed as part of a single line.
+  white-space: nowrap
+
+  &[data-is-composite="true"]
+    list-style-type: disclosure-closed
+
+  > .variable__display-name,
+  > .variable__type,
+  > .variable__value
+    display: inline-block
+    box-sizing: border-box
+
+  > .variable__display-name,
+  > .variable__type,
+    padding-right: 1em
+
+  > .variable-list
+    display: none
+
+  // Uncollapsed variable tree.
+  &.expanded
+    > .variable-list
+      display: block
+
+    &[data-is-composite="true"]
+      list-style-type: disclosure-open

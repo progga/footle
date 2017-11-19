@@ -33,6 +33,7 @@ jQuery(function () {
   setupTabCloser()
   setupContinuationControls()
   setupBreakpointTrigger()
+  setupVariableDisplay()
 
   // Process responses from the server.
   var sse = new EventSource('/message-stream')
@@ -74,6 +75,8 @@ function processMsg (msg) {
     refreshBreakpoints(msg.Breakpoints)
   } else if (msg.MessageType === 'response' && msg.State === 'stopped') {
     removePreviousBreak()
+  } else if (msg.MessageType === 'response' && msg.Properties.Command === 'context_get') {
+    updateVarsDisplay(msg.Context.Local)
   } else if (msg.MessageType === 'init') {
   }
 }
