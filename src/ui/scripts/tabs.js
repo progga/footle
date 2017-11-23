@@ -32,10 +32,10 @@ function addTab (filepath, postTabOpenAction) {
 
   jQuery.get(formattedFilepath, function (data) {
     /* Tab link. */
-    var tabLink = jQuery('<li id="' + filepath + '" class="tab-selector" data-filepath="' + filepath + '"><a href="#">' + filename + '<span class="tab-closer">X</span></a></li>')
+    var tabLink = jQuery('<li id="' + filepath + '" class="tab-selector" data-filepath="' + filepath + '" title="' + filepath + '"><a href="#">' + filename + '<span class="tab-closer">X</span></a></li>')
     // Make sure to add a jQuery object instead of plain markup so that we can
     // use the object later.
-    jQuery('.tab-nav').append(tabLink)
+    jQuery('#tab-selector-wrapper').append(tabLink)
 
     /* Tab content. */
     var tabContent = '<li id="body-of-' + filepath + '" class="tab-content" data-filepath="' + filepath + '"><div class="file-content">' + data + '</div></li>'
@@ -47,6 +47,10 @@ function addTab (filepath, postTabOpenAction) {
     /* Activate tab. */
     openTabForFile(filepath)
 
+    // The tab content area should start after the fix positioned tab
+    // selector area.
+    adjustTabContentPosition()
+
     if (postTabOpenAction) {
       postTabOpenAction()
     }
@@ -57,7 +61,7 @@ function addTab (filepath, postTabOpenAction) {
  * Close a tab when its close link is clicked.
  */
 function setupTabCloser () {
-  jQuery('.tab-nav').on('click', '.tab-closer', function (event) {
+  jQuery('#tab-selector-wrapper').on('click', '.tab-closer', function (event) {
     event.preventDefault()
     event.stopPropagation()
 
@@ -141,6 +145,8 @@ function removeTabForFile (filepath) {
 
   removeFileTabMapping(filepath)
 
+  adjustTabContentPosition()
+
   /* When we are closing the active tab, return to file browser in first tab. */
   var isActiveTab = tabElement.hasClass('uk-active')
   if (isActiveTab) {
@@ -186,4 +192,19 @@ function getTabContentElementForFile (filename) {
   } else {
     return tabContent
   }
+}
+
+/**
+ * Position tab content after tab selector.
+ *
+ * The tab selector is sticky at the top thanks to its *fix* positioning.
+ * Unless we do something, the tab content area will flow under it.  We
+ * avoid it by pushing down the tab content area as much as the height of
+ * the tab selector.  To push it down, we adjust the top padding of the
+ * *whole tab* area everytime the height of the tab selector area *may* change.
+ *
+ * @todo Adjust top padding on window resize.
+ */
+function adjustTabContentPosition () {
+  jQuery('#tab').css('padding-top', jQuery('#tab-selector-wrapper').outerHeight(true))
 }
