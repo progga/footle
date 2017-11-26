@@ -47,3 +47,17 @@
 
     &[data-is-composite="true"]
       list-style-type: disclosure-open
+
+    > .wait--loading-children
+      display: inline-block
+
+/**
+ * By default, hide spinner for variable.
+ *
+ * Display the spinner only after a variable is expanded.  This indicates
+ * that we are in the process of loading the children of that variable.
+ *
+ * @see .variable.expanded
+ */
+.wait--loading-children.uk-icon-spin
+  display: none

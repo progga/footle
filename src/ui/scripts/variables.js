@@ -14,7 +14,17 @@
 function setupVariableDisplay () {
   // When a variable with children is clicked, collapse it.
   jQuery('.variables').on('click', '.variable[data-is-composite="true"]', function (event) {
-    jQuery(event.target).toggleClass('expanded')
+    jQuery(this).toggleClass('expanded')
+
+    var hasNotLoadedChildren = jQuery(this).is('[data-has-loaded-children="false"]')
+    if (hasNotLoadedChildren) {
+      var varName = jQuery(this).attr('data-var-fullname')
+
+      sendCommand('property_get', [varName])
+    }
+
+    // We do *not* want to deal with parent variables.
+    return false
   })
 }
 
@@ -74,8 +84,13 @@ function prepareVarMarkup (varFullname, varDetail, childrenMarkup) {
     varType += '(' + varDetail.AccessModifier + ')'
   }
 
+  if (varDetail.IsCompositeType && !varDetail.HasLoadedChildren) {
+    childrenMarkup = '<span class="wait--loading-children uk-icon-refresh uk-icon-spin"></span>'
+  }
+
   var markup = '<li class="variable" data-var-fullname="' + varFullname +
-                 '" data-is-composite="' + varDetail.IsCompositeType + '">' +
+                 '" data-is-composite="' + varDetail.IsCompositeType +
+                 '" data-has-loaded-children="' + varDetail.HasLoadedChildren + '">' +
                  '<span class="variable__display-name">' + varDetail.DisplayName + '</span>' +
                  '<span class="variable__type">' + varType + '</span>' +
                  '<span class="variable__value">' + varDetail.Value + '</span>' +
