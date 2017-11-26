@@ -14,20 +14,7 @@ import (
 	"log"
 )
 
-/**
- * Stored DBGp messages.
- *
- * Storage for any DBGp message that has arrived after the previous command has
- * been issued from the command line.  Stored messages are usually the result of
- * the previous command.
- *
- * This is needed because we do not *block* the command line once a command has
- * been issued.  The response for the previous command is displayed when the
- * next command is issued.
- *
- * @see UpdateUIStatus()
- */
-var incomingMsgQueue []message.Message
+const READLINE_PROMPT = "> "
 
 /**
  * Execute the command line interface.
@@ -48,7 +35,7 @@ var incomingMsgQueue []message.Message
  */
 func RunUI(out chan<- string, bye chan struct{}) {
 
-	rl, err := readline.New("> ")
+	rl, err := readline.New(READLINE_PROMPT)
 	if nil != err {
 		log.Fatal(err)
 	}
@@ -56,21 +43,6 @@ func RunUI(out chan<- string, bye chan struct{}) {
 	config := config.Get()
 
 	for {
-		if len(incomingMsgQueue) > 0 {
-			// First, display all messages stored in the queue.
-			for _, msg := range incomingMsgQueue {
-				fmt.Println(msg)
-
-				// Some commands such as "source" send XML character data
-				// as inner XML content.
-				decoded, err := base64.StdEncoding.DecodeString(msg.Content)
-				if nil == err && 0 < len(decoded) {
-					fmt.Printf("%s", string(decoded))
-				}
-			}
-			incomingMsgQueue = incomingMsgQueue[:0]
-		}
-
 		cmd, err := rl.Readline()
 		if nil != err {
 			fmt.Println(err)
@@ -108,14 +80,18 @@ func RunUI(out chan<- string, bye chan struct{}) {
 }
 
 /**
- * Store incoming DBGP messages.
- *
- * The stored messages can be viewed in the command line interface.
+ * Display incoming DBGP messages.
  */
 func UpdateUIStatus(in <-chan message.Message) {
 
 	for msg := range in {
-		// @todo Lock the queue before updating.
-		incomingMsgQueue = append(incomingMsgQueue, msg)
+		fmt.Printf("%s\n\r%s", msg, READLINE_PROMPT)
+
+		// Some commands such as "source" send XML character data
+		// as inner XML content.
+		decoded, err := base64.StdEncoding.DecodeString(msg.Content)
+		if nil == err && 0 < len(decoded) {
+			fmt.Printf("%s\n\r%s", string(decoded), READLINE_PROMPT)
+		}
 	}
 }
