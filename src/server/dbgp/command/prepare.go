@@ -54,6 +54,9 @@ func PrepareDBGpCmd(cmd string, args []string) (DBGpCmd string, err error) {
 	case "dbgp":
 		DBGpCmd, err = prepareRawDBGpCmd(args, TxId)
 
+	case "property_get", "var":
+		DBGpCmd, err = preparePropertyGetCmd(args, TxId)
+
 	case "source", "src", "sr":
 		DBGpCmd, err = prepareSourceCmd(args, TxId)
 
