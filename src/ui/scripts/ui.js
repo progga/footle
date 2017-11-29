@@ -6,6 +6,8 @@
  * File browser is displayed in an iframe.  This iframe sits inside the first
  * tab.  When a filename is clicked in the file browser, it should be displayed
  * in another tab.  This tab will contain the HTML formatted file content.
+ *
+ * *** Js Syntax: ES2015 (AKA ES6) ***
  */
 
 'use strict'
@@ -33,7 +35,7 @@ jQuery(function () {
   setupTabCloser()
   setupContinuationControls()
   setupBreakpointTrigger()
-  setupVariableDisplay()
+  setupVariableInteraction()
 
   // Process responses from the server.
   var sse = new EventSource('/message-stream')
@@ -77,6 +79,8 @@ function processMsg (msg) {
     removePreviousBreak()
   } else if (msg.MessageType === 'response' && msg.Properties.Command === 'context_get') {
     updateVarsDisplay(msg.Context.Local)
+  } else if (msg.MessageType === 'response' && msg.Properties.Command === 'property_get') {
+    displaySingleVar(msg.Context.Local)
   } else if (msg.MessageType === 'init') {
   }
 }
