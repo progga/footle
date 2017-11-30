@@ -8,17 +8,25 @@
  * Wrapper for variable tree display.
  *
  * Variables are displayed to the left-hand side of all tabs.
+ *
+ * When considering width and height, keep some space for scrollbars as they
+ * appear outside.
  */
 .variables
   position: fixed
   top: 33vh
   left: 66vw
-  width: 34vw
-  max-height: 67vh
-  overflow: scroll
+  width: 33vw
+  max-height: 66vh
+  overflow: auto
 
   &:empty
     display: none
+
+  > .variable-list
+    // This is needed for horizontal scrolling as .variable is using
+    // white-space: nowrap
+    display: inline-block
 
 .variable
   // The variable name, type, and value must be displayed as part of a single line.

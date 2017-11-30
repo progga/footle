@@ -57,7 +57,10 @@ function displaySingleVar (varDetailList) {
 function setupVariableInteraction () {
   // When a variable with children is clicked, collapse it.
   jQuery('.variables').on('click', '.variable[data-is-composite="true"]', function (event) {
-    if (jQuery(event.target).is(':not(.variable)')) {
+    // Has the click been on a variable with children?  Only act on clicks
+    // that are on the list item surrounding a variable name or the variable
+    // name itself.
+    if (!jQuery(event.target).is('.variable[data-is-composite="true"], .variable[data-is-composite="true"] > .variable__display-name')) {
       return false
     }
 
