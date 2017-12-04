@@ -11,6 +11,7 @@ import (
 	"./file"
 	"encoding/json"
 	"fmt"
+	"html"
 	"io"
 	"log"
 	"net/http"
@@ -86,6 +87,7 @@ func TellBrowsers(in <-chan message.Message, config config.Config) {
 
 	for msg := range in {
 		adjustedMsg := adjustFilepath(msg, codeDir)
+		adjustedMsg.Context.Local = escapeVarValue(msg.Context.Local)
 
 		jsonMsg, err := json.Marshal(adjustedMsg)
 
@@ -347,4 +349,32 @@ func determineDBGpServersCodeDir(config config.Config) (codeDir string) {
 	}
 
 	return codeDir
+}
+
+/**
+ * HTML escapse variable values.
+ *
+ * Let's not burden HTTP clients with HTML escaping.
+ */
+func escapeVarValue(vars map[string]message.Variable) (variables map[string]message.Variable) {
+
+	if len(vars) == 0 {
+		return
+	}
+
+	var escapedVar message.Variable
+	variables = make(map[string]message.Variable)
+
+	for varFullname, varDetails := range vars {
+		escapedVar = varDetails
+		escapedVar.Value = html.EscapeString(varDetails.Value)
+
+		if len(varDetails.Children) > 0 {
+			escapedVar.Children = escapeVarValue(varDetails.Children)
+		}
+
+		variables[varFullname] = escapedVar
+	}
+
+	return
 }
