@@ -4,25 +4,44 @@
  * Style rules for main Footle UI.
  */
 
-.file-content iframe
+iframe.file_browser
   position: absolute
   height: 80%
 
+/**
+ * Applies inside the file list iframe when this stylehsheet is added into the
+ * iframe content.
+ *
+ * @see improveFileListUX()
+ */
+.file-list
+  > .breadcrumb--file-path
+    margin-bottom: 0
+
+    & > .link--dir:first-child
+      padding-left: .75em
+
+  > pre
+    margin-top: 0
+    background: white // Override uikit default.
+
 .line
-  background : white
+  background: white
   font-family: monospace
-  line-height : 1.4
+  line-height: 1.4
 
   &:hover
     background-color: gold
+
 .line__number
-  color : #787878
-  background : #ECECEC
-  cursor : pointer
+  color: #787878
+  background: #ECECEC
+  cursor: pointer
   padding: 0 1em
 
   &:hover
     background-color: #DEDEDE
+
 .line__code
   white-space: pre
   padding-left: .5em

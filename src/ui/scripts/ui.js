@@ -27,10 +27,10 @@ jQuery(function () {
   /* We have missed the very first "load" event for the iframe.  So we
      need to explicitely call setupFileLinks() for setting up the click
      handlers on the file links inside the file browser. */
-  setupFileLinks()
+  setupFileList()
 
   // iframe is loaded again when a directory is opened.
-  jQuery('iframe').on('load', setupFileLinks)
+  jQuery('iframe').on('load', setupFileList)
 
   setupTabCloser()
   setupContinuationControls()
@@ -46,22 +46,6 @@ jQuery(function () {
     processMsg(msg)
   })
 })
-
-/**
- * Setup click handler on all *file* links in the file browser.
- *
- * @param object ignoredEvent
- *    Optional, it is okay to call a Javascript function without its arguments.
- */
-function setupFileLinks (ignoredEvent) {
-  /* Directory names end in a slash, filenames do not. */
-  jQuery('pre :not(a[href$="/"])', window.file_browser.document).on('click', function (event) {
-    var relativeFilepath = this.pathname.replace('/files/', '')
-    addTab(relativeFilepath)
-
-    event.preventDefault()
-  })
-}
 
 /**
  * Update UI based on debugging status.
