@@ -5,7 +5,7 @@
 package core
 
 import (
-	"../config"
+	"server/config"
 	"log"
 	"net"
 )

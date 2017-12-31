@@ -10,6 +10,7 @@
 #
 # Required tools:
 # - Go >= 1.8: https://golang.org/doc/install
+# - Go dep: go get -u github.com/golang/dep/cmd/dep
 # - Node.js and npm: https://github.com/creationix/nvm
 # - Bower: npm install --global bower
 # - Sassc: https://github.com/sass/sassc
@@ -43,6 +44,7 @@ WIN_64_BUILD_DIR_PATH = ${BUILD_ROOT}/${WIN_64_BUILD_DIR}
 # Location of Go code.
 SERVER_SRC_DIR_PATH = ./src/server
 GO_SRC_FILES = $(shell find ${SERVER_SRC_DIR_PATH} -name *.go -type f)
+OUR_GO_PATH = $(shell pwd)
 
 # Location of HTML/CSS/Javascript-based UI code.
 UI_SRC_DIR_PATH = ./src/ui
@@ -75,10 +77,16 @@ all: Server ui
 #
 # Trivia: "server" as a target name does not work, but "Server" does.
 #
-Server: ${BUILD_DIR_PATH}/bin/footle
+Server: godeps ${BUILD_DIR_PATH}/bin/footle
 
 ${BUILD_DIR_PATH}/bin/footle: ${GO_SRC_FILES}
-	go build -o ${BUILD_DIR_PATH}/bin/footle ${SERVER_SRC_DIR_PATH}
+	GOPATH=${OUR_GO_PATH} go build -o ${BUILD_DIR_PATH}/bin/footle ${SERVER_SRC_DIR_PATH}
+
+# Grab Go package dependencies.
+godeps: ${SERVER_SRC_DIR_PATH}/vendor
+${SERVER_SRC_DIR_PATH}/vendor: ${SERVER_SRC_DIR_PATH}/Gopkg.toml
+	cd ${SERVER_SRC_DIR_PATH} ; \
+	GOPATH=${OUR_GO_PATH} dep ensure
 
 
 ### Compile and prepare the UI #################################################

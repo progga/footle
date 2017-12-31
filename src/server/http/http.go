@@ -5,10 +5,10 @@
 package http
 
 import (
-	"../config"
-	"../dbgp/command"
-	"../dbgp/message"
-	"./file"
+	"server/config"
+	"server/dbgp/command"
+	"server/dbgp/message"
+	"server/http/file"
 	"encoding/json"
 	"fmt"
 	"html"

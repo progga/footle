@@ -8,11 +8,11 @@
 package main
 
 import (
-	"./cmdline"
-	"./config"
-	"./core"
-	"./dbgp/message"
-	"./http"
+	"server/cmdline"
+	"server/config"
+	"server/core"
+	"server/dbgp/message"
+	"server/http"
 	"net"
 )
 

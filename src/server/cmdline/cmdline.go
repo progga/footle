@@ -5,9 +5,9 @@
 package cmdline
 
 import (
-	"../config"
-	"../dbgp/command"
-	"../dbgp/message"
+	"server/config"
+	"server/dbgp/command"
+	"server/dbgp/message"
 	"encoding/base64"
 	"fmt"
 	"github.com/chzyer/readline"

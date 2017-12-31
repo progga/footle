@@ -5,9 +5,9 @@
 package core
 
 import (
-	"../config"
-	"../dbgp"
-	"../dbgp/message"
+	"server/config"
+	"server/dbgp"
+	"server/dbgp/message"
 	"log"
 	"net"
 )
