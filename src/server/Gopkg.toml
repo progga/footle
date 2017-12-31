@@ -1,0 +1,8 @@
+
+[[constraint]]
+  name = "github.com/chzyer/readline"
+  version = "1.4.0"
+
+[[constraint]]
+  branch = "master"
+  name = "golang.org/x/net"

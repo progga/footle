@@ -79,14 +79,24 @@ all: Server ui
 #
 Server: godeps ${BUILD_DIR_PATH}/bin/footle
 
+# *Temporarily* set $GOPATH to Footle's top level dir so that Footle's Go
+# packages (e.g. server/config) can be located during compilation.  This
+# frees Footle from the Go workspace allowing it to reside anywhere
+# in the file system.
 ${BUILD_DIR_PATH}/bin/footle: ${GO_SRC_FILES}
 	GOPATH=${OUR_GO_PATH} go build -o ${BUILD_DIR_PATH}/bin/footle ${SERVER_SRC_DIR_PATH}
 
 # Grab Go package dependencies.
+#
+# We are using "dep" as the dependency manager.  "dep" demands that Footle be
+# inside $GOPATH.  So we temporarily point $GOPATH to Footle's top level dir.
+# This has the side effect that "dep" drops a "pkg/" directory inside Footle.
+# Once "dep" is finished, we remove "pkg/" for the sake of cleanliness.
 godeps: ${SERVER_SRC_DIR_PATH}/vendor
 ${SERVER_SRC_DIR_PATH}/vendor: ${SERVER_SRC_DIR_PATH}/Gopkg.toml
 	cd ${SERVER_SRC_DIR_PATH} ; \
 	GOPATH=${OUR_GO_PATH} dep ensure
+	rm -rf ${OUR_GO_PATH}/pkg
 
 
 ### Compile and prepare the UI #################################################
