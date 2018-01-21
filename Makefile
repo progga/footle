@@ -165,27 +165,27 @@ cross-compile: linux32 linux64 freebsd64 macos64 win32 win64
 
 linux32: ${LINUX_32_BUILD_DIR_PATH}/bin/footle
 ${LINUX_32_BUILD_DIR_PATH}/bin/footle: ${GO_SRC_FILES}
-	GOOS=linux GOARCH=386 go build -o ${LINUX_32_BUILD_DIR_PATH}/bin/footle ${SERVER_SRC_DIR_PATH}
+	GOPATH=${OUR_GO_PATH} GOOS=linux GOARCH=386 go build -o ${LINUX_32_BUILD_DIR_PATH}/bin/footle ${SERVER_SRC_DIR_PATH}
 
 linux64: ${LINUX_64_BUILD_DIR_PATH}/bin/footle
 ${LINUX_64_BUILD_DIR_PATH}/bin/footle: ${GO_SRC_FILES}
-	GOOS=linux GOARCH=amd64 go build -o ${LINUX_64_BUILD_DIR_PATH}/bin/footle ${SERVER_SRC_DIR_PATH}
+	GOPATH=${OUR_GO_PATH} GOOS=linux GOARCH=amd64 go build -o ${LINUX_64_BUILD_DIR_PATH}/bin/footle ${SERVER_SRC_DIR_PATH}
 
 freebsd64: ${FREEBSD_64_BUILD_DIR_PATH}/bin/footle
 ${FREEBSD_64_BUILD_DIR_PATH}/bin/footle: ${GO_SRC_FILES}
-	GOOS=freebsd GOARCH=amd64 go build -o ${FREEBSD_64_BUILD_DIR_PATH}/bin/footle ${SERVER_SRC_DIR_PATH}
+	GOPATH=${OUR_GO_PATH} GOOS=freebsd GOARCH=amd64 go build -o ${FREEBSD_64_BUILD_DIR_PATH}/bin/footle ${SERVER_SRC_DIR_PATH}
 
 macos64: ${MACOS_64_BUILD_DIR_PATH}/bin/footle
 ${MACOS_64_BUILD_DIR_PATH}/bin/footle: ${GO_SRC_FILES}
-	GOOS=darwin GOARCH=amd64 go build -o ${MACOS_64_BUILD_DIR_PATH}/bin/footle ${SERVER_SRC_DIR_PATH}
+	GOPATH=${OUR_GO_PATH} GOOS=darwin GOARCH=amd64 go build -o ${MACOS_64_BUILD_DIR_PATH}/bin/footle ${SERVER_SRC_DIR_PATH}
 
 win32: ${WIN_32_BUILD_DIR_PATH}/bin/footle
 ${WIN_32_BUILD_DIR_PATH}/bin/footle: ${GO_SRC_FILES}
-	GOOS=windows GOARCH=386 go build -o ${WIN_32_BUILD_DIR_PATH}/bin/footle ${SERVER_SRC_DIR_PATH}
+	GOPATH=${OUR_GO_PATH} GOOS=windows GOARCH=386 go build -o ${WIN_32_BUILD_DIR_PATH}/bin/footle ${SERVER_SRC_DIR_PATH}
 
 win64: ${WIN_64_BUILD_DIR_PATH}/bin/footle
 ${WIN_64_BUILD_DIR_PATH}/bin/footle: ${GO_SRC_FILES}
-	GOOS=windows GOARCH=amd64 go build -o ${WIN_64_BUILD_DIR_PATH}/bin/footle ${SERVER_SRC_DIR_PATH}
+	GOPATH=${OUR_GO_PATH} GOOS=windows GOARCH=amd64 go build -o ${WIN_64_BUILD_DIR_PATH}/bin/footle ${SERVER_SRC_DIR_PATH}
 
 # Copy the same UI code inside every distribution everytime *any* UI source
 # file changes.  Do not forget to update the timestamp of the *copied* directory
