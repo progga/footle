@@ -81,12 +81,7 @@ func (c *Connection) Activate() {
 		return
 	}
 
-	c.isActive = true
-
-	if c.wait != nil {
-		close(c.wait)
-	}
-
+	c.signalActivation()
 	c.startListeningForDBGpEngine()
 }
 
@@ -143,6 +138,22 @@ func (c *Connection) Disconnect() error {
 func (c *Connection) Get() *net.Conn {
 
 	return &c.connection
+}
+
+/**
+ * End wait by WaitUntilActive().
+ */
+func (c *Connection) signalActivation() {
+
+	if c.isActive {
+		return
+	}
+
+	c.isActive = true
+
+	if c.wait != nil {
+		close(c.wait)
+	}
 }
 
 /**
