@@ -148,8 +148,11 @@ ${UI_FONT_REQUIRED_DIR}: ${UI_FONT_ORIG_DIR}
 #
 # At the moment, we have tests for the Go code only.
 #
+# We are explicitely mentioning the Go packages because we do *not* want to
+# test the vendor packages.  Go 1.9 ignores the vendor packages.  So this is
+# a temporary arrangement while we support Go 1.8.
 test:
-	go test ${SERVER_SRC_DIR_PATH}/...
+	GOPATH=${OUR_GO_PATH} go test ${SERVER_SRC_DIR_PATH}/core/... ${SERVER_SRC_DIR_PATH}/dbgp/... ${SERVER_SRC_DIR_PATH}/http/...
 
 
 ### Cross compile and prepare tarballs ########################################
