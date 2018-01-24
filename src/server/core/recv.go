@@ -5,22 +5,28 @@
 package core
 
 import (
+	"log"
 	"server/config"
+	conn "server/core/connection"
 	"server/dbgp"
 	"server/dbgp/message"
-	"log"
-	"net"
 )
 
 /**
  * Receive message from DBGp engine and pass it to user interfaces.
  */
-func RecvMsgsFromDBGpEngine(sock net.Listener, activeDBGpConnection *net.Conn, MsgsForCmdLineUI, MsgsForHTTPUI chan<- message.Message) {
+func RecvMsgsFromDBGpEngine(DBGpConnection *conn.Connection, MsgsForCmdLineUI, MsgsForHTTPUI chan<- message.Message) {
 
 	config := config.Get()
 
 	for {
-		*activeDBGpConnection = StartTalkingToDBGpEngine(sock)
+		DBGpConnection.WaitUntilActive()
+
+		activeDBGpConnection := DBGpConnection.Connect()
+
+		if *activeDBGpConnection == nil {
+			continue
+		}
 
 		for {
 			msg, err := dbgp.Read(*activeDBGpConnection)
@@ -37,21 +43,8 @@ func RecvMsgsFromDBGpEngine(sock net.Listener, activeDBGpConnection *net.Conn, M
 			}
 		}
 
-		(*activeDBGpConnection).Close()
+		DBGpConnection.Disconnect()
 	}
-}
-
-/**
- * Establish connection with a DBGp engine.
- */
-func StartTalkingToDBGpEngine(sock net.Listener) (connection net.Conn) {
-
-	connection, err := sock.Accept()
-	if nil != err {
-		log.Fatal(err)
-	}
-
-	return connection
 }
 
 /**

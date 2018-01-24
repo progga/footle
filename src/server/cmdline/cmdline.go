@@ -5,13 +5,13 @@
 package cmdline
 
 import (
-	"server/config"
-	"server/dbgp/command"
-	"server/dbgp/message"
 	"encoding/base64"
 	"fmt"
 	"github.com/chzyer/readline"
 	"log"
+	"server/config"
+	"server/dbgp/command"
+	"server/dbgp/message"
 )
 
 const READLINE_PROMPT = "> "
@@ -57,7 +57,6 @@ func RunUI(out chan<- string, bye chan struct{}) {
 
 		if "bye" == shortCmd || "quit" == shortCmd || "q" == shortCmd {
 			close(bye)
-
 			return
 		} else if "refresh" == cmd || "" == cmd {
 			continue
@@ -66,6 +65,10 @@ func RunUI(out chan<- string, bye chan struct{}) {
 			continue
 		} else if cmd == "no-verbose" {
 			config.GoSilent()
+			continue
+		} else if cmd == "on" || cmd == "off" || cmd == "continue" {
+			// Commands for controlling Footle.
+			out <- cmd
 			continue
 		}
 

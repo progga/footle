@@ -5,24 +5,27 @@
 package core
 
 import (
-	"server/config"
-	"log"
-	"net"
-	"strconv"
+	conn "server/core/connection"
 )
 
 /**
- * Start listening on the standard DBGp port of 9000.
+ * Process commands coming from UIs.
+ *
+ * Some commands (e.g. run) are meant for the DBGp engine.  These are forwarded
+ * to the appropriate channel.  Other commands (e.g. on) are meant to control
+ * Footle's behavior.  These are acted up on.
  */
-func ListenForDBGpEngine(config config.Config) (sock net.Listener) {
+func ProcessUICmds(CmdsFromUI, DBGpCmds chan string, DBGpConnection *conn.Connection) {
 
-	DBGpPort := config.GetDBGpPort()
-	address := ":" + strconv.Itoa(DBGpPort)
-
-	sock, err := net.Listen("tcp", address)
-	if nil != err {
-		log.Fatal(err)
+	for cmd := range CmdsFromUI {
+		if cmd == "on" {
+			DBGpConnection.Activate()
+		} else if cmd == "off" {
+			DBGpConnection.Deactivate()
+		} else if cmd == "continue" {
+			DBGpConnection.Disconnect()
+		} else {
+			DBGpCmds <- cmd
+		}
 	}
-
-	return sock
 }

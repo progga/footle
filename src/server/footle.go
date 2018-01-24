@@ -11,9 +11,9 @@ import (
 	"server/cmdline"
 	"server/config"
 	"server/core"
+	conn "server/core/connection"
 	"server/dbgp/message"
 	"server/http"
-	"net"
 )
 
 /**
@@ -29,11 +29,10 @@ func main() {
 	config := config.Get()
 
 	// Initializations.
-	var activeDBGpConnection net.Conn
-
 	var MsgsForCmdLineUI, MsgsForHTTPUI chan message.Message
 
 	CmdsFromUI := make(chan string)
+	DBGpCmds := make(chan string)
 	bye := make(chan struct{})
 
 	// Launch all interfaces.
@@ -52,9 +51,15 @@ func main() {
 	}
 
 	// Talk to DBGp engine.
-	sock := core.ListenForDBGpEngine(config)
-	go core.RecvMsgsFromDBGpEngine(sock, &activeDBGpConnection, MsgsForCmdLineUI, MsgsForHTTPUI)
-	go core.SendCmdsToDBGpEngine(&activeDBGpConnection, CmdsFromUI)
+	DBGpConnection := conn.GetConnection()
+	DBGpConnection.Activate()
+
+	go core.RecvMsgsFromDBGpEngine(DBGpConnection, MsgsForCmdLineUI, MsgsForHTTPUI)
+	go core.SendCmdsToDBGpEngine(DBGpConnection, DBGpCmds)
+
+	// Let Footle deal with all commands from UIs first.  Some commands will then
+	// head for the DBGp engine while some will change Footle's internal state.
+	go core.ProcessUICmds(CmdsFromUI, DBGpCmds, DBGpConnection)
 
 	<-bye
 }
