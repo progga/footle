@@ -73,7 +73,8 @@ function setupVariableInteraction () {
       sendCommand('property_get', [varName])
     }
 
-    // We do *not* want to expand/collapse with parent variables.
+    // We do *not* want to expand/collapse the parent variables of the clicked
+    // variable.
     return false
   })
 }
