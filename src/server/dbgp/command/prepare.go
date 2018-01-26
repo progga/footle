@@ -138,7 +138,7 @@ func prepareBreakpointGetCmd(args []string, TxId int) (DBGpCmd string, err error
 func prepareEvalCmd(args []string, TxId int) (DBGpCmd string, err error) {
 
 	if 0 == len(args) {
-		return DBGpCmd, fmt.Errorf("Unsufficient number of args for eval.")
+		return DBGpCmd, fmt.Errorf("Insufficient number of args for eval.")
 	}
 
 	DBGpCmd = fmt.Sprintf("eval -i %d -- %s\x00", TxId, args[0])
@@ -161,7 +161,7 @@ func prepareRawDBGpCmd(args []string, TxId int) (DBGpCmdWTxId string, err error)
 		return DBGpCmdWTxId, fmt.Errorf("No raw DBGp command given.")
 	}
 
-	rawDBGpCmd := strings.Join(args, " ")
+	rawDBGpCmd := strings.Join(args, space)
 	DBGpCmdWTxId = fmt.Sprintf("%s -i %d\x00", rawDBGpCmd, TxId)
 
 	return DBGpCmdWTxId, err
@@ -173,7 +173,7 @@ func prepareRawDBGpCmd(args []string, TxId int) (DBGpCmdWTxId string, err error)
 func prepareSourceCmd(args []string, TxId int) (DBGpCmd string, err error) {
 
 	if 2 != len(args) {
-		err = fmt.Errorf("Unsufficient number of args for source.")
+		err = fmt.Errorf("Insufficient number of args for source.")
 		return DBGpCmd, err
 	}
 
@@ -191,17 +191,26 @@ func prepareSourceCmd(args []string, TxId int) (DBGpCmd string, err error) {
  *
  * It fetches the value of a single variable.
  *
- * Example: property_get -i 9 -n foo
+ * Example: property_get -i 9 -n "foo"
  */
 func preparePropertyGetCmd(args []string, TxId int) (DBGpCmd string, err error) {
 
-	if len(args) != 1 {
-		err = fmt.Errorf("Unsufficient number of args for property_get.")
+	if len(args) < 1 {
+		err = fmt.Errorf("Insufficient number of args for property_get.")
 		return DBGpCmd, err
 	}
 
-	variableName := args[0]
-	DBGpCmd = fmt.Sprintf("property_get -i %d -n %s\x00", TxId, variableName)
+	// Some variable names may contain a space character (e.g. foo["bar buz"]).
+	// Such names will appear as separate argument items.  We reconstruct the
+	// original variable name by joining the items.
+	variableName := strings.Join(args, space)
+
+	// Escapse following chars with backslash: single quote, double quote, null,
+	// and backslash as per the DBGp protocol.
+	escapseRule := strings.NewReplacer(`'`, `\'`, `"`, `\"`, "\x00", "\\\x00", `\`, `\\`)
+	variableName = escapseRule.Replace(variableName)
+
+	DBGpCmd = fmt.Sprintf("property_get -i %d -n \"%s\"\x00", TxId, variableName)
 
 	return DBGpCmd, err
 }

@@ -149,7 +149,8 @@ func TestValidateRawDBGpArgs(t *testing.T) {
  * Tests for validatePropertyGetArgs().
  *
  * We expect just one argument (a variable name) to prepare the
- * property_get command.
+ * property_get command.  When multiple arguments are given, they are joined
+ * with a space character to form a single variable name.
  */
 func TestValidatePropertyGetArgs(t *testing.T) {
 
@@ -160,17 +161,17 @@ func TestValidatePropertyGetArgs(t *testing.T) {
 		t.Error(err)
 	}
 
+	// Pass case where variable name has space characters.
+	err = validatePropertyGetArgs([]string{"foo['bar baz qux']"})
+
+	if err != nil {
+		t.Error("Failed to verify variable name with space character.")
+	}
+
 	// Fail case.  No argument.
 	err = validatePropertyGetArgs([]string{})
 
 	if err == nil {
 		t.Error("Failed to spot lack of arguments.")
-	}
-
-	// Fail case.  Too many arguments.
-	err = validatePropertyGetArgs([]string{"foo", "bar"})
-
-	if err == nil {
-		t.Error("Failed to spot incorrect number of arguments.")
 	}
 }

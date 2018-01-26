@@ -175,6 +175,13 @@ func TestPrepareRawDBGpCmd(t *testing.T) {
  *
  * The preparePropertyGetCmd() expects a variable name as well as the
  * transaction Id.
+ *
+ * It is safe to always wrap the variable name in double quotes in case the
+ * name contains a space or null (unlikely case) character.  We escape the
+ * following characters with backslash in the variable name: single quote,
+ * double quote, null, backslash.
+ *
+ * @see https://xdebug.org/docs-dbgp.php#escaping-rules
  */
 func TestPreparePropertyGetCmd(t *testing.T) {
 
@@ -183,7 +190,18 @@ func TestPreparePropertyGetCmd(t *testing.T) {
 	TxId := 4
 	cmd, _ := preparePropertyGetCmd(args, TxId)
 
-	expected := "property_get -i 4 -n foo\x00"
+	expected := "property_get -i 4 -n \"foo\"\x00"
+	if cmd != expected {
+		t.Errorf("property_get command preparation failed.  Expected: %s, got: %s", expected, cmd)
+	}
+
+	// Pass case where variable name (e.g. foo['bar baz'\x00\]) has single quote,
+	// space character, null, and backslash.  This tests variable name escaping.
+	args = []string{"foo['bar", "baz'\x00\\]"}
+	TxId = 44
+	cmd, _ = preparePropertyGetCmd(args, TxId)
+
+	expected = "property_get -i 44 -n \"foo[\\'bar baz\\'\\\x00\\\\]\"\x00"
 	if cmd != expected {
 		t.Errorf("property_get command preparation failed.  Expected: %s, got: %s", expected, cmd)
 	}

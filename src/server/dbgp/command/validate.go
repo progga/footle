@@ -168,7 +168,7 @@ func validateRawDBGpArgs(args []string) (err error) {
  */
 func validatePropertyGetArgs(args []string) (err error) {
 
-	if len(args) != 1 {
+	if len(args) < 1 {
 		err = fmt.Errorf("The \"property_get\" command takes a variable name as an argument.")
 		return err
 	}
