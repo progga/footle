@@ -5,6 +5,7 @@
 package core
 
 import (
+	"log"
 	conn "server/core/connection"
 	"server/dbgp/command"
 	"server/dbgp/message"
@@ -20,14 +21,28 @@ import (
 func ProcessUICmds(CmdsFromUI, DBGpCmds chan string, DBGpConnection *conn.Connection) {
 
 	for cmd := range CmdsFromUI {
-		if cmd == "on" {
+		shortCmd, cmdArgs, err := command.Break(cmd)
+
+		if nil != err {
+			log.Println(err)
+			continue
+		}
+
+		if shortCmd == "on" {
 			DBGpConnection.Activate()
-		} else if cmd == "off" {
+		} else if shortCmd == "off" {
 			DBGpConnection.Deactivate()
-		} else if cmd == "continue" {
+		} else if shortCmd == "continue" {
 			DBGpConnection.Disconnect()
 		} else {
-			DBGpCmds <- cmd
+			fullDBGpCmd, err := command.Prepare(shortCmd, cmdArgs)
+
+			if nil != err {
+				log.Println(err)
+				continue
+			}
+
+			DBGpCmds <- fullDBGpCmd
 		}
 	}
 }

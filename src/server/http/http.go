@@ -5,10 +5,6 @@
 package http
 
 import (
-	"server/config"
-	"server/dbgp/command"
-	"server/dbgp/message"
-	"server/http/file"
 	"encoding/json"
 	"fmt"
 	"html"
@@ -17,6 +13,10 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"server/config"
+	"server/dbgp/command"
+	"server/dbgp/message"
+	"server/http/file"
 )
 
 const DOCROOT_PATH = "../../ui/"
@@ -121,16 +121,16 @@ func makeReceiveHandler(out chan string) http.HandlerFunc {
  */
 func receive(writeStream http.ResponseWriter, request *http.Request, out chan string) {
 
-	msg := request.FormValue("msg")
+	cmd := request.FormValue("cmd")
 
-	shortCmd, cmdArgs, err := command.Break(msg)
+	shortCmd, cmdArgs, err := command.Break(cmd)
 	if nil != err {
 		fmt.Fprintf(writeStream, "%s", err)
 
 		return
 	}
 
-	DBGpCmd, err := command.Prepare(shortCmd, cmdArgs)
+	err = command.Validate(shortCmd, cmdArgs)
 	if nil != err {
 		fmt.Fprintf(writeStream, "%s", err)
 
@@ -139,7 +139,7 @@ func receive(writeStream http.ResponseWriter, request *http.Request, out chan st
 
 	fmt.Fprintf(writeStream, "Got it.")
 
-	out <- DBGpCmd
+	out <- cmd
 }
 
 /**
