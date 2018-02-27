@@ -20,7 +20,7 @@ function sendCommand (command, args) {
   var footleCommand = [command].concat(args).join(' ')
 
   jQuery.post('steering-wheel', {
-    'msg': footleCommand
+    'cmd': footleCommand
   }).fail(function (jqXHR, textStatus, errorThrown) {
     console.log(errorThrown)
   })

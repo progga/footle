@@ -90,7 +90,7 @@ function isNewBreakpoint (breakpoint) {
  * When a file containing a new breakpoint has no tab, create a new tab for
  * that file.
  *
- * @param object msg
+ * @param object breakpoint
  */
 function addBreakpoint (breakpoint) {
   var filename = breakpoint.Filename

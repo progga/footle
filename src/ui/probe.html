@@ -9,8 +9,8 @@
   <body>
     <div class="command-post">
       <form class="controls">
-        <label class="form-label" for="msg">Command:</label>
-        <input type="text" name="msg" placeholder="Message" autofocus="true" required />
+        <label class="form-label" for="cmd">Command:</label>
+        <input type="text" name="cmd" placeholder="Message" autofocus="true" required />
 
         <button id="send-btn">Send</button>
       </form>
@@ -27,13 +27,13 @@
         jQuery('#send-btn').click(function(e) {
           e.preventDefault();
 
-          var msg = jQuery('input[name="msg"]').val();
+          var cmd = jQuery('input[name="cmd"]').val();
 
           jQuery.ajax({
             url: "steering-wheel",
             method: "POST",
             data: {
-              "msg": msg,
+              "cmd": cmd,
             }
           }).done(function(feedbackMsg) {
             jQuery(".feedback").html('<small class="feedback-msg uk-animation-shake">' + feedbackMsg + "</small>");
