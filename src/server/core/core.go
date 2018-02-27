@@ -63,9 +63,9 @@ func ProcessDBGpMessages(DBGpCmds chan string, DBGpMessages, MsgsForCmdLineUI, M
 			endSession(DBGpCmds)
 		} else if state == "starting" {
 			sendPendingBreakpoints(DBGpCmds)
-		} else {
-			BroadcastMsgToUIs(msg, MsgsForCmdLineUI, MsgsForHTTPUI)
 		}
+
+		BroadcastMsgToUIs(msg, MsgsForCmdLineUI, MsgsForHTTPUI)
 	}
 }
 
