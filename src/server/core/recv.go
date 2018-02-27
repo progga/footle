@@ -13,9 +13,9 @@ import (
 )
 
 /**
- * Receive message from DBGp engine and pass it to user interfaces.
+ * Receive messages from DBGp engine and send it for further processing.
  */
-func RecvMsgsFromDBGpEngine(DBGpConnection *conn.Connection, MsgsForCmdLineUI, MsgsForHTTPUI chan<- message.Message) {
+func RecvMsgsFromDBGpEngine(DBGpConnection *conn.Connection, DBGpMessages chan<- message.Message) {
 
 	config := config.Get()
 
@@ -35,7 +35,7 @@ func RecvMsgsFromDBGpEngine(DBGpConnection *conn.Connection, MsgsForCmdLineUI, M
 			}
 
 			if parsedMsg, err := message.Decode(msg); nil == err {
-				BroadcastMsgToUIs(parsedMsg, MsgsForCmdLineUI, MsgsForHTTPUI)
+				DBGpMessages <- parsedMsg
 			}
 
 			if config.IsVerbose() {
@@ -44,21 +44,5 @@ func RecvMsgsFromDBGpEngine(DBGpConnection *conn.Connection, MsgsForCmdLineUI, M
 		}
 
 		DBGpConnection.Disconnect()
-	}
-}
-
-/**
- * Pass on a DBGP message to all the user interfaces.
- *
- * User interfaces include the command line interface and the HTTP interface.
- */
-func BroadcastMsgToUIs(msg message.Message, toCmdLine, toHTTP chan<- message.Message) {
-
-	if nil != toCmdLine {
-		toCmdLine <- msg
-	}
-
-	if nil != toHTTP {
-		toHTTP <- msg
 	}
 }

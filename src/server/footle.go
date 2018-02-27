@@ -33,33 +33,46 @@ func main() {
 
 	CmdsFromUI := make(chan string)
 	DBGpCmds := make(chan string)
+	DBGpMessages := make(chan message.Message)
 	bye := make(chan struct{})
 
-	// Launch all interfaces.
-	if config.HasCmdLine() {
-		MsgsForCmdLineUI = make(chan message.Message)
-
-		go cmdline.RunUI(CmdsFromUI, bye)
-		go cmdline.UpdateUIStatus(MsgsForCmdLineUI)
-	}
-
-	if config.HasHTTP() {
-		MsgsForHTTPUI = make(chan message.Message)
-
-		go http.Listen(CmdsFromUI, config)
-		go http.TellBrowsers(MsgsForHTTPUI, config)
-	}
+	launchUIs(config, &MsgsForCmdLineUI, &MsgsForHTTPUI, CmdsFromUI, bye)
 
 	// Talk to DBGp engine.
 	DBGpConnection := conn.GetConnection()
 	DBGpConnection.Activate()
 
-	go core.RecvMsgsFromDBGpEngine(DBGpConnection, MsgsForCmdLineUI, MsgsForHTTPUI)
+	go core.RecvMsgsFromDBGpEngine(DBGpConnection, DBGpMessages)
 	go core.SendCmdsToDBGpEngine(DBGpConnection, DBGpCmds)
 
 	// Let Footle deal with all commands from UIs first.  Some commands will then
 	// head for the DBGp engine while some will change Footle's internal state.
 	go core.ProcessUICmds(CmdsFromUI, DBGpCmds, DBGpConnection)
 
+	// Process incoming DBGP messages before selectively passing them to the UIs.
+	go core.ProcessDBGpMessages(DBGpCmds, DBGpMessages, MsgsForCmdLineUI, MsgsForHTTPUI)
+
 	<-bye
+}
+
+/**
+ * Launch all user interfaces.
+ *
+ * Start the HTTP and/or the Cli interfaces depending on user preferences.
+ */
+func launchUIs(config config.Config, MsgsForCmdLineUI, MsgsForHTTPUI *chan message.Message, CmdsFromUI chan string, bye chan struct{}) {
+
+	if config.HasCmdLine() {
+		*MsgsForCmdLineUI = make(chan message.Message)
+
+		go cmdline.RunUI(CmdsFromUI, bye)
+		go cmdline.UpdateUIStatus(*MsgsForCmdLineUI)
+	}
+
+	if config.HasHTTP() {
+		*MsgsForHTTPUI = make(chan message.Message)
+
+		go http.Listen(CmdsFromUI, config)
+		go http.TellBrowsers(*MsgsForHTTPUI, config)
+	}
 }
