@@ -133,6 +133,29 @@ func (c *Connection) Disconnect() error {
 }
 
 /**
+ * Are we talking to a DBGp engine?
+ *
+ * We go on air once a DBGp engine connects to Footle.
+ *
+ * Write an empty byte array to test if a connection has been established.
+ */
+func (c *Connection) IsOnAir() bool {
+
+	ignore := []byte{}
+
+	if nil == c.connection {
+		return false
+	}
+
+	if readCount, err := c.connection.Write(ignore); nil != err {
+		_ = readCount
+		return false
+	}
+
+	return true
+}
+
+/**
  * Return an instance of the network connection, active or not.
  */
 func (c *Connection) Get() *net.Conn {

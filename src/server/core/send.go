@@ -6,13 +6,12 @@ package core
 
 import (
 	"log"
-	"net"
 	"server/config"
 	conn "server/core/connection"
 )
 
 /**
- * Send DBGp command to DBGp engine (i.e. Xdebug).
+ * Send DBGp command to DBGp engine (e.g. Xdebug).
  */
 func SendCmdsToDBGpEngine(DBGpConnection *conn.Connection, in <-chan string) {
 
@@ -21,7 +20,7 @@ func SendCmdsToDBGpEngine(DBGpConnection *conn.Connection, in <-chan string) {
 	for DBGpCmd := range in {
 		connection := DBGpConnection.Get()
 
-		if isActiveConnection(*connection) {
+		if DBGpConnection.IsOnAir() {
 			if config.IsVerbose() {
 				log.Println(DBGpCmd)
 			}
@@ -35,25 +34,4 @@ func SendCmdsToDBGpEngine(DBGpConnection *conn.Connection, in <-chan string) {
 			log.Println("Inactive connection.")
 		}
 	}
-}
-
-/**
- * Has the given network connection been initialized?
- *
- * Initialization happens when a DBGp engine connects to Footle.
- */
-func isActiveConnection(connection net.Conn) bool {
-
-	ignore := []byte{}
-
-	if nil == connection {
-		return false
-	}
-
-	if readCount, err := connection.Write(ignore); nil != err {
-		_ = readCount
-		return false
-	}
-
-	return true
 }
