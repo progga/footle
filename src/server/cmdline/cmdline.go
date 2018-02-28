@@ -72,13 +72,13 @@ func RunUI(out chan<- string, bye chan struct{}) {
 			continue
 		}
 
-		err = command.Validate(shortCmd, cmdArgs)
+		DBGpCmd, err := command.Prepare(shortCmd, cmdArgs)
 		if nil != err {
 			fmt.Println(err)
 			continue
 		}
 
-		out <- cmd
+		out <- DBGpCmd
 	}
 }
 

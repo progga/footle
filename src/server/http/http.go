@@ -130,7 +130,7 @@ func receive(writeStream http.ResponseWriter, request *http.Request, out chan st
 		return
 	}
 
-	err = command.Validate(shortCmd, cmdArgs)
+	DBGpCmd, err := command.Prepare(shortCmd, cmdArgs)
 	if nil != err {
 		fmt.Fprintf(writeStream, "%s", err)
 
@@ -139,7 +139,7 @@ func receive(writeStream http.ResponseWriter, request *http.Request, out chan st
 
 	fmt.Fprintf(writeStream, "Got it.")
 
-	out <- cmd
+	out <- DBGpCmd
 }
 
 /**

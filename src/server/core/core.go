@@ -18,30 +18,23 @@ import (
  * to the appropriate channel.  Other commands (e.g. on) are meant to control
  * Footle's behavior.  These are acted up on.
  */
-func ProcessUICmds(CmdsFromUI, DBGpCmds chan string, DBGpConnection *conn.Connection) {
+func ProcessUICmds(CmdsFromUIs, DBGpCmds chan string, DBGpConnection *conn.Connection) {
 
-	for cmd := range CmdsFromUI {
-		shortCmd, cmdArgs, err := command.Break(cmd)
+	for fullDBGpCmd := range CmdsFromUIs {
+		cmdName, _, err := command.Break(fullDBGpCmd)
 
 		if nil != err {
 			log.Println(err)
 			continue
 		}
 
-		if shortCmd == "on" {
+		if cmdName == "on" {
 			DBGpConnection.Activate()
-		} else if shortCmd == "off" {
+		} else if cmdName == "off" {
 			DBGpConnection.Deactivate()
-		} else if shortCmd == "continue" {
+		} else if cmdName == "continue" {
 			DBGpConnection.Disconnect()
 		} else {
-			fullDBGpCmd, err := command.Prepare(shortCmd, cmdArgs)
-
-			if nil != err {
-				log.Println(err)
-				continue
-			}
-
 			DBGpCmds <- fullDBGpCmd
 		}
 	}
