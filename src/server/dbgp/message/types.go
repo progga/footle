@@ -81,7 +81,7 @@ type Breakpoint struct {
 	Filename string `xml:"filename,attr"`
 	LineNo   int    `xml:"lineno,attr"`
 	Type     string `xml:"type,attr"`
-	State    string `xml:"state,attr"`
+	State    string `xml:"state,attr"`  // enabled
 	HitCount int    `xml:"hit_count,attr"`
 	HitValue int    `xml:"hit_value,attr"`
 	Id       int    `xml:"id,attr"`

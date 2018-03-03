@@ -6,6 +6,7 @@ package core
 
 import (
 	"log"
+	"server/core/breakpoint"
 	conn "server/core/connection"
 	"server/dbgp/command"
 	"server/dbgp/message"
@@ -21,7 +22,7 @@ import (
 func ProcessUICmds(CmdsFromUIs, DBGpCmds chan string, DBGpConnection *conn.Connection) {
 
 	for fullDBGpCmd := range CmdsFromUIs {
-		cmdName, _, err := command.Break(fullDBGpCmd)
+		cmdName, cmdArgs, err := command.Break(fullDBGpCmd)
 
 		if nil != err {
 			log.Println(err)
@@ -34,6 +35,9 @@ func ProcessUICmds(CmdsFromUIs, DBGpCmds chan string, DBGpConnection *conn.Conne
 			DBGpConnection.Deactivate()
 		} else if cmdName == "continue" {
 			DBGpConnection.Disconnect()
+		} else if cmdName == "breakpoint_set" && !DBGpConnection.IsOnAir() {
+			// Example of cmd: breakpoint_set -i 5 -t line -f index.php -n 18\x00
+			breakpoint.Enqueue(breakpoint.Line_type_breakpoint, cmdArgs[5], cmdArgs[7])
 		} else {
 			DBGpCmds <- fullDBGpCmd
 		}
@@ -55,7 +59,10 @@ func ProcessDBGpMessages(DBGpCmds chan string, DBGpMessages, MsgsForCmdLineUI, M
 		if state == "stopping" {
 			endSession(DBGpCmds)
 		} else if state == "starting" {
-			sendPendingBreakpoints(DBGpCmds)
+			breakpoint.SendPending(DBGpCmds)
+			proceedWithSession(DBGpCmds)
+		} else if msg.Properties.Command == "breakpoint_list" {
+			breakpoint.RenewList(msg.Breakpoints)
 		}
 
 		BroadcastMsgToUIs(msg, MsgsForCmdLineUI, MsgsForHTTPUI)
@@ -65,7 +72,7 @@ func ProcessDBGpMessages(DBGpCmds chan string, DBGpMessages, MsgsForCmdLineUI, M
 /**
  * Respond to the "stopping" state.
  *
- * End the debugging session by issuing the the DBGp "stop" command.
+ * End the debugging session by issuing the DBGp "stop" command.
  */
 func endSession(DBGpCmds chan string) {
 
@@ -79,11 +86,19 @@ func endSession(DBGpCmds chan string) {
 }
 
 /**
- * Setup breakpoints at the beginning of the debugging session.
+ * Respond to the "starting" state.
  *
- * This function is a placeholder.  It does *not* do anything at the moment.
+ * Carry on with the debugging session by issuing the DBGp "run" command.
  */
-func sendPendingBreakpoints(DBGpCmds chan string) {
+func proceedWithSession(DBGpCmds chan string) {
+
+	runCmd, err := command.Prepare("run", []string{})
+
+	if err != nil {
+		return
+	}
+
+	DBGpCmds <- runCmd
 }
 
 /**
