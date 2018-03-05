@@ -5,7 +5,9 @@
 package breakpoint
 
 import (
+	"server/config"
 	"server/dbgp/command"
+	"server/dbgp/message"
 	"strconv"
 )
 
@@ -40,4 +42,22 @@ func SendPending(DBGpCmds chan string) {
 
 		DBGpCmds <- cmd
 	}
+}
+
+/**
+ * Broadcast the list of existing and pending breakpoints.
+ *
+ * Existing breakpoints are the ones that have been set during the previous
+ * debugging session.  Pending breakpoints have been added through the UI, but
+ * have not been sent to the debugging engine yet.
+ */
+func BroadcastPending(DBGpMessages chan message.Message, config config.Config) {
+
+	fakeMsg := FakeMessage{}
+	fakeMsg.init(config, "breakpoint_list")
+	fakeMsg.AddExistingBreakpoints(list)
+	fakeMsg.AddPendingBreakpoints(pending)
+
+	msg := fakeMsg.GetMsg()
+	DBGpMessages <- msg
 }

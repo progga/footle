@@ -83,7 +83,7 @@ func Listen(out chan string, config config.Config) {
  */
 func TellBrowsers(in <-chan message.Message, config config.Config) {
 
-	codeDir := determineDBGpServersCodeDir(config)
+	codeDir := config.DetermineCodeDir()
 
 	for msg := range in {
 		adjustedMsg := adjustFilepath(msg, codeDir)
@@ -302,6 +302,7 @@ func adjustFilepath(response message.Message, codeDir string) message.Message {
 	hasFilename := filepath.HasPrefix(response.Properties.Filename, codeDirUri)
 	hasBreakpoints := len(response.Breakpoints) > 0
 
+	// Adjust response.Properties.Filename
 	if hasFilename {
 		relativePath, err := filepath.Rel(codeDirUri, response.Properties.Filename)
 
@@ -310,6 +311,8 @@ func adjustFilepath(response message.Message, codeDir string) message.Message {
 		}
 	}
 
+	// Now adjust response.Breakpoints
+	//
 	// Modify a *copy* of the breakpoint list.  Otherwise it will modify the
 	// original message too.  This is because the breakpoint list is a map
 	// *reference* and not a copy.
@@ -331,24 +334,6 @@ func adjustFilepath(response message.Message, codeDir string) message.Message {
 	response.Breakpoints = adjustedBreakpoints
 
 	return response
-}
-
-/**
- * Determine the source code path returned by the DBGp server.
- *
- * When the DBGp server and Footle are in different machines, source code paths
- * returned by the DBGp server will start with a path from that machine.  This
- * path is likely to be different from local paths seen by Footle.
- */
-func determineDBGpServersCodeDir(config config.Config) (codeDir string) {
-
-	codeDir = config.GetRemoteDocroot()
-
-	if codeDir == "" {
-		codeDir = config.GetDocroot()
-	}
-
-	return codeDir
 }
 
 /**

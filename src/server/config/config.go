@@ -26,18 +26,36 @@ func (c Config) GetDocroot() string {
 /**
  * Getter for remote path of source code to debug.
  *
- * Only relevant when Footle and the DBGp server are running in different
- * machines.  In this type of setups, the file paths returned by the DBGp server
+ * Only relevant when Footle and the DBGp engine are running in different
+ * machines.  In this type of setups, the file paths returned by the DBGp engine
  * will start with the remote path.
  *
  * Example:
  *   Docroot in Footle's machine: /home/foo/bar/
- *   Docroot in DBGp server's machine: /var/www/html/
+ *   Docroot in DBGp engine's machine: /var/www/html/
  *   In this case /var/www/html/ is the remote docroot.
  */
 func (c Config) GetRemoteDocroot() string {
 
 	return c.GetArg("remote-docroot")
+}
+
+/**
+ * Determine the source code path returned by the DBGp engine.
+ *
+ * When the DBGp engine and Footle are in different machines, source code paths
+ * returned by the DBGp engine will start with a path from that machine.  This
+ * path is likely to be different from local paths seen by Footle.
+ */
+func (c Config) DetermineCodeDir() (codeDir string) {
+
+	codeDir = c.GetRemoteDocroot()
+
+	if codeDir == "" {
+		codeDir = c.GetDocroot()
+	}
+
+	return codeDir
 }
 
 /**

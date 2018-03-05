@@ -6,6 +6,7 @@ package core
 
 import (
 	"log"
+	"server/config"
 	"server/core/breakpoint"
 	conn "server/core/connection"
 	"server/dbgp/command"
@@ -19,7 +20,9 @@ import (
  * to the appropriate channel.  Other commands (e.g. on) are meant to control
  * Footle's behavior.  These are acted up on.
  */
-func ProcessUICmds(CmdsFromUIs, DBGpCmds chan string, DBGpConnection *conn.Connection) {
+func ProcessUICmds(CmdsFromUIs, DBGpCmds chan string, DBGpMessages chan message.Message, DBGpConnection *conn.Connection) {
+
+	config := config.Get()
 
 	for fullDBGpCmd := range CmdsFromUIs {
 		cmdName, cmdArgs, err := command.Break(fullDBGpCmd)
@@ -38,6 +41,7 @@ func ProcessUICmds(CmdsFromUIs, DBGpCmds chan string, DBGpConnection *conn.Conne
 		} else if cmdName == "breakpoint_set" && !DBGpConnection.IsOnAir() {
 			// Example of cmd: breakpoint_set -i 5 -t line -f index.php -n 18\x00
 			breakpoint.Enqueue(breakpoint.Line_type_breakpoint, cmdArgs[5], cmdArgs[7])
+			breakpoint.BroadcastPending(DBGpMessages, config)
 		} else {
 			DBGpCmds <- fullDBGpCmd
 		}
@@ -61,7 +65,7 @@ func ProcessDBGpMessages(DBGpCmds chan string, DBGpMessages, MsgsForCmdLineUI, M
 		} else if state == "starting" {
 			breakpoint.SendPending(DBGpCmds)
 			proceedWithSession(DBGpCmds)
-		} else if msg.Properties.Command == "breakpoint_list" {
+		} else if state == "" && msg.Properties.Command == "breakpoint_list" {
 			breakpoint.RenewList(msg.Breakpoints)
 		}
 

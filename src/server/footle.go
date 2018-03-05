@@ -47,7 +47,7 @@ func main() {
 
 	// Let Footle deal with all commands from UIs first.  Some commands will then
 	// head for the DBGp engine while some will change Footle's internal state.
-	go core.ProcessUICmds(CmdsFromUI, DBGpCmds, DBGpConnection)
+	go core.ProcessUICmds(CmdsFromUI, DBGpCmds, DBGpMessages, DBGpConnection)
 
 	// Process incoming DBGP messages before selectively passing them to the UIs.
 	go core.ProcessDBGpMessages(DBGpCmds, DBGpMessages, MsgsForCmdLineUI, MsgsForHTTPUI)
