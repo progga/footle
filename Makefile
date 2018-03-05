@@ -132,8 +132,9 @@ ${UI_HTML_BUILD_PATH}: ${UI_HTML_SRC_PATH}
 
 # Copy Javascript whenever *any* script file changes.
 script: ${UI_SCRIPT_BUILD_DIR_PATH} 
-${UI_SCRIPT_BUILD_DIR_PATH}: ${UI_SCRIPT_SRC_FILES} 
-	cp -r ${UI_SCRIPT_SRC_DIR_PATH} $@
+${UI_SCRIPT_BUILD_DIR_PATH}: ${UI_SCRIPT_SRC_DIR_PATH}
+	cp -r ${UI_SCRIPT_SRC_DIR_PATH}/. $@
+	touch $@
 
 # Relocate uikit's "fonts" directory.  Otherwise it won't be found by the
 # web browser.
