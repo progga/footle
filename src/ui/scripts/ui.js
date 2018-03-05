@@ -55,8 +55,6 @@ jQuery(function () {
 function processMsg (msg) {
   if (msg.MessageType === 'response' && msg.State === 'break' && msg.Properties.Filename) {
     updateBreak(msg.Properties.Filename, msg.Properties.LineNumber)
-  } else if (msg.MessageType === 'response' && msg.Properties.Command === 'breakpoint_set') {
-    sendCommand('breakpoint_list')
   } else if (msg.MessageType === 'response' && msg.Properties.Command === 'breakpoint_list') {
     refreshBreakpoints(msg.Breakpoints)
   } else if (msg.MessageType === 'response' && msg.State === 'stopped') {
