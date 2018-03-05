@@ -65,6 +65,8 @@ func ProcessDBGpMessages(DBGpCmds chan string, DBGpMessages, MsgsForCmdLineUI, M
 		} else if state == "starting" {
 			breakpoint.SendPending(DBGpCmds)
 			proceedWithSession(DBGpCmds)
+		} else if state == "" && msg.Properties.Command == "breakpoint_set" {
+			requestBreakpointList(DBGpCmds)
 		} else if state == "" && msg.Properties.Command == "breakpoint_list" {
 			breakpoint.RenewList(msg.Breakpoints)
 		}
@@ -97,6 +99,23 @@ func endSession(DBGpCmds chan string) {
 func proceedWithSession(DBGpCmds chan string) {
 
 	runCmd, err := command.Prepare("run", []string{})
+
+	if err != nil {
+		return
+	}
+
+	DBGpCmds <- runCmd
+}
+
+/**
+ * Ask the DBGp engine for its breakpoint list.
+ *
+ * Respond to "breakpoint_set" command by requesting the complete breakpoint
+ * list.
+ */
+func requestBreakpointList(DBGpCmds chan string) {
+
+	runCmd, err := command.Prepare("breakpoint_list", []string{})
 
 	if err != nil {
 		return
