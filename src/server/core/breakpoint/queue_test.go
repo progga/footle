@@ -49,3 +49,23 @@ func TestQueue(t *testing.T) {
 		t.Error("Queue should be empty.")
 	}
 }
+
+/**
+ * Tests for the delete operation from the breakpoint Queue.
+ */
+func TestQueueDelete(t *testing.T) {
+
+	var q Queue
+
+	// Push two items and then remove the first one.
+	q.push(breakpoint{Filename: "foo.php"})
+	q.push(breakpoint{Filename: "bar.php"})
+
+	q.delete(0)
+
+	remaining := q.pop()
+	expectedFilename := "bar.php"
+	if remaining.Filename != expectedFilename {
+		t.Errorf("After deleting the first item, the popped item should be for %s", expectedFilename)
+	}
+}

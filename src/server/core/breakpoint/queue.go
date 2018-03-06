@@ -3,6 +3,8 @@
  */
 package breakpoint
 
+import "errors"
+
 type Queue []breakpoint
 
 /**
@@ -29,4 +31,19 @@ func (q *Queue) pop() (b breakpoint) {
 	*q = (*q)[1:]
 
 	return b
+}
+
+/**
+ * Delete the item for the given array index.
+ */
+func (q *Queue) delete(index int) (err error) {
+
+	if index < 0 || index >= len(*q) {
+		err = errors.New("Array index out of bound.")
+		return err
+	}
+
+	*q = append((*q)[:index], (*q)[index+1:]...)
+
+	return err
 }

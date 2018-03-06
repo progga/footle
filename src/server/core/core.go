@@ -18,7 +18,9 @@ import (
  *
  * Some commands (e.g. run) are meant for the DBGp engine.  These are forwarded
  * to the appropriate channel.  Other commands (e.g. on) are meant to control
- * Footle's behavior.  These are acted up on.
+ * Footle's behavior.  These are acted up on.  Some other commands (e.g.
+ * breakpoint_set, breakpoint_remove) need special treatment outside a
+ * debugging session to allow breakpoint management at all times.
  */
 func ProcessUICmds(CmdsFromUIs, DBGpCmds chan string, DBGpMessages chan message.Message, DBGpConnection *conn.Connection) {
 
@@ -39,8 +41,15 @@ func ProcessUICmds(CmdsFromUIs, DBGpCmds chan string, DBGpMessages chan message.
 		} else if cmdName == "continue" {
 			DBGpConnection.Disconnect()
 		} else if cmdName == "breakpoint_set" && !DBGpConnection.IsOnAir() {
-			// Example of cmd: breakpoint_set -i 5 -t line -f index.php -n 18\x00
-			breakpoint.Enqueue(breakpoint.Line_type_breakpoint, cmdArgs[5], cmdArgs[7])
+			// Example command: breakpoint_set -i 5 -t line -f index.php -n 18\x00
+			filename := cmdArgs[5]
+			lineNo := cmdArgs[7] // Ends in a null byte.
+			breakpoint.Enqueue(breakpoint.Line_type_breakpoint, filename, lineNo)
+			breakpoint.BroadcastPending(DBGpMessages, config)
+		} else if cmdName == "breakpoint_remove" && !DBGpConnection.IsOnAir() {
+			// Example command: breakpoint_remove -i 5 -d 18\x00
+			breakpointId := cmdArgs[3] // Ends in a null byte.
+			breakpoint.RemovePending(breakpointId)
 			breakpoint.BroadcastPending(DBGpMessages, config)
 		} else {
 			DBGpCmds <- fullDBGpCmd

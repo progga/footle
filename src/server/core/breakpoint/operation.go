@@ -9,6 +9,7 @@ import (
 	"server/dbgp/command"
 	"server/dbgp/message"
 	"strconv"
+	"strings"
 )
 
 var list breakpointList = make(breakpointList)
@@ -45,11 +46,40 @@ func SendPending(DBGpCmds chan string) {
 }
 
 /**
+ * Remove given breakpoint even if it is pending.
+ */
+func RemovePending(breakpointId string) (err error) {
+
+	breakpointId = strings.Trim(breakpointId, "\x00")
+	breakpointIdNum, err := strconv.Atoi(breakpointId)
+
+	if err != nil {
+		return err
+	}
+
+	// Because pending breakpoints are always assigned a negative Id.
+	// @see getNewId()
+	isPending := breakpointIdNum < 0
+
+	if isPending {
+		for breakpointIndex, breakpoint := range pending {
+			if breakpoint.DBGpId == breakpointIdNum {
+				pending.delete(breakpointIndex)
+			}
+		}
+	} else if _, exists := list[breakpointIdNum]; exists {
+		delete(list, breakpointIdNum)
+	}
+
+	return err
+}
+
+/**
  * Broadcast the list of existing and pending breakpoints.
  *
  * Existing breakpoints are the ones that have been set during the previous
  * debugging session.  Pending breakpoints have been added through the UI, but
- * have not been sent to the debugging engine yet.
+ * have not been sent to the debugger engine yet.
  */
 func BroadcastPending(DBGpMessages chan message.Message, config config.Config) {
 

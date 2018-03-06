@@ -100,7 +100,8 @@ func validateBreakpointGetArgs(args []string) (err error) {
 	}
 
 	breakpointId, err := strconv.ParseInt(args[0], 10, 64)
-	if nil != err || breakpointId < 1 {
+	_ = breakpointId
+	if nil != err {
 		err = fmt.Errorf("Expecting breakpoint ID as the first argument. %s given.", args[0])
 	}
 
@@ -118,7 +119,8 @@ func validateBreakpointRemoveArgs(args []string) (err error) {
 	}
 
 	breakpointId, err := strconv.ParseInt(args[0], 10, 64)
-	if nil != err || breakpointId < 1 {
+	_ = breakpointId
+	if nil != err {
 		err = fmt.Errorf("Expecting a breakpoint ID as the only argument. %s given.", args[0])
 	}
 
