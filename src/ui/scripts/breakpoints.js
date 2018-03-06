@@ -20,20 +20,34 @@
 var fileBreakpointMapping = {}
 
 /**
- * Click handler for creating new breakpoints.
+ * Click handler for creating/removing breakpoints.
  *
- * When a line number is clicked, a breakpoint is added for that line.
+ * Clicking a line number toggles its breakpoint.  Using event delegation, we
+ * setup one click handler per tab to process clicks on any line of the file
+ * shown in that tab.
+ *
+ * Note that when a breakpoint is present, the "breakpoint" class is assigned to
+ * the *parent* of the ".line__number" element.
  */
 function setupBreakpointTrigger () {
   jQuery('.tab').on('click', '.tab-content', function (event) {
-    // event.currentTarget is the tab element for a file.
+    var hasClickedLineNoWOBreakpoint = event.target.classList.contains('line__number') && !jQuery(event.target).parent('.line.breakpoint').length
+    var hasClickedLineNoWBreakpoint = event.target.classList.contains('line__number') && jQuery(event.target).parent('.line.breakpoint').length
+    var hasNothingToDoWBreakpoint = !(hasClickedLineNoWOBreakpoint || hasClickedLineNoWBreakpoint)
+
+    if (hasNothingToDoWBreakpoint) {
+      return
+    }
+
+    // event.currentTarget is the tab element displaying a file's content.
     var filepath = jQuery(event.currentTarget).data('filepath')
+    // event.target is the line number element which received the click.
+    var lineNo = event.target.innerText
 
-    if (event.target.classList.contains('line__number')) {
-      // event.target is the line number element which received the click.
-      var lineNumber = event.target.innerText
-
-      sendCommand('breakpoint_set', [filepath, lineNumber])
+    if (hasClickedLineNoWOBreakpoint) {
+      sendCommand('breakpoint_set', [filepath, lineNo])
+    } else if (hasClickedLineNoWBreakpoint) {
+      sendCommand('breakpoint_remove', [filepath, lineNo])
     }
   })
 }
@@ -75,9 +89,9 @@ function isNewBreakpoint (breakpoint) {
   }
 
   var lineNoIndex = fileBreakpointMapping[filename].indexOf(lineNo)
-  var unknownLineNo = lineNoIndex > -1
+  var knownLineNo = lineNoIndex > -1
 
-  if (unknownLineNo) {
+  if (knownLineNo) {
     return false
   }
 

@@ -25,7 +25,7 @@
  */
 jQuery(function () {
   /* We have missed the very first "load" event for the iframe.  So we
-     need to explicitely call setupFileLinks() for setting up the click
+     need to explicitely call setupFileList() for setting up the click
      handlers on the file links inside the file browser. */
   setupFileList()
 
