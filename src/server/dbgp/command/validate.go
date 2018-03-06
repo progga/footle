@@ -28,6 +28,9 @@ func Validate(cmd string, args []string) (err error) {
 	case "breakpoint_get", "bg":
 		err = validateBreakpointGetArgs(args)
 
+	case "breakpoint_remove", "br":
+		err = validateBreakpointRemoveArgs(args)
+
 	case "breakpoint_list", "bl":
 		err = validateCmdWithNoArg("breakpoint_list", args)
 
@@ -99,6 +102,24 @@ func validateBreakpointGetArgs(args []string) (err error) {
 	breakpointId, err := strconv.ParseInt(args[0], 10, 64)
 	if nil != err || breakpointId < 1 {
 		err = fmt.Errorf("Expecting breakpoint ID as the first argument. %s given.", args[0])
+	}
+
+	return err
+}
+
+/**
+ * Validate the Breakpoint remove command.
+ */
+func validateBreakpointRemoveArgs(args []string) (err error) {
+
+	if len(args) != 1 {
+		err = fmt.Errorf("Usage: breakpoint_remove breakpoint-id")
+		return err
+	}
+
+	breakpointId, err := strconv.ParseInt(args[0], 10, 64)
+	if nil != err || breakpointId < 1 {
+		err = fmt.Errorf("Expecting a breakpoint ID as the only argument. %s given.", args[0])
 	}
 
 	return err

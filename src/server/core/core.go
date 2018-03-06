@@ -65,7 +65,7 @@ func ProcessDBGpMessages(DBGpCmds chan string, DBGpMessages, MsgsForCmdLineUI, M
 		} else if state == "starting" {
 			breakpoint.SendPending(DBGpCmds)
 			proceedWithSession(DBGpCmds)
-		} else if state == "" && msg.Properties.Command == "breakpoint_set" {
+		} else if state == "" && (msg.Properties.Command == "breakpoint_set" || msg.Properties.Command == "breakpoint_remove") {
 			requestBreakpointList(DBGpCmds)
 		} else if state == "" && msg.Properties.Command == "breakpoint_list" {
 			breakpoint.RenewList(msg.Breakpoints)

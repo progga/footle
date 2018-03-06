@@ -57,6 +57,7 @@ func (m *FakeMessage) AddPendingBreakpoints(pending Queue) {
 			Filename: filepath,
 			LineNo:   breakpointRecord.LineNo,
 			Type:     Line_type_breakpoint,
+			Id:       breakpointRecord.DBGpId,
 		}
 	}
 }
@@ -71,6 +72,7 @@ func (m *FakeMessage) AddExistingBreakpoints(existingList breakpointList) {
 			Filename: breakpointRecord.Filename,
 			LineNo:   breakpointRecord.LineNo,
 			Type:     Line_type_breakpoint,
+			Id:       breakpointRecord.DBGpId,
 		}
 	}
 }

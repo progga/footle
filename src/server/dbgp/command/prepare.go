@@ -42,6 +42,9 @@ func PrepareDBGpCmd(cmd string, args []string) (DBGpCmd string, err error) {
 	case "breakpoint_get", "bg":
 		DBGpCmd, err = prepareBreakpointGetCmd(args, TxId)
 
+	case "breakpoint_remove", "br":
+		DBGpCmd, err = prepareBreakpointRemoveCmd(args, TxId)
+
 	case "context_get", "vl":
 		DBGpCmd, err = prepareCmdNoArgs("context_get", TxId)
 
@@ -122,12 +125,28 @@ func prepareBreakpointCmd(args []string, TxId int) (DBGpCmd string, err error) {
 func prepareBreakpointGetCmd(args []string, TxId int) (DBGpCmd string, err error) {
 
 	if 1 > len(args) {
-		return DBGpCmd, fmt.Errorf("Need at least one argument for preparing the breakpoint get cmd.")
+		return DBGpCmd, fmt.Errorf("Need at least one argument to prepare the breakpoint_get cmd.")
 	}
 
 	breakpointId := args[0]
 
 	DBGpCmd = fmt.Sprintf("breakpoint_get -i %d -d %s\x00", TxId, breakpointId)
+
+	return DBGpCmd, err
+}
+
+/**
+ * The DBGp breakpoint_remove command.
+ */
+func prepareBreakpointRemoveCmd(args []string, TxId int) (DBGpCmd string, err error) {
+
+	if 1 > len(args) {
+		return DBGpCmd, fmt.Errorf("Need at least one argument to prepare the breakpoint_remove cmd.")
+	}
+
+	breakpointId := args[0]
+
+	DBGpCmd = fmt.Sprintf("breakpoint_remove -i %d -d %s\x00", TxId, breakpointId)
 
 	return DBGpCmd, err
 }

@@ -78,6 +78,33 @@ func TestValidateBreakpointGetArgs(t *testing.T) {
 }
 
 /**
+ * Tests for validateBreakpointRemoveArgs()
+ */
+func TestValidateBreakpointRemoveArgs(t *testing.T) {
+
+	// Pass case.
+	err := validateBreakpointRemoveArgs([]string{"28"})
+
+	if nil != err {
+		t.Error(err)
+	}
+
+	// Fail case.  Noninteger argument.
+	err = validateBreakpointArgs([]string{"/home/foo/bar.php"})
+
+	if nil == err {
+		t.Error("Failed to spot invalid argument for the breakpoint_remove command.")
+	}
+
+	// Fail case.  No argument.
+	err = validateBreakpointArgs([]string{})
+
+	if nil == err {
+		t.Error("Failed to spot missing argument for the breakpoint_remove command.")
+	}
+}
+
+/**
  * Tests for validateCmdWithNoArg().
  */
 func TestValidateCmdWithNoArg(t *testing.T) {
