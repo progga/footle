@@ -18,6 +18,11 @@ import (
 const BreakpointEnabledState = "enabled"
 
 /**
+ * @see getNewId()
+ */
+var lastPendingBreakpointId int = 0
+
+/**
  * Renew breakpoint list.
  *
  * Update our list of existing breakpoints maintained by the DBGp engine.
@@ -27,7 +32,7 @@ func RenewList(breakpoints map[int]message.Breakpoint) {
 	list.Empty()
 
 	for _, v := range breakpoints {
-		add(v.Type, v.Filename, v.LineNo, v.State)
+		add(v.Type, v.Filename, v.LineNo, v.Id, v.State)
 	}
 }
 
@@ -57,12 +62,12 @@ func Enqueue(breakpointType, arg0, arg1 string) {
  * This record is for an existing breakpoint.  Only deals with line breakpoints
  * at the moment.
  */
-func add(breakpointType, filename string, lineNo int, state string) {
+func add(breakpointType, filename string, lineNo, id int, state string) {
 
 	breakpointState := (state == BreakpointEnabledState)
 
 	if breakpointType == Line_type_breakpoint {
-		list.AddLine(filename, lineNo, breakpointState)
+		list.AddLine(filename, lineNo, id, breakpointState)
 	}
 }
 
@@ -79,13 +84,29 @@ func enqueueLine(filename, lineNoArg string) {
 		return
 	}
 
+	pendingBreakpointId := getNewId()
+
 	b := breakpoint{
 		Type:     Line_type_breakpoint,
 		LineNo:   lineNo,
 		Filename: filename,
-		DBGpId:   -1,
+		DBGpId:   pendingBreakpointId,
 		State:    true,
 	}
 
 	pending.push(b)
+}
+
+/**
+ * Produce a new ID number for breakpoint records.
+ *
+ * This Breakpoint ID is different from the numbers assigned by the DBGp engine.
+ * These are for Footle's internal use as IDs for pending breakpoints.  Numbers
+ * start at -1 and keeps going *down*: -2, -3,...
+ */
+func getNewId() int {
+
+	lastPendingBreakpointId -= 1
+
+	return lastPendingBreakpointId
 }
