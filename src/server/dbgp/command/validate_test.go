@@ -71,7 +71,7 @@ func TestValidateBreakpointGetArgs(t *testing.T) {
 	}
 
 	// Another fail case.  Invalid breakpoint ID.
-	err = validateBreakpointGetArgs([]string{"0"})
+	err = validateBreakpointGetArgs([]string{"foo"})
 	if nil == err {
 		t.Error("Failed to spot invalid breakpoint ID for the breakpoint_get command.")
 	}
@@ -200,5 +200,54 @@ func TestValidatePropertyGetArgs(t *testing.T) {
 
 	if err == nil {
 		t.Error("Failed to spot lack of arguments.")
+	}
+}
+
+/**
+ * Tests for validateContextGetArgs().
+ *
+ * We expect one or two *optional* arguments.  First argument is the context
+ * label and the second one is the stack depth number.  Stack depth must come
+ * after the context label.  *local* is the default context label.
+ */
+func TestValidateContextGetArgs(t *testing.T) {
+
+	// Pass cases.
+	err := validateContextGetArgs([]string{})
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	err = validateContextGetArgs([]string{"local", "2"})
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	err = validateContextGetArgs([]string{"global", "2"})
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	err = validateContextGetArgs([]string{"global"})
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	// Fail case.  Unacceptable context name.
+	err = validateContextGetArgs([]string{"foo"})
+
+	if err == nil {
+		t.Error("Failed to spot unacceptable context name.")
+	}
+
+	// Fail case.  Stack depth is not an integer.
+	err = validateContextGetArgs([]string{"local", "foo"})
+
+	if err == nil {
+		t.Error("Failed to spot noninteger stack depth.")
 	}
 }

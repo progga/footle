@@ -35,7 +35,7 @@ func Validate(cmd string, args []string) (err error) {
 		err = validateCmdWithNoArg("breakpoint_list", args)
 
 	case "context_get", "vl":
-		err = validateCmdWithNoArg("context_get", args)
+		err = validateContextGetArgs(args)
 
 	case "eval", "ev":
 		err = validateCmdWithNoArg("eval", args)
@@ -194,6 +194,35 @@ func validatePropertyGetArgs(args []string) (err error) {
 	if len(args) < 1 {
 		err = fmt.Errorf("The \"property_get\" command takes a variable name as an argument.")
 		return err
+	}
+
+	return err
+}
+
+/**
+ * Validate the arguments for the context_get command.
+ *
+ * Acceptable command formats: context_get, context_get local/global,
+ * context local/global N
+ */
+func validateContextGetArgs(args []string) (err error) {
+
+	argCount := len(args)
+
+	if argCount == 0 {
+		return err
+	}
+
+	if argCount == 1 && (args[0] != localContextLabel && args[0] != globalContextLabel) {
+		err = fmt.Errorf("Invalid context.  Acceptable values: %s, %s.  %s given.", localContextLabel, globalContextLabel, args[0])
+
+		return err
+	}
+
+	if argCount == 2 {
+		_, err = strconv.Atoi(args[1])
+	} else if argCount > 2 {
+		err = fmt.Errorf("Too many arguments.")
 	}
 
 	return err

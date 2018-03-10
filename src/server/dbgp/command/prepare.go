@@ -12,6 +12,21 @@ import (
 )
 
 /**
+ * Context ID number for fetching local or global variables.
+ *
+ * The context Ids for the local and global contexts are used in the context_get
+ * command.  These are used to fetch local and global variables.
+ */
+const localContextId = 0
+const globalContextId = 1
+
+/**
+ * Context labels available to UIs.
+ */
+const localContextLabel = "local"
+const globalContextLabel = "global"
+
+/**
  * DBGp transaction ID.  Its value was last used for the DBGp command's
  * transaction ID.
  *
@@ -46,7 +61,7 @@ func PrepareDBGpCmd(cmd string, args []string) (DBGpCmd string, err error) {
 		DBGpCmd, err = prepareBreakpointRemoveCmd(args, TxId)
 
 	case "context_get", "vl":
-		DBGpCmd, err = prepareCmdNoArgs("context_get", TxId)
+		DBGpCmd, err = prepareContextGetCmd(args, TxId)
 
 	case "eval", "ev":
 		DBGpCmd, err = prepareEvalCmd(args, TxId)
@@ -250,6 +265,47 @@ func prepareCmdNoArgs(cmd string, TxId int) (DBGpCmd string, err error) {
 	}
 
 	DBGpCmd = fmt.Sprintf("%s -i %d\x00", cmd, TxId)
+
+	return DBGpCmd, err
+}
+
+/**
+ * DBGp context_get command.
+ *
+ * It fetches all local or global variables.
+ *
+ * First argument, when present, can be "global" or anything else to denote a
+ * "local" context.  Second argument, when present, must be a number.
+ *
+ * Example: context_get -i 9 -c 1, context_get -i 9 -c 0 -d 0
+ */
+func prepareContextGetCmd(args []string, TxId int) (DBGpCmd string, err error) {
+
+	if err = validateContextGetArgs(args); err != nil {
+		return DBGpCmd, err
+	}
+
+	contextId := localContextId // Default is local context.
+	argCount := len(args)
+	stackDepth := 0
+
+	if argCount == 0 {
+		DBGpCmd = fmt.Sprintf("context_get -i %d -c %d\x00", TxId, localContextId)
+
+		return DBGpCmd, err
+	}
+
+	if argCount >= 1 && args[0] == globalContextLabel {
+		contextId = globalContextId
+	}
+
+	if argCount == 1 {
+		DBGpCmd = fmt.Sprintf("context_get -i %d -c %d\x00", TxId, contextId)
+	} else if argCount >= 2 {
+		stackDepth, err = strconv.Atoi(args[1])
+
+		DBGpCmd = fmt.Sprintf("context_get -i %d -c %d -d %d\x00", TxId, contextId, stackDepth)
+	}
 
 	return DBGpCmd, err
 }

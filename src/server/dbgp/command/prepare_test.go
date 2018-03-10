@@ -235,3 +235,39 @@ func TestPreparePropertyGetCmd(t *testing.T) {
 		t.Error("Failed to spot lack of a variable name.")
 	}
 }
+
+/**
+ * Tests for prepareContextGetCmd().
+ *
+ * Example DBGp commands: context_get -i N -c N, context_get -i N -c N -d N
+ */
+func TestPrepareContextGetCmd(t *testing.T) {
+
+	// Pass case.
+	args := []string{}
+	TxId := 5
+	cmd, _ := prepareContextGetCmd(args, TxId)
+
+	expected := "context_get -i 5 -c 0\x00"
+	if cmd != expected {
+		t.Errorf("context_get command preparation failed.  Expected: %s, got: %s", expected, cmd)
+	}
+
+	args = []string{"global", "0"}
+	TxId = 5
+	cmd, _ = prepareContextGetCmd(args, TxId)
+
+	expected = "context_get -i 5 -c 1 -d 0\x00"
+	if cmd != expected {
+		t.Errorf("context_get command preparation failed.  Expected: %s, got: %s", expected, cmd)
+	}
+
+	// Fail case.
+	args = []string{"global", "Foo"}
+	TxId = 5
+	_, err := prepareContextGetCmd(args, TxId)
+
+	if err == nil {
+		t.Error("Failed to spot invalid stack depth.", expected, cmd)
+	}
+}
