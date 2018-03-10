@@ -49,6 +49,9 @@ func Validate(cmd string, args []string) (err error) {
 	case "property_get", "var":
 		err = validatePropertyGetArgs(args)
 
+	case "stack_get", "stk":
+		err = validateCmdWithNoArg("stack_get", args)
+
 	case "source", "src", "sr":
 		err = validateSourceArgs(args)
 
