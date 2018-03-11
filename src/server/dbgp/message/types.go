@@ -15,6 +15,7 @@ type Message struct {
 	Context     Context
 	Content     string
 	Breakpoints map[int]Breakpoint
+	StackDetail []StackLevel
 }
 
 type Properties struct {
@@ -68,6 +69,7 @@ type Response struct {
 	Breakpoints   []Breakpoint      `xml:"breakpoint"`
 	Error         Error             `xml:"error"`
 	Variables     []VariableDetails `xml:"property"`
+	StackDetail   []StackLevel      `xml:"stack"`
 	Content       string            `xml:",chardata"`
 }
 
@@ -81,7 +83,7 @@ type Breakpoint struct {
 	Filename string `xml:"filename,attr"`
 	LineNo   int    `xml:"lineno,attr"`
 	Type     string `xml:"type,attr"`
-	State    string `xml:"state,attr"`  // enabled
+	State    string `xml:"state,attr"` // enabled
 	HitCount int    `xml:"hit_count,attr"`
 	HitValue int    `xml:"hit_value,attr"`
 	Id       int    `xml:"id,attr"`
@@ -109,4 +111,14 @@ type VariableDetails struct {
 	NumChildren int               `xml:"numchildren,attr"`
 	Value       string            `xml:",chardata"`
 	Variables   []VariableDetails `xml:"property"`
+}
+
+type StackLevel struct {
+	Level    int    `xml:"level,attr"`
+	Type     string `xml:"type,attr"`
+	Filename string `xml:"filename,attr"`
+	LineNo   int    `xml:"lineno,attr"`
+	Where    string `xml:"where,attr"`
+	CmdBegin string `xml:"cmdbegin,attr"`
+	CmdEnd   string `xml:"cmdend,attr"`
 }

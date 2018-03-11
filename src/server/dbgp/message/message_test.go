@@ -166,7 +166,7 @@ func TestDecodeResponse(t *testing.T) {
 	}
 
 	if "breakpoint_get" != response.Command {
-		t.Error(`decodeResponse(<response ... command="status"...></response>): Command is not "status"`)
+		t.Error(`decodeResponse(<response ... command="breakpoint_get"...></response>): Command is not "breakpoint_get"`)
 	}
 
 	if 14 != response.Breakpoints[0].LineNo {
@@ -175,6 +175,60 @@ func TestDecodeResponse(t *testing.T) {
 
 	if 68310001 != response.Breakpoints[0].Id {
 		t.Errorf("Failed to spot Breakpoint ID. %d given.", response.Breakpoints[0].Id)
+	}
+}
+
+/**
+ * Tests for decodeResponse() against stack_get.
+ *
+ * Verify the decoded response for the DBGp stack_get command.
+ */
+func TestDecodeResponseForStackGet(t *testing.T) {
+
+	xml :=
+		`<response xmlns="urn:debugger_protocol_v1" xmlns:xdebug="http://xdebug.org/dbgp/xdebug" command="stack_get" transaction_id="10">
+  <stack
+    where="Drupal\Core\DrupalKernel::bootEnvironment"
+    level="0"
+    type="file"
+    filename="file:///srv/www/drupal/drupal8/core/lib/Drupal/Core/DrupalKernel.php"
+    lineno="882">
+  </stack>
+  <stack
+    where="Drupal\Core\DrupalKernel-&gt;handle"
+    level="1"
+    type="file"
+    filename="file:///srv/www/drupal/drupal8/core/lib/Drupal/Core/DrupalKernel.php"
+    lineno="615">
+  </stack>
+  <stack
+    where="{main}"
+    level="2"
+    type="file"
+    filename="file:///srv/www/drupal/drupal8/index.php"
+    lineno="19">
+  </stack>
+</response>`
+
+	response, err := decodeResponse(xml)
+	if nil != err {
+		t.Error(err)
+	}
+
+	if "stack_get" != response.Command {
+		t.Error(`decodeResponse(<response ... command="stack_get"...></response>): Command is not "stack_get"`)
+	}
+
+	if response.StackDetail[0].LineNo != 882 {
+		t.Errorf("Failed to spot line number in call stack record. %d given.", response.StackDetail[0].LineNo)
+	}
+
+	if response.StackDetail[0].Level != 0 {
+		t.Errorf("Failed to spot stack level number. %d given.", response.StackDetail[0].Level)
+	}
+
+	if response.StackDetail[2].Filename != "file:///srv/www/drupal/drupal8/index.php" {
+		t.Errorf("Failed to spot filename in call stack record. %s given.", response.StackDetail[2].Filename)
 	}
 }
 

@@ -77,6 +77,14 @@ func prepareResponseMessage(response Response) (message Message) {
 		}
 	}
 
+	if stackDepth := len(response.StackDetail); stackDepth > 0 {
+		message.StackDetail = make([]StackLevel, stackDepth)
+
+		for _, StackLevel := range response.StackDetail {
+			message.StackDetail[StackLevel.Level] = StackLevel
+		}
+	}
+
 	message.Context.Local = prepareVariables(response.Variables)
 
 	return message
