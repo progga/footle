@@ -90,10 +90,6 @@ function listBasicVars (varDetailList) {
   var childrenMarkup = ''
 
   for (var varFullname in varDetailList) {
-    if (!varDetailList.hasOwnProperty(varFullname)) {
-      continue
-    }
-
     var varDetail = varDetailList[varFullname]
     childrenMarkup = ''
 

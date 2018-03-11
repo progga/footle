@@ -63,6 +63,8 @@ function processMsg (msg) {
     updateVarsDisplay(msg.Context.Local)
   } else if (msg.MessageType === 'response' && msg.Properties.Command === 'property_get') {
     displaySingleVar(msg.Context.Local)
+  } else if (msg.MessageType === 'response' && msg.Properties.Command === 'stack_get') {
+    displayStackTrace(msg.StackDetail)
   } else if (msg.MessageType === 'init') {
   }
 }
