@@ -22,24 +22,31 @@
       </ul>
     </div>
 
-    <!-- Continuation buttons -->
-    <div class="controls">
-      <button type="button" class="button button--control" name="button--step-over">Next</button>
-      <button type="button" class="button button--control" name="button--step-in">In</button>
-      <button type="button" class="button button--control" name="button--step-out">Out</button>
-      <button type="button" class="button button--control" name="button--run">Run</button>
-    </div>
+    <div class="execution-states">
+      <!-- Continuation buttons -->
+      <div class="controls uk-panel">
+        <button type="button" class="button button--control" name="button--step-over">Next</button>
+        <button type="button" class="button button--control" name="button--step-in">In</button>
+        <button type="button" class="button button--control" name="button--step-out">Out</button>
+        <button type="button" class="button button--control" name="button--run">Run</button>
+      </div>
 
-    <!-- Variable display -->
-    <div class="variables"></div>
+      <!-- Variable display -->
+      <div class="variables-wrapper uk-panel uk-panel-divider">
+        <button type="button" class="button button--control" name="button--variable__local">Locals</button>
+        <button type="button" class="button button--control" name="button--variable__global">Globals</button>
+        <div class="variables"></div>
+      </div>
 
-    <!-- Stacktrace display -->
-    <div class="stacktrace-wrapper">
-      <table class="stacktrace">
-        <thead><th>Where</th><th>File</th><th>Line</th></thead>
-        <tbody class="traces"></tbody>
-      </table>
-    </div>
+      <!-- Stacktrace display -->
+      <div class="stacktrace-wrapper uk-panel uk-panel-divider">
+        <button type="button" class="button button--control" name="button--stacktrace">Stacktrace</button>
+        <table class="stacktrace">
+          <thead><th>Where</th><th>File</th><th>Line</th></thead>
+          <tbody class="traces"></tbody>
+        </table>
+      </div>
+    </div> <!-- /execution-states -->
 
     <script type="text/javascript" src="libs/bower_components/jquery/dist/jquery.min.js"></script>
     <script type="text/javascript" src="libs/bower_components/uikit/js/uikit.min.js"></script>
