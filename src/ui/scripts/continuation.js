@@ -15,7 +15,11 @@ function setupContinuationControls () {
     'step_over': '[name="button--step-over"]',
     'step_into': '[name="button--step-in"]',
     'step_out': '[name="button--step-out"]',
-    'run': '[name="button--run"]'
+    'run': '[name="button--run"]',
+    'continue': '[name="button--continue"]',
+    'context_get': '[name="button--variable__local"]',
+    'context_get global': '[name="button--variable__global"]',
+    'stack_get': '[name="button--stacktrace"]'
   }
 
   var command = ''
