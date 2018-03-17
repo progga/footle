@@ -28,4 +28,8 @@ function displayStackTrace (callStack) {
 
     jQuery('.stacktrace > .traces').append(traceMarkup)
   }
+
+  // Initially, the table remains hidden to avoid displaying table headers for
+  // an empty table.
+  jQuery('.stacktrace').removeClass('uk-hidden')
 }

@@ -1,0 +1,32 @@
+
+/**
+ * @file
+ * Wrapper for execution control buttons, stacktraces, and variables.
+ *
+ * Also includes styling for stacktraces.
+ */
+
+/**
+ * Sticky from top-right.
+ */
+.states-n-controls
+  position: fixed
+  top: 2.5em
+  right: 0
+  width: 25vw
+  z-index: 10
+
+// Wraps variables and stacktraces.
+.execution-states
+  // Emulate .uk-panel-divider which doesn't play well with overflow :(
+  margin-top: $panel-divider-gutter
+  padding-top: $panel-divider-gutter
+  border-top: $panel-divider-border-width solid $panel-divider-border
+
+  // Scrollbar.
+  max-height: 75vh
+  overflow: auto
+
+.variables,
+.stacktrace
+  margin-top: 1em

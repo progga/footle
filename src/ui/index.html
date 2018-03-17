@@ -22,7 +22,7 @@
       </ul>
     </div>
 
-    <div class="execution-states">
+    <div class="states-n-controls">
       <!-- Continuation buttons -->
       <div class="controls uk-panel">
         <button type="button" class="button button--control" name="button--step-over">Next</button>
@@ -33,22 +33,24 @@
         <button type="button" class="button button--control" name="button--on-off">Off</button>
       </div>
 
-      <!-- Variable display -->
-      <div class="variables-wrapper uk-panel uk-panel-divider">
-        <button type="button" class="button button--control" name="button--variable__local">Locals</button>
-        <button type="button" class="button button--control" name="button--variable__global">Globals</button>
-        <div class="variables"></div>
-      </div>
+      <div class="execution-states">
+        <!-- Variable display -->
+        <div class="variables-wrapper uk-panel">
+          <button type="button" class="button button--control" name="button--variable__local">Locals</button>
+          <button type="button" class="button button--control" name="button--variable__global">Globals</button>
+          <div class="variables"></div>
+        </div>
 
-      <!-- Stacktrace display -->
-      <div class="stacktrace-wrapper uk-panel uk-panel-divider">
-        <button type="button" class="button button--control" name="button--stacktrace">Stacktrace</button>
-        <table class="stacktrace">
-          <thead><th>Where</th><th>File</th><th>Line</th></thead>
-          <tbody class="traces"></tbody>
-        </table>
-      </div>
-    </div> <!-- /execution-states -->
+        <!-- Stacktrace display -->
+        <div class="stacktrace-wrapper uk-panel uk-panel-divider">
+          <button type="button" class="button button--control" name="button--stacktrace">Stacktrace</button>
+          <table class="stacktrace uk-hidden uk-table uk-table-hover uk-table-striped uk-table-condensed">
+            <thead><th>Where</th><th>File</th><th>Line</th></thead>
+            <tbody class="traces"></tbody>
+          </table>
+        </div>
+      </div> <!-- /.execution-states -->
+    </div> <!-- /.states-n-controls -->
 
     <script type="text/javascript" src="libs/bower_components/jquery/dist/jquery.min.js"></script>
     <script type="text/javascript" src="libs/bower_components/uikit/js/uikit.min.js"></script>
