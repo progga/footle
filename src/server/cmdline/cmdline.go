@@ -8,6 +8,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"github.com/chzyer/readline"
+	"io"
 	"log"
 	"server/config"
 	"server/dbgp/command"
@@ -44,9 +45,12 @@ func RunUI(out chan<- string, bye chan struct{}) {
 
 	for {
 		cmd, err := rl.Readline()
-		if nil != err {
+		if err != nil && err != io.EOF {
 			fmt.Println(err)
 			continue
+		} else if err == io.EOF {
+			close(bye)
+			return
 		}
 
 		shortCmd, cmdArgs, err := command.Break(cmd)
