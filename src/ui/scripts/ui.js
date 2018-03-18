@@ -65,7 +65,7 @@ function processMsg (msg) {
   } else if (msg.MessageType === 'response' && msg.Properties.Command === 'property_get') {
     displaySingleVar(msg.Context.Local)
   } else if (msg.MessageType === 'response' && msg.Properties.Command === 'stack_get') {
-    displayStackTrace(msg.StackDetail)
+    displayStackTrace(msg.Stacktrace)
   } else if (msg.MessageType === 'init') {
   }
 }
