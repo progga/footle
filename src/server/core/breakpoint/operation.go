@@ -9,7 +9,6 @@ import (
 	"server/dbgp/command"
 	"server/dbgp/message"
 	"strconv"
-	"strings"
 )
 
 var list breakpointList = make(breakpointList)
@@ -50,7 +49,6 @@ func SendPending(DBGpCmds chan string) {
  */
 func RemovePending(breakpointId string) (err error) {
 
-	breakpointId = strings.Trim(breakpointId, "\x00")
 	breakpointIdNum, err := strconv.Atoi(breakpointId)
 
 	if err != nil {

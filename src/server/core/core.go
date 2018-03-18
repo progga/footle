@@ -26,8 +26,8 @@ func ProcessUICmds(CmdsFromUIs, DBGpCmds chan string, DBGpMessages chan message.
 
 	config := config.Get()
 
-	for fullDBGpCmd := range CmdsFromUIs {
-		cmdName, cmdArgs, err := command.Break(fullDBGpCmd)
+	for cmd := range CmdsFromUIs {
+		cmdName, cmdArgs, err := command.Break(cmd)
 
 		if nil != err {
 			log.Println(err)
@@ -41,17 +41,17 @@ func ProcessUICmds(CmdsFromUIs, DBGpCmds chan string, DBGpMessages chan message.
 		} else if cmdName == "continue" {
 			DBGpConnection.Disconnect()
 		} else if cmdName == "breakpoint_set" && !DBGpConnection.IsOnAir() {
-			// Example command: breakpoint_set -i 5 -t line -f index.php -n 18\x00
-			filename := cmdArgs[5]
-			lineNo := cmdArgs[7] // Ends in a null byte.
+			// Example command from UI: breakpoint_set index.php 18
+			filename := cmdArgs[0]
+			lineNo := cmdArgs[1]
 			breakpoint.Enqueue(breakpoint.Line_type_breakpoint, filename, lineNo)
 			breakpoint.BroadcastPending(DBGpMessages, config)
 		} else if cmdName == "breakpoint_remove" && !DBGpConnection.IsOnAir() {
-			// Example command: breakpoint_remove -i 5 -d 18\x00
-			breakpointId := cmdArgs[3] // Ends in a null byte.
+			// Example command from UI: breakpoint_remove 18
+			breakpointId := cmdArgs[0]
 			breakpoint.RemovePending(breakpointId)
 			breakpoint.BroadcastPending(DBGpMessages, config)
-		} else {
+		} else if fullDBGpCmd, err := command.Prepare(cmdName, cmdArgs); err == nil {
 			DBGpCmds <- fullDBGpCmd
 		}
 	}

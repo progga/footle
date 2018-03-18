@@ -130,8 +130,12 @@ func receive(writeStream http.ResponseWriter, request *http.Request, out chan st
 		return
 	}
 
-	DBGpCmd, err := command.Prepare(shortCmd, cmdArgs)
-	if nil != err {
+	isInternalCmd := (shortCmd == "on" || shortCmd == "off" || shortCmd == "continue")
+
+	err = command.Validate(shortCmd, cmdArgs)
+
+	isInvalidDBGpCmd := !isInternalCmd && err != nil
+	if isInvalidDBGpCmd {
 		fmt.Fprintf(writeStream, "%s", err)
 
 		return
@@ -139,7 +143,7 @@ func receive(writeStream http.ResponseWriter, request *http.Request, out chan st
 
 	fmt.Fprintf(writeStream, "Got it.")
 
-	out <- DBGpCmd
+	out <- cmd
 }
 
 /**

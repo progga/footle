@@ -8,7 +8,6 @@ import (
 	"log"
 	"server/dbgp/message"
 	"strconv"
-	"strings"
 )
 
 /**
@@ -76,7 +75,6 @@ func add(breakpointType, filename string, lineNo, id int, state string) {
  */
 func enqueueLine(filename, lineNoArg string) {
 
-	lineNoArg = strings.Trim(lineNoArg, "\x00")
 	lineNo, err := strconv.Atoi(lineNoArg)
 
 	if filename == "" || err != nil {
