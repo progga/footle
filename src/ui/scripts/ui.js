@@ -34,6 +34,7 @@ jQuery(function () {
 
   setupTabCloser()
   setupContinuationControls()
+  setupStateControl()
   setupBreakpointTrigger()
   setupVariableInteraction()
 
