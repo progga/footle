@@ -296,6 +296,7 @@ func determineUIPath() (uiPath string, err error) {
  * Filepaths are present in:
  *  - response.Properties.Filename
  *  - response.Breakpoints
+ *  - response.Stacktrace
  */
 func adjustFilepath(response message.Message, codeDir string) message.Message {
 
@@ -305,6 +306,7 @@ func adjustFilepath(response message.Message, codeDir string) message.Message {
 	// replacement is found.
 	hasFilename := filepath.HasPrefix(response.Properties.Filename, codeDirUri)
 	hasBreakpoints := len(response.Breakpoints) > 0
+	hasStacktrace := len(response.Stacktrace) > 0
 
 	// Adjust response.Properties.Filename
 	if hasFilename {
@@ -323,19 +325,33 @@ func adjustFilepath(response message.Message, codeDir string) message.Message {
 	var adjustedBreakpoints map[int]message.Breakpoint
 	if hasBreakpoints {
 		adjustedBreakpoints = make(map[int]message.Breakpoint)
-	} else {
-		return response
-	}
 
-	for breakpointId, breakpoint := range response.Breakpoints {
-		relativePath, err := filepath.Rel(codeDirUri, breakpoint.Filename)
+		for breakpointId, breakpoint := range response.Breakpoints {
+			relativePath, err := filepath.Rel(codeDirUri, breakpoint.Filename)
 
-		if nil == err {
-			breakpoint.Filename = relativePath
-			adjustedBreakpoints[breakpointId] = breakpoint
+			if nil == err {
+				breakpoint.Filename = relativePath
+				adjustedBreakpoints[breakpointId] = breakpoint
+			}
 		}
+		response.Breakpoints = adjustedBreakpoints
 	}
-	response.Breakpoints = adjustedBreakpoints
+
+	// Lastly, adjust response.Stacktrace
+	var adjustedStacktrace []message.StackLevel
+	if hasStacktrace {
+		adjustedStacktrace = []message.StackLevel{}
+
+		for _, StackLevel := range response.Stacktrace {
+			relativePath, err := filepath.Rel(codeDirUri, StackLevel.Filename)
+
+			if nil == err {
+				StackLevel.Filename = relativePath
+				adjustedStacktrace = append(adjustedStacktrace, StackLevel)
+			}
+		}
+		response.Stacktrace = adjustedStacktrace
+	}
 
 	return response
 }

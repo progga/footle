@@ -15,7 +15,7 @@ type Message struct {
 	Context     Context
 	Content     string
 	Breakpoints map[int]Breakpoint
-	StackDetail []StackLevel
+	Stacktrace  []StackLevel
 }
 
 type Properties struct {
@@ -69,7 +69,7 @@ type Response struct {
 	Breakpoints   []Breakpoint      `xml:"breakpoint"`
 	Error         Error             `xml:"error"`
 	Variables     []VariableDetails `xml:"property"`
-	StackDetail   []StackLevel      `xml:"stack"`
+	Stacktrace    []StackLevel      `xml:"stack"`
 	Content       string            `xml:",chardata"`
 }
 

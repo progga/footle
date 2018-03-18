@@ -219,16 +219,16 @@ func TestDecodeResponseForStackGet(t *testing.T) {
 		t.Error(`decodeResponse(<response ... command="stack_get"...></response>): Command is not "stack_get"`)
 	}
 
-	if response.StackDetail[0].LineNo != 882 {
-		t.Errorf("Failed to spot line number in call stack record. %d given.", response.StackDetail[0].LineNo)
+	if response.Stacktrace[0].LineNo != 882 {
+		t.Errorf("Failed to spot line number in call stack record. %d given.", response.Stacktrace[0].LineNo)
 	}
 
-	if response.StackDetail[0].Level != 0 {
-		t.Errorf("Failed to spot stack level number. %d given.", response.StackDetail[0].Level)
+	if response.Stacktrace[0].Level != 0 {
+		t.Errorf("Failed to spot stack level number. %d given.", response.Stacktrace[0].Level)
 	}
 
-	if response.StackDetail[2].Filename != "file:///srv/www/drupal/drupal8/index.php" {
-		t.Errorf("Failed to spot filename in call stack record. %s given.", response.StackDetail[2].Filename)
+	if response.Stacktrace[2].Filename != "file:///srv/www/drupal/drupal8/index.php" {
+		t.Errorf("Failed to spot filename in call stack record. %s given.", response.Stacktrace[2].Filename)
 	}
 }
 

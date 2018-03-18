@@ -77,11 +77,11 @@ func prepareResponseMessage(response Response) (message Message) {
 		}
 	}
 
-	if stackDepth := len(response.StackDetail); stackDepth > 0 {
-		message.StackDetail = make([]StackLevel, stackDepth)
+	if stackDepth := len(response.Stacktrace); stackDepth > 0 {
+		message.Stacktrace = make([]StackLevel, stackDepth)
 
-		for _, StackLevel := range response.StackDetail {
-			message.StackDetail[StackLevel.Level] = StackLevel
+		for _, StackLevel := range response.Stacktrace {
+			message.Stacktrace[StackLevel.Level] = StackLevel
 		}
 	}
 
