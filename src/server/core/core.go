@@ -36,10 +36,13 @@ func ProcessUICmds(CmdsFromUIs, DBGpCmds chan string, DBGpMessages chan message.
 
 		if cmdName == "on" {
 			DBGpConnection.Activate()
+			broadcastFakeMsgToUIs("on", "awake", DBGpMessages)
 		} else if cmdName == "off" {
 			DBGpConnection.Deactivate()
+			broadcastFakeMsgToUIs("off", "asleep", DBGpMessages)
 		} else if cmdName == "continue" {
 			DBGpConnection.Disconnect()
+			broadcastFakeMsgToUIs("continue", "stopped", DBGpMessages)
 		} else if cmdName == "breakpoint_set" && !DBGpConnection.IsOnAir() {
 			// Example command from UI: breakpoint_set index.php 18
 			filename := cmdArgs[0]
@@ -81,6 +84,22 @@ func ProcessDBGpMessages(DBGpCmds chan string, DBGpMessages, MsgsForCmdLineUI, M
 		}
 
 		BroadcastMsgToUIs(msg, MsgsForCmdLineUI, MsgsForHTTPUI)
+	}
+}
+
+/**
+ * Pass on a DBGP message to all the user interfaces.
+ *
+ * User interfaces include the command line interface and the HTTP interface.
+ */
+func BroadcastMsgToUIs(msg message.Message, toCmdLine, toHTTP chan<- message.Message) {
+
+	if nil != toCmdLine {
+		toCmdLine <- msg
+	}
+
+	if nil != toHTTP {
+		toHTTP <- msg
 	}
 }
 
@@ -134,17 +153,17 @@ func requestBreakpointList(DBGpCmds chan string) {
 }
 
 /**
- * Pass on a DBGP message to all the user interfaces.
+ * Broadcast message for Footle's internal commands.
  *
- * User interfaces include the command line interface and the HTTP interface.
+ * Knowing the execution of internal commands allows UIs to offer better UX.
+ *
+ * Example commands: on, off, continue.
  */
-func BroadcastMsgToUIs(msg message.Message, toCmdLine, toHTTP chan<- message.Message) {
+func broadcastFakeMsgToUIs(cmd string, state string, DBGpMessages chan message.Message) {
 
-	if nil != toCmdLine {
-		toCmdLine <- msg
-	}
+	fakeMsg := message.Message{}
+	fakeMsg.Properties.Command = cmd
+	fakeMsg.State = state
 
-	if nil != toHTTP {
-		toHTTP <- msg
-	}
+	DBGpMessages <- fakeMsg
 }
