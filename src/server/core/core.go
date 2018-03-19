@@ -155,13 +155,15 @@ func requestBreakpointList(DBGpCmds chan string) {
 /**
  * Broadcast message for Footle's internal commands.
  *
- * Knowing the execution of internal commands allows UIs to offer better UX.
+ * Knowing about the execution states resulting from the internal commands
+ * allows UIs to offer better UX.
  *
  * Example commands: on, off, continue.
  */
 func broadcastFakeMsgToUIs(cmd string, state string, DBGpMessages chan message.Message) {
 
 	fakeMsg := message.Message{}
+	fakeMsg.MessageType = "response"
 	fakeMsg.Properties.Command = cmd
 	fakeMsg.State = state
 
