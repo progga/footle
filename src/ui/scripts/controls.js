@@ -22,15 +22,6 @@ function setupContinuationControls () {
   }
 
   setupCommandNControl(commandsNSelectors)
-
-  /**
-   * Display either the "On" or the "Off" button.
-   *
-   * @see Markup for the "On" button.
-   */
-  jQuery('[name="button--on"], [name="button--off"]').click(function () {
-    jQuery('[name="button--on"], [name="button--off"]').toggleClass('uk-hidden')
-  })
 }
 
 /**
@@ -46,6 +37,15 @@ function setupStateControl () {
   }
 
   setupCommandNControl(commandsNSelectors)
+}
+
+/**
+ * Display either the "On" or the "Off" button.
+ *
+ * @see Markup for the "On" button.
+ */
+function toggleOnOffbuttons() {
+  jQuery('[name="button--on"], [name="button--off"]').toggleClass('uk-hidden')
 }
 
 /**

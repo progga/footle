@@ -66,6 +66,10 @@ function processMsg (msg) {
     displaySingleVar(msg.Context.Local)
   } else if (msg.MessageType === 'response' && msg.Properties.Command === 'stack_get') {
     displayStackTrace(msg.Stacktrace)
+  } else if (msg.MessageType === 'response' && msg.State === 'awake') {
+    toggleOnOffbuttons()
+  } else if (msg.MessageType === 'response' && msg.State === 'asleep') {
+    toggleOnOffbuttons()
   } else if (msg.MessageType === 'init') {
   }
 }
