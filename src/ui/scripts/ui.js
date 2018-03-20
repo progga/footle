@@ -49,7 +49,7 @@ jQuery(function () {
 })
 
 /**
- * Update UI based on debugging status.
+ * Update UI based on debugger response.
  *
  * @param object msg
  */

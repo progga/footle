@@ -10,7 +10,7 @@
 'use strict'
 
 /**
- * List of files and their corresponding tab element.
+ * List of files and their corresponding tab elements.
  */
 var fileTabMapping = {}
 
@@ -31,6 +31,11 @@ function addTab (filepath, postTabOpenAction) {
   }
 
   jQuery.get(formattedFilepath, function (data) {
+    if (hasFileTabMapping(filepath)) {
+      // The mapping may have been updated in the meantime.  Hence this recheck.
+      return
+    }
+
     /* Tab link. */
     var tabLink = jQuery('<li id="' + filepath + '" class="tab-selector" data-filepath="' + filepath + '" title="' + filepath + '"><a href="#">' + filename + '<span class="tab-closer">X</span></a></li>')
     // Make sure to add a jQuery object instead of plain markup so that we can
@@ -197,7 +202,7 @@ function getTabContentElementForFile (filename) {
 /**
  * Position tab content after tab selector.
  *
- * The tab selector is sticky at the top thanks to its *fix* positioning.
+ * The tab selector is sticky at the top thanks to its *fixed* positioning.
  * Unless we do something, the tab content area will flow under it.  We
  * avoid it by pushing down the tab content area as much as the height of
  * the tab selector.  To push it down, we adjust the top padding of the
@@ -206,5 +211,6 @@ function getTabContentElementForFile (filename) {
  * @todo Adjust top padding on window resize.
  */
 function adjustTabContentPosition () {
-  jQuery('#tab').css('padding-top', jQuery('#tab-selector-wrapper').outerHeight(true))
+  var tabSelectorHeight = jQuery('#tab-selector-wrapper').outerHeight(true)
+  jQuery('#tab').css('padding-top', tabSelectorHeight)
 }
