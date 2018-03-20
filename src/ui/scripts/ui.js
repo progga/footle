@@ -68,8 +68,28 @@ function processMsg (msg) {
     displayStackTrace(msg.Stacktrace)
   } else if (msg.MessageType === 'response' && msg.State === 'awake') {
     toggleOnOffbuttons()
+    removePreviousBreak()
   } else if (msg.MessageType === 'response' && msg.State === 'asleep') {
     toggleOnOffbuttons()
+    removePreviousBreak()
   } else if (msg.MessageType === 'init') {
   }
+
+  updateExecutionState(msg.State)
+}
+
+/**
+ * Update programme execution state.
+ *
+ * This is useful for providing hints in the UI about the state of the debugger
+ * and the programme we are debugging.
+ *
+ * @param string state
+ */
+function updateExecutionState (state) {
+  if (typeof state === 'undefined' || state === '' || state === 'waiting') {
+    return
+  }
+
+  jQuery('.execution-states').attr('data-state', state)
 }

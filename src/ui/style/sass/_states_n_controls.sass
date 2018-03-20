@@ -3,7 +3,7 @@
  * @file
  * Wrapper for execution control buttons, stacktraces, and variables.
  *
- * Also includes styling for stacktraces.
+ * Also includes styling for stacktraces and programme execution states.
  */
 
 /**
@@ -16,12 +16,14 @@
   width: 25vw
   z-index: 10
 
-// Wraps variables and stacktraces.
+/**
+ * Wraps variables and stacktraces.
+ */
 .execution-states
   // Emulate .uk-panel-divider which doesn't play well with overflow :(
   margin-top: $panel-divider-gutter
   padding-top: $panel-divider-gutter
-  border-top: $panel-divider-border-width solid $panel-divider-border
+  border-top: 2 * $panel-divider-border-width solid $panel-divider-border
 
   // Scrollbar.
   max-height: 75vh
@@ -30,3 +32,29 @@
 .variables,
 .stacktrace
   margin-top: 1em
+
+/**
+ * Highlight debugger status.
+ *
+ * Differ the top border colour of .execution-states to indicate where we are.
+ * Mappings between states and colours are as follows:
+ * - awake: red
+ * - asleep: initial greyish colour
+ * - started: green
+ * - break: amber
+ * - stopped: red
+ * - executing: green
+ */
+.execution-states
+  transition: border-top-color 0.5s
+
+  &[data-state=awake]
+    border-top-color: red
+  &[data-state=asleep]
+    border-top-color: $panel-divider-border
+  &[data-state=started]
+    border-top-color: green
+  &[data-state=break]
+    border-top-color: #ffbf00 // Amber
+  &[data-state=stopped]
+    border-top-color: red
