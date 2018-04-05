@@ -27,6 +27,23 @@ func ProcessUICmds(CmdsFromUIs, DBGpCmds chan string, DBGpMessages chan message.
 	config := config.Get()
 
 	for cmd := range CmdsFromUIs {
+
+		// First, deal with Footle specific commands.
+		if cmd == "on" {
+			DBGpConnection.Activate()
+			broadcastFakeMsgToUIs("on", "awake", DBGpMessages)
+			continue
+		} else if cmd == "off" {
+			DBGpConnection.Deactivate()
+			broadcastFakeMsgToUIs("off", "asleep", DBGpMessages)
+			continue
+		} else if cmd == "continue" {
+			DBGpConnection.Disconnect()
+			broadcastFakeMsgToUIs("continue", "stopped", DBGpMessages)
+			continue
+		}
+
+		// Now the DBGp commands.
 		cmdName, cmdArgs, err := command.Break(cmd)
 
 		if nil != err {
@@ -34,27 +51,31 @@ func ProcessUICmds(CmdsFromUIs, DBGpCmds chan string, DBGpMessages chan message.
 			continue
 		}
 
-		if cmdName == "on" {
-			DBGpConnection.Activate()
-			broadcastFakeMsgToUIs("on", "awake", DBGpMessages)
-		} else if cmdName == "off" {
-			DBGpConnection.Deactivate()
-			broadcastFakeMsgToUIs("off", "asleep", DBGpMessages)
-		} else if cmdName == "continue" {
-			DBGpConnection.Disconnect()
-			broadcastFakeMsgToUIs("continue", "stopped", DBGpMessages)
-		} else if cmdName == "breakpoint_set" && !DBGpConnection.IsOnAir() {
+		DBGpCmdName, err := command.Extract(cmd)
+
+		if nil != err {
+			log.Println(err)
+			continue
+		}
+
+		if DBGpCmdName == "breakpoint_set" {
+			// Filepaths coming from UIs *could be* relative paths.  These need to be
+			// turned into absolute file URIs such as file:///foo/bar/baz.php
+			cmdArgs[0] = breakpoint.ToAbsoluteUri(cmdArgs[0], config)
+		}
+
+		if DBGpCmdName == "breakpoint_set" && !DBGpConnection.IsOnAir() {
 			// Example command from UI: breakpoint_set index.php 18
 			filename := cmdArgs[0]
 			lineNo := cmdArgs[1]
 			breakpoint.Enqueue(breakpoint.Line_type_breakpoint, filename, lineNo)
-			breakpoint.BroadcastPending(DBGpMessages, config)
-		} else if cmdName == "breakpoint_remove" && !DBGpConnection.IsOnAir() {
+			breakpoint.BroadcastPending(DBGpMessages)
+		} else if DBGpCmdName == "breakpoint_remove" && !DBGpConnection.IsOnAir() {
 			// Example command from UI: breakpoint_remove 18
 			breakpointId := cmdArgs[0]
 			breakpoint.RemovePending(breakpointId)
-			breakpoint.BroadcastPending(DBGpMessages, config)
-		} else if fullDBGpCmd, err := command.Prepare(cmdName, cmdArgs); err == nil {
+			breakpoint.BroadcastPending(DBGpMessages)
+		} else if fullDBGpCmd, err := command.Prepare(DBGpCmdName, cmdArgs); err != nil {
 			DBGpCmds <- fullDBGpCmd
 		}
 	}

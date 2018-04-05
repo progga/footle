@@ -47,53 +47,55 @@ func PrepareDBGpCmd(cmd string, args []string) (DBGpCmd string, err error) {
 
 	TxId := fetchNextTxId()
 
-	switch strings.ToLower(cmd) {
-	case "breakpoint_set", "b":
+	DBGpCmd = resolveAlias(cmd)
+
+	switch DBGpCmd {
+	case "breakpoint_set":
 		DBGpCmd, err = prepareBreakpointCmd(args, TxId)
 
-	case "breakpoint_list", "bl":
+	case "breakpoint_list":
 		DBGpCmd, err = prepareCmdNoArgs("breakpoint_list", TxId)
 
-	case "breakpoint_get", "bg":
+	case "breakpoint_get":
 		DBGpCmd, err = prepareBreakpointGetCmd(args, TxId)
 
-	case "breakpoint_remove", "br":
+	case "breakpoint_remove":
 		DBGpCmd, err = prepareBreakpointRemoveCmd(args, TxId)
 
-	case "context_get", "vl":
+	case "context_get":
 		DBGpCmd, err = prepareContextGetCmd(args, TxId)
 
-	case "eval", "ev":
+	case "eval":
 		DBGpCmd, err = prepareEvalCmd(args, TxId)
 
-	case "run", "r":
+	case "run":
 		DBGpCmd, err = prepareCmdNoArgs("run", TxId)
 
 	case "dbgp":
 		DBGpCmd, err = prepareRawDBGpCmd(args, TxId)
 
-	case "property_get", "var":
+	case "property_get":
 		DBGpCmd, err = preparePropertyGetCmd(args, TxId)
 
-	case "stack_get", "stk":
+	case "stack_get":
 		DBGpCmd, err = prepareCmdNoArgs("stack_get", TxId)
 
-	case "source", "src", "sr":
+	case "source":
 		DBGpCmd, err = prepareSourceCmd(args, TxId)
 
-	case "status", "s":
+	case "status":
 		DBGpCmd, err = prepareCmdNoArgs("status", TxId)
 
-	case "stop", "st":
+	case "stop":
 		DBGpCmd, err = prepareCmdNoArgs("stop", TxId)
 
-	case "step_into", "si":
+	case "step_into":
 		DBGpCmd, err = prepareCmdNoArgs("step_into", TxId)
 
-	case "step_out", "so":
+	case "step_out":
 		DBGpCmd, err = prepareCmdNoArgs("step_out", TxId)
 
-	case "step_over", "sov", "sv":
+	case "step_over":
 		DBGpCmd, err = prepareCmdNoArgs("step_over", TxId)
 
 	default:

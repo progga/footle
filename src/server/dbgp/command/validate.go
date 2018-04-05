@@ -18,56 +18,58 @@ import (
  */
 func Validate(cmd string, args []string) (err error) {
 
-	switch cmd {
+	DBGpCmd := resolveAlias(cmd)
+
+	switch DBGpCmd {
 	default:
 		err = fmt.Errorf("Unknown command.")
 
-	case "breakpoint_set", "b":
+	case "breakpoint_set":
 		err = validateBreakpointArgs(args)
 
-	case "breakpoint_get", "bg":
+	case "breakpoint_get":
 		err = validateBreakpointGetArgs(args)
 
-	case "breakpoint_remove", "br":
+	case "breakpoint_remove":
 		err = validateBreakpointRemoveArgs(args)
 
-	case "breakpoint_list", "bl":
+	case "breakpoint_list":
 		err = validateCmdWithNoArg("breakpoint_list", args)
 
-	case "context_get", "vl":
+	case "context_get":
 		err = validateContextGetArgs(args)
 
-	case "eval", "ev":
+	case "eval":
 		err = validateCmdWithNoArg("eval", args)
 
-	case "run", "r":
+	case "run":
 		err = validateCmdWithNoArg("run", args)
 
 	case "dbgp":
 		err = validateRawDBGpArgs(args)
 
-	case "property_get", "var":
+	case "property_get":
 		err = validatePropertyGetArgs(args)
 
-	case "stack_get", "stk":
+	case "stack_get":
 		err = validateCmdWithNoArg("stack_get", args)
 
-	case "source", "src", "sr":
+	case "source":
 		err = validateSourceArgs(args)
 
-	case "stop", "st":
+	case "stop":
 		err = validateCmdWithNoArg("stop", args)
 
-	case "status", "s":
+	case "status":
 		err = validateCmdWithNoArg("status", args)
 
-	case "step_into", "si":
+	case "step_into":
 		err = validateCmdWithNoArg("step_into", args)
 
-	case "step_out", "so":
+	case "step_out":
 		err = validateCmdWithNoArg("step_out", args)
 
-	case "step_over", "sov", "sv":
+	case "step_over":
 		err = validateCmdWithNoArg("step_over", args)
 	}
 

@@ -57,3 +57,28 @@ func Prepare(shortCmd string, cmdArgs []string) (DBGpCmd string, err error) {
 
 	return DBGpCmd, err
 }
+
+/**
+ * Given a DBGp command, extract the command name.
+ *
+ * For example, if the UI has received "b foo.php 2", which is a shorthand for
+ * "breakpoint_set foo.php 2", return "breakpoint_set".
+ */
+func Extract(cmdFromUI string) (DBGpCmdName string, err error) {
+
+	cmdName, cmdArgs, err := Break(cmdFromUI)
+
+	if err != nil {
+		return DBGpCmdName, err
+	}
+
+	err = Validate(cmdName, cmdArgs)
+
+	if err != nil {
+		return DBGpCmdName, err
+	}
+
+	DBGpCmdName = resolveAlias(cmdName)
+
+	return DBGpCmdName, err
+}
