@@ -7,6 +7,7 @@ package config
 
 import (
 	"flag"
+	"os"
 	"strconv"
 )
 
@@ -72,7 +73,7 @@ func Get() Config {
  */
 func getFlagsAndArgs() (docroot, remoteDocroot, verbosity string, httpPort, DBGpPort int, hasCmdLine, hasHTTP bool) {
 
-	docrootArg := flag.String("docroot", "", "[Needed] Path of directory whose code you want to debug; e.g. /var/www/html/")
+	docrootArg := flag.String("docroot", "", "[Optional] Path of directory whose code you want to debug; e.g. /var/www/html/ (default is current dir)")
 	remoteDocrootArg := flag.String("docroot-remote", "", "[Optional] When Footle and the DBGp server (e.g. xdebug) are in different machines, this is the path of the source code directory in the remote machine.  This scenario is *not* recommended.  Try as a last resort.")
 	DBGpPortArg := flag.Int("port-dbgp", 9000, "[Optional] Network port to listen for the DBGp server.")
 	httpPortArg := flag.Int("port-http", 9090, "[Optional] Network port for Footle's Web interface.")
@@ -91,6 +92,14 @@ func getFlagsAndArgs() (docroot, remoteDocroot, verbosity string, httpPort, DBGp
 	DBGpPort = *DBGpPortArg
 	hasCmdLine = *hasCmdLineFlag
 	hasHTTP = !*noHTTPFlag
+
+	if docroot == "" {
+		currentDir, err := os.Getwd()
+
+		if err == nil {
+			docroot = currentDir
+		}
+	}
 
 	if *HighVerbosityFlag {
 		verbosity = "high"
