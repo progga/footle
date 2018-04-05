@@ -5,10 +5,12 @@
 package breakpoint
 
 import (
+	"path/filepath"
 	"server/config"
 	"server/dbgp/command"
 	"server/dbgp/message"
 	"strconv"
+	"strings"
 )
 
 var list breakpointList = make(breakpointList)
@@ -79,13 +81,44 @@ func RemovePending(breakpointId string) (err error) {
  * debugging session.  Pending breakpoints have been added through the UI, but
  * have not been sent to the debugger engine yet.
  */
-func BroadcastPending(DBGpMessages chan message.Message, config config.Config) {
+func BroadcastPending(DBGpMessages chan message.Message) {
 
 	fakeMsg := FakeMessage{}
-	fakeMsg.init(config, "breakpoint_list")
+	fakeMsg.init("breakpoint_list")
 	fakeMsg.AddExistingBreakpoints(list)
 	fakeMsg.AddPendingBreakpoints(pending)
 
 	msg := fakeMsg.GetMsg()
 	DBGpMessages <- msg
+}
+
+/**
+ * Turn a relative filepath into an absolute URI.
+ *
+ * Examples:
+ *   - foo/bar.txt -> file://docroot/foo/bar.txt
+ *   - /foo/bar.txt -> file:///foo/bar.txt
+ *   - file://docroot/foo/bar.txt -> file://docroot/foo/bar.txt
+ *
+ * @todo Add Unit tests.
+ */
+func ToAbsoluteUri(relativePath string, config config.Config) (absoluteUri string) {
+
+	isAbsoluteUri := strings.HasPrefix(relativePath, "file://")
+	if isAbsoluteUri {
+		absoluteUri = relativePath
+		return absoluteUri
+	}
+
+	isAbsolutePath := filepath.IsAbs(relativePath)
+	if isAbsolutePath {
+		absoluteUri = "file://" + relativePath
+
+		return absoluteUri
+	}
+
+	docroot := config.DetermineCodeDir()
+	absoluteUri = "file://" + filepath.Join(docroot, relativePath)
+
+	return absoluteUri
 }
