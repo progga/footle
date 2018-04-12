@@ -44,7 +44,7 @@ func ProcessUICmds(CmdsFromUIs, DBGpCmds chan string, DBGpMessages chan message.
 		}
 
 		// Now the DBGp commands.
-		cmdName, cmdArgs, err := command.Break(cmd)
+		_, cmdArgs, err := command.Break(cmd)
 
 		if nil != err {
 			log.Println(err)
@@ -75,7 +75,7 @@ func ProcessUICmds(CmdsFromUIs, DBGpCmds chan string, DBGpMessages chan message.
 			breakpointId := cmdArgs[0]
 			breakpoint.RemovePending(breakpointId)
 			breakpoint.BroadcastPending(DBGpMessages)
-		} else if fullDBGpCmd, err := command.Prepare(DBGpCmdName, cmdArgs); err != nil {
+		} else if fullDBGpCmd, err := command.Prepare(DBGpCmdName, cmdArgs); err == nil {
 			DBGpCmds <- fullDBGpCmd
 		}
 	}
