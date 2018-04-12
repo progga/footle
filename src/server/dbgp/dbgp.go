@@ -22,12 +22,13 @@ func Read(connection io.Reader) (msg string, err error) {
 	var msgSize int
 
 	count, err := fmt.Fscanf(connection, "%d\x00", &msgSize)
-	if nil != err {
+	if err != nil && err != io.EOF {
 		log.Print(err)
 
 		return msg, err
-	}
-	if 0 == count {
+	} else if err == io.EOF {
+		return msg, err
+	} else if 0 == count {
 		return msg, err
 	}
 
