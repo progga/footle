@@ -37,7 +37,7 @@ const READLINE_PROMPT = "> "
 func RunUI(out chan<- string, bye chan struct{}) {
 
 	rl, err := readline.New(READLINE_PROMPT)
-	if nil != err {
+	if err != nil {
 		log.Fatal(err)
 	}
 
@@ -46,7 +46,7 @@ func RunUI(out chan<- string, bye chan struct{}) {
 	for {
 		cmd, err := rl.Readline()
 		if err != nil && err != io.EOF {
-			fmt.Println(err)
+			log.Println(err)
 			continue
 		} else if err == io.EOF {
 			close(bye)
@@ -55,7 +55,7 @@ func RunUI(out chan<- string, bye chan struct{}) {
 
 		cmdAlias, cmdArgs, err := command.Break(cmd)
 		if nil != err {
-			fmt.Println(err)
+			log.Println(err)
 			continue
 		}
 

@@ -26,8 +26,6 @@ import (
  */
 func ProcessUICmds(CmdsFromUIs, DBGpCmds chan string, DBGpMessages chan message.Message, DBGpConnection *conn.Connection) {
 
-	config := config.Get()
-
 	for cmd := range CmdsFromUIs {
 		cmdAlias, cmdArgs, err := command.Break(cmd)
 		if nil != err {
@@ -35,69 +33,12 @@ func ProcessUICmds(CmdsFromUIs, DBGpCmds chan string, DBGpMessages chan message.
 			continue
 		}
 
-		// First, deal with Footle specific commands.
-		if cmd == "on" {
-			DBGpConnection.Activate()
-
-			fakeCmd := message.Properties{Command: "on"}
-			broadcastFakeMsg(fakeCmd, "awake", DBGpMessages)
-
-			continue
-		} else if cmd == "off" {
-			DBGpConnection.Deactivate()
-
-			fakeCmd := message.Properties{Command: "off"}
-			broadcastFakeMsg(fakeCmd, "asleep", DBGpMessages)
-
-			continue
-		} else if cmd == "continue" {
-			DBGpConnection.Disconnect()
-
-			fakeCmd := message.Properties{Command: "continue"}
-			broadcastFakeMsg(fakeCmd, "stopped", DBGpMessages)
-
-			continue
-		} else if cmdAlias == "broadcast" && len(cmdArgs) == 2 && cmdArgs[0] == "update_source" {
-			filename := cmdArgs[1]
-			absoluteFilename := toAbsolutePath(filename, config)
-
-			if _, err := os.Stat(absoluteFilename); os.IsNotExist(err) {
-				log.Printf("File doesn't exist: %s", filename)
-				continue
-			}
-
-			fakeCmd := message.Properties{Command: "update_source", Filename: filename}
-			broadcastFakeMsg(fakeCmd, "", DBGpMessages)
-
-			continue
-		}
-
-		// Now the DBGp commands.
-		DBGpCmdName, err := command.Extract(cmd)
-		if nil != err {
+		if cmdAlias == "on" || cmdAlias == "off" || cmdAlias == "continue" || cmdAlias == "broadcast" {
+			processInternalFootleCmds(cmdAlias, cmdArgs, DBGpMessages, DBGpConnection)
+		} else if DBGpCmdName, err := command.Extract(cmd); err == nil {
+			processDBGpCmds(DBGpCmdName, cmdArgs, DBGpCmds, DBGpMessages, DBGpConnection)
+		} else {
 			log.Println(err)
-			continue
-		}
-
-		if DBGpCmdName == "breakpoint_set" {
-			// Filepaths coming from UIs *could be* relative paths.  These need to be
-			// turned into absolute file URIs such as file:///foo/bar/baz.php
-			cmdArgs[0] = toAbsoluteUri(cmdArgs[0], config)
-		}
-
-		if DBGpCmdName == "breakpoint_set" && !DBGpConnection.IsOnAir() {
-			// Example command from UI: breakpoint_set index.php 18
-			filename := cmdArgs[0]
-			lineNo := cmdArgs[1]
-			breakpoint.Enqueue(breakpoint.Line_type_breakpoint, filename, lineNo)
-			breakpoint.BroadcastPending(DBGpMessages)
-		} else if DBGpCmdName == "breakpoint_remove" && !DBGpConnection.IsOnAir() {
-			// Example command from UI: breakpoint_remove 18
-			breakpointId := cmdArgs[0]
-			breakpoint.RemovePending(breakpointId)
-			breakpoint.BroadcastPending(DBGpMessages)
-		} else if fullDBGpCmd, err := command.Prepare(DBGpCmdName, cmdArgs); err == nil {
-			DBGpCmds <- fullDBGpCmd
 		}
 	}
 }
@@ -126,6 +67,78 @@ func ProcessDBGpMessages(DBGpCmds chan string, DBGpMessages, MsgsForCmdLineUI, M
 		}
 
 		broadcastMsgToUIs(msg, MsgsForCmdLineUI, MsgsForHTTPUI)
+	}
+}
+
+/**
+ * Post-processing of DBGp commands.
+ *
+ * Commands coming from the UIs may need some massaging before they are ready
+ * for the consumption of the DBGp engine.  Examples:
+ *   - We need to provide absolute file URIs for creating breakpoints.  UIs
+ *     usually will send us relative filepaths.
+ *   - Some DBGp commands are queued when the DBGp engine is unavailable.  These
+ *     queued commands are later sent when the engine makes contact.
+ */
+func processDBGpCmds(cmdName string, cmdArgs []string, DBGpCmds chan string, DBGpMessages chan message.Message, DBGpConnection *conn.Connection) {
+
+	if cmdName == "breakpoint_set" {
+		// Filepaths coming from UIs *could be* relative paths.  These need to be
+		// turned into absolute file URIs such as file:///foo/bar/baz.php
+		config := config.Get()
+		cmdArgs[0] = toAbsoluteUri(cmdArgs[0], config)
+	}
+
+	if cmdName == "breakpoint_set" && !DBGpConnection.IsOnAir() {
+		// Example command from UI: breakpoint_set index.php 18
+		filename := cmdArgs[0]
+		lineNo := cmdArgs[1]
+
+		breakpoint.Enqueue(breakpoint.Line_type_breakpoint, filename, lineNo)
+		breakpoint.BroadcastPending(DBGpMessages)
+	} else if cmdName == "breakpoint_remove" && !DBGpConnection.IsOnAir() {
+		// Example command from UI: breakpoint_remove 18
+		breakpointId := cmdArgs[0]
+		breakpoint.RemovePending(breakpointId)
+		breakpoint.BroadcastPending(DBGpMessages)
+	} else if err := command.Validate(cmdName, cmdArgs); err == nil {
+		fullDBGpCmd, _ := command.Prepare(cmdName, cmdArgs)
+		DBGpCmds <- fullDBGpCmd
+	}
+}
+
+/**
+ * Processing of Footle's internal commands.
+ */
+func processInternalFootleCmds(cmdAlias string, cmdArgs []string, DBGpMessages chan message.Message, DBGpConnection *conn.Connection) {
+
+	if cmdAlias == "on" {
+		DBGpConnection.Activate()
+
+		fakeCmd := message.Properties{Command: "on"}
+		broadcastFakeMsg(fakeCmd, "awake", DBGpMessages)
+	} else if cmdAlias == "off" {
+		DBGpConnection.Deactivate()
+
+		fakeCmd := message.Properties{Command: "off"}
+		broadcastFakeMsg(fakeCmd, "asleep", DBGpMessages)
+	} else if cmdAlias == "continue" {
+		DBGpConnection.Disconnect()
+
+		fakeCmd := message.Properties{Command: "continue"}
+		broadcastFakeMsg(fakeCmd, "stopped", DBGpMessages)
+	} else if cmdAlias == "broadcast" && cmdArgs[0] == "update_source" && len(cmdArgs) == 2 {
+		filename := cmdArgs[1]
+
+		config := config.Get()
+		absoluteFilename := toAbsolutePath(filename, config)
+
+		if _, err := os.Stat(absoluteFilename); os.IsNotExist(err) {
+			log.Printf("File doesn't exist: %s", filename)
+		}
+
+		fakeCmd := message.Properties{Command: "update_source", Filename: filename}
+		broadcastFakeMsg(fakeCmd, "", DBGpMessages)
 	}
 }
 

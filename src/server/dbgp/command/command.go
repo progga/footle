@@ -67,13 +67,11 @@ func Prepare(shortCmd string, cmdArgs []string) (DBGpCmd string, err error) {
 func Extract(cmdFromUI string) (DBGpCmdName string, err error) {
 
 	cmdName, cmdArgs, err := Break(cmdFromUI)
-
 	if err != nil {
 		return DBGpCmdName, err
 	}
 
 	err = Validate(cmdName, cmdArgs)
-
 	if err != nil {
 		return DBGpCmdName, err
 	}
