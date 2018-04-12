@@ -7,6 +7,7 @@ package config
 
 import (
 	"flag"
+	"log"
 	"os"
 	"strconv"
 )
@@ -99,6 +100,8 @@ func getFlagsAndArgs() (docroot, remoteDocroot, verbosity string, httpPort, DBGp
 		if err == nil {
 			docroot = currentDir
 		}
+	} else if _, err := os.Stat(docroot); os.IsNotExist(err) {
+		log.Fatal(err)
 	}
 
 	if *HighVerbosityFlag {
