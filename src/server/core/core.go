@@ -1,11 +1,13 @@
 /**
- * Package for talking to the DBGp engine.
+ * @file
+ * Package for post-processing debugger commands and responses.
  */
 
 package core
 
 import (
 	"log"
+	"os"
 	"server/config"
 	"server/core/breakpoint"
 	conn "server/core/connection"
@@ -27,32 +29,51 @@ func ProcessUICmds(CmdsFromUIs, DBGpCmds chan string, DBGpMessages chan message.
 	config := config.Get()
 
 	for cmd := range CmdsFromUIs {
-
-		// First, deal with Footle specific commands.
-		if cmd == "on" {
-			DBGpConnection.Activate()
-			broadcastFakeMsgToUIs("on", "awake", DBGpMessages)
-			continue
-		} else if cmd == "off" {
-			DBGpConnection.Deactivate()
-			broadcastFakeMsgToUIs("off", "asleep", DBGpMessages)
-			continue
-		} else if cmd == "continue" {
-			DBGpConnection.Disconnect()
-			broadcastFakeMsgToUIs("continue", "stopped", DBGpMessages)
-			continue
-		}
-
-		// Now the DBGp commands.
-		_, cmdArgs, err := command.Break(cmd)
-
+		cmdAlias, cmdArgs, err := command.Break(cmd)
 		if nil != err {
 			log.Println(err)
 			continue
 		}
 
-		DBGpCmdName, err := command.Extract(cmd)
+		// First, deal with Footle specific commands.
+		if cmd == "on" {
+			DBGpConnection.Activate()
 
+			fakeCmd := message.Properties{Command: "on"}
+			broadcastFakeMsg(fakeCmd, "awake", DBGpMessages)
+
+			continue
+		} else if cmd == "off" {
+			DBGpConnection.Deactivate()
+
+			fakeCmd := message.Properties{Command: "off"}
+			broadcastFakeMsg(fakeCmd, "asleep", DBGpMessages)
+
+			continue
+		} else if cmd == "continue" {
+			DBGpConnection.Disconnect()
+
+			fakeCmd := message.Properties{Command: "continue"}
+			broadcastFakeMsg(fakeCmd, "stopped", DBGpMessages)
+
+			continue
+		} else if cmdAlias == "broadcast" && len(cmdArgs) == 2 && cmdArgs[0] == "update_source" {
+			filename := cmdArgs[1]
+			absoluteFilename := toAbsolutePath(filename, config)
+
+			if _, err := os.Stat(absoluteFilename); os.IsNotExist(err) {
+				log.Printf("File doesn't exist: %s", filename)
+				continue
+			}
+
+			fakeCmd := message.Properties{Command: "update_source", Filename: filename}
+			broadcastFakeMsg(fakeCmd, "", DBGpMessages)
+
+			continue
+		}
+
+		// Now the DBGp commands.
+		DBGpCmdName, err := command.Extract(cmd)
 		if nil != err {
 			log.Println(err)
 			continue
@@ -61,7 +82,7 @@ func ProcessUICmds(CmdsFromUIs, DBGpCmds chan string, DBGpMessages chan message.
 		if DBGpCmdName == "breakpoint_set" {
 			// Filepaths coming from UIs *could be* relative paths.  These need to be
 			// turned into absolute file URIs such as file:///foo/bar/baz.php
-			cmdArgs[0] = breakpoint.ToAbsoluteUri(cmdArgs[0], config)
+			cmdArgs[0] = toAbsoluteUri(cmdArgs[0], config)
 		}
 
 		if DBGpCmdName == "breakpoint_set" && !DBGpConnection.IsOnAir() {
@@ -104,7 +125,7 @@ func ProcessDBGpMessages(DBGpCmds chan string, DBGpMessages, MsgsForCmdLineUI, M
 			breakpoint.RenewList(msg.Breakpoints)
 		}
 
-		BroadcastMsgToUIs(msg, MsgsForCmdLineUI, MsgsForHTTPUI)
+		broadcastMsgToUIs(msg, MsgsForCmdLineUI, MsgsForHTTPUI)
 	}
 }
 
@@ -113,7 +134,7 @@ func ProcessDBGpMessages(DBGpCmds chan string, DBGpMessages, MsgsForCmdLineUI, M
  *
  * User interfaces include the command line interface and the HTTP interface.
  */
-func BroadcastMsgToUIs(msg message.Message, toCmdLine, toHTTP chan<- message.Message) {
+func broadcastMsgToUIs(msg message.Message, toCmdLine, toHTTP chan<- message.Message) {
 
 	if nil != toCmdLine {
 		toCmdLine <- msg
@@ -125,19 +146,22 @@ func BroadcastMsgToUIs(msg message.Message, toCmdLine, toHTTP chan<- message.Mes
 }
 
 /**
- * Respond to the "stopping" state.
+ * Broadcast response for Footle's internal commands.
  *
- * End the debugging session by issuing the DBGp "stop" command.
+ * Knowing about the execution states resulting from the internal commands
+ * allows UIs to offer better UX.
+ *
+ * Example commands: on, off, continue, update_source.
  */
-func endSession(DBGpCmds chan string) {
+func broadcastFakeMsg(prop message.Properties, state string, DBGpMessages chan message.Message) {
 
-	stopCmd, err := command.Prepare("stop", []string{})
+	fakeMsg := message.Message{}
+	fakeMsg.MessageType = "response"
+	fakeMsg.Properties.Command = prop.Command
+	fakeMsg.Properties.Filename = prop.Filename
+	fakeMsg.State = state
 
-	if err != nil {
-		return
-	}
-
-	DBGpCmds <- stopCmd
+	DBGpMessages <- fakeMsg
 }
 
 /**
@@ -157,6 +181,22 @@ func proceedWithSession(DBGpCmds chan string) {
 }
 
 /**
+ * Respond to the "stopping" state.
+ *
+ * End the debugging session by issuing the DBGp "stop" command.
+ */
+func endSession(DBGpCmds chan string) {
+
+	stopCmd, err := command.Prepare("stop", []string{})
+
+	if err != nil {
+		return
+	}
+
+	DBGpCmds <- stopCmd
+}
+
+/**
  * Ask the DBGp engine for its breakpoint list.
  *
  * Respond to "breakpoint_set" command by requesting the complete breakpoint
@@ -171,22 +211,4 @@ func requestBreakpointList(DBGpCmds chan string) {
 	}
 
 	DBGpCmds <- runCmd
-}
-
-/**
- * Broadcast message for Footle's internal commands.
- *
- * Knowing about the execution states resulting from the internal commands
- * allows UIs to offer better UX.
- *
- * Example commands: on, off, continue.
- */
-func broadcastFakeMsgToUIs(cmd string, state string, DBGpMessages chan message.Message) {
-
-	fakeMsg := message.Message{}
-	fakeMsg.MessageType = "response"
-	fakeMsg.Properties.Command = cmd
-	fakeMsg.State = state
-
-	DBGpMessages <- fakeMsg
 }

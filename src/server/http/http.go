@@ -123,16 +123,16 @@ func receive(writeStream http.ResponseWriter, request *http.Request, out chan st
 
 	cmd := request.FormValue("cmd")
 
-	shortCmd, cmdArgs, err := command.Break(cmd)
+	cmdAlias, cmdArgs, err := command.Break(cmd)
 	if nil != err {
 		fmt.Fprintf(writeStream, "%s", err)
 
 		return
 	}
 
-	isInternalCmd := (shortCmd == "on" || shortCmd == "off" || shortCmd == "continue")
+	isInternalCmd := (cmdAlias == "on" || cmdAlias == "off" || cmdAlias == "continue" || cmdAlias == "broadcast")
 
-	err = command.Validate(shortCmd, cmdArgs)
+	err = command.Validate(cmdAlias, cmdArgs)
 
 	isInvalidDBGpCmd := !isInternalCmd && err != nil
 	if isInvalidDBGpCmd {

@@ -53,13 +53,13 @@ func RunUI(out chan<- string, bye chan struct{}) {
 			return
 		}
 
-		shortCmd, cmdArgs, err := command.Break(cmd)
+		cmdAlias, cmdArgs, err := command.Break(cmd)
 		if nil != err {
 			fmt.Println(err)
 			continue
 		}
 
-		if "bye" == shortCmd || "quit" == shortCmd || "q" == shortCmd {
+		if "bye" == cmd || "quit" == cmd || "q" == cmd {
 			close(bye)
 			return
 		} else if "refresh" == cmd || "" == cmd {
@@ -70,15 +70,15 @@ func RunUI(out chan<- string, bye chan struct{}) {
 		} else if cmd == "no-verbose" {
 			config.GoSilent()
 			continue
-		} else if cmd == "on" || cmd == "off" || cmd == "continue" {
+		} else if cmd == "on" || cmd == "off" || cmd == "continue" || cmdAlias == "broadcast" {
 			// Commands for controlling Footle.
 			out <- cmd
 			continue
 		}
 
-		err = command.Validate(shortCmd, cmdArgs)
+		err = command.Validate(cmdAlias, cmdArgs)
 		if nil != err {
-			fmt.Println(err)
+			log.Println(err)
 			continue
 		}
 
