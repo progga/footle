@@ -149,26 +149,39 @@ func validateCmdWithNoArg(cmd string, args []string) (err error) {
 /**
  * Validate the Source command.
  *
- * Valid format: source line-number line-count
- * Example: source 14 5
- *   This should return 5 lines starting at line number 14.
+ * Valid formats:
+ *   - source line-number line-count
+ *   - source filepath
+ * Examples:
+ *   - source 14 5: This should return 5 lines *starting* at line number 14.
+ *   - source foo/bar/baz.php: This should return the complete source code of
+ *     baz.php.
  */
 func validateSourceArgs(args []string) (err error) {
 
-	if 2 != len(args) {
-		err = fmt.Errorf("The \"source\" command takes two numbers as argument.")
+	argCount := len(args)
+	if argCount != 1 && argCount != 2 {
+		err = fmt.Errorf("The \"source\" command takes a filepath OR two numbers as argument.")
 		return err
 	}
 
-	lineNumber, err := strconv.ParseInt(args[0], 10, 64)
-	lineCount, err := strconv.ParseInt(args[1], 10, 64)
+	if argCount == 2 {
+		lineNumber, err := strconv.ParseInt(args[0], 10, 64)
+		if err != nil {
+			return err
+		}
+		lineCount, err := strconv.ParseInt(args[1], 10, 64)
+		if err != nil {
+			return err
+		}
 
-	if lineNumber < 1 {
-		err = fmt.Errorf("Invalid line number.")
-	}
+		if lineNumber < 1 {
+			err = fmt.Errorf("Invalid line number.")
+		}
 
-	if lineCount < 1 {
-		err = fmt.Errorf("Invalid line count.")
+		if lineCount < 1 {
+			err = fmt.Errorf("Invalid line count.")
+		}
 	}
 
 	return err

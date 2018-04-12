@@ -129,6 +129,13 @@ func TestPrepareSourceCmd(t *testing.T) {
 	if expected != cmd {
 		t.Errorf("Source command preparation failed. Expected: %s, got: %s", expected, cmd)
 	}
+
+	cmd, _ = prepareSourceCmd([]string{"foo/bar/baz.php"}, TxId)
+
+	expected = "source -i 4 -f foo/bar/baz.php\x00"
+	if expected != cmd {
+		t.Errorf("Source command preparation failed. Expected: %s, got: %s", expected, cmd)
+	}
 }
 
 /**

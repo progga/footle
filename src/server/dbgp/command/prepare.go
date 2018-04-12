@@ -208,19 +208,33 @@ func prepareRawDBGpCmd(args []string, TxId int) (DBGpCmdWTxId string, err error)
 
 /**
  * DBGp Source command.
+ *
+ * Valid formats: source foo.php; source LINE-NUMBER-OF-CURRENT-FILE LINE-COUNT
  */
 func prepareSourceCmd(args []string, TxId int) (DBGpCmd string, err error) {
 
-	if 2 != len(args) {
+	argCount := len(args)
+	if argCount != 1 && argCount != 2 {
 		err = fmt.Errorf("Insufficient number of args for source.")
 		return DBGpCmd, err
 	}
 
-	beginLine, err := strconv.ParseInt(args[0], 10, 64)
-	lineCount, err := strconv.ParseInt(args[1], 10, 64)
-	endLine := beginLine + lineCount
+	grabWholeFile := (argCount == 1)
+	grabFileChunk := (argCount == 2)
 
-	DBGpCmd = fmt.Sprintf("source -i %d -b %d -e %d\x00", TxId, beginLine, endLine)
+	if grabWholeFile {
+		// source foo.php
+		filepath := args[0]
+
+		DBGpCmd = fmt.Sprintf("source -i %d -f %s\x00", TxId, filepath)
+	} else if grabFileChunk {
+		// source LINE-NUMBER-OF-CURRENT-FILE LINE-COUNT
+		beginLine, _ := strconv.ParseInt(args[0], 10, 64)
+		lineCount, _ := strconv.ParseInt(args[1], 10, 64)
+		endLine := beginLine + lineCount
+
+		DBGpCmd = fmt.Sprintf("source -i %d -b %d -e %d\x00", TxId, beginLine, endLine)
+	}
 
 	return DBGpCmd, err
 }

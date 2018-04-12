@@ -127,11 +127,20 @@ func TestValidateCmdWithNoArg(t *testing.T) {
 
 /**
  * Tests for validateSourceArgs().
+ *
+ * Valid formats: source line-number count; source filepath.
  */
 func TestValidateSourceArgs(t *testing.T) {
 
-	// Pass case.
+	// Pass case.  Line number based.
 	err := validateSourceArgs([]string{"10", "5"})
+
+	if nil != err {
+		t.Error(err)
+	}
+
+	// Pass case.  Filepath based.
+	err = validateSourceArgs([]string{"foo/bar/baz.php"})
 
 	if nil != err {
 		t.Error(err)
@@ -142,13 +151,6 @@ func TestValidateSourceArgs(t *testing.T) {
 
 	if nil == err {
 		t.Error("Failed to spot lack of arguments.")
-	}
-
-	// Fail case.
-	err = validateSourceArgs([]string{"1"})
-
-	if nil == err {
-		t.Error("Failed to spot insufficient number of arguments.")
 	}
 }
 
