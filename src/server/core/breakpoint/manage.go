@@ -22,13 +22,41 @@ const BreakpointEnabledState = "enabled"
 var lastPendingBreakpointId int = 0
 
 /**
+ * List both pending and established breakpoints.
+ */
+func ListAllBreakpoints() (breakpoints map[int]message.Breakpoint) {
+
+	breakpoints = make(map[int]message.Breakpoint)
+
+	for k, breakpointRecord := range pending {
+		breakpoints[k] = message.Breakpoint{
+			Filename: breakpointRecord.Filename,
+			LineNo:   breakpointRecord.LineNo,
+			Type:     Line_type_breakpoint,
+			Id:       breakpointRecord.DBGpId,
+		}
+	}
+
+	for k, breakpointRecord := range established {
+		breakpoints[k] = message.Breakpoint{
+			Filename: breakpointRecord.Filename,
+			LineNo:   breakpointRecord.LineNo,
+			Type:     Line_type_breakpoint,
+			Id:       breakpointRecord.DBGpId,
+		}
+	}
+
+	return breakpoints
+}
+
+/**
  * Renew breakpoint list.
  *
  * Update our list of existing breakpoints maintained by the DBGp engine.
  */
 func RenewList(breakpoints map[int]message.Breakpoint) {
 
-	list.Empty()
+	established.Empty()
 
 	for _, v := range breakpoints {
 		add(v.Type, v.Filename, v.LineNo, v.Id, v.State)
@@ -40,7 +68,7 @@ func RenewList(breakpoints map[int]message.Breakpoint) {
  */
 func Delete(breakpointId int) {
 
-	delete(list, breakpointId)
+	delete(established, breakpointId)
 }
 
 /**
@@ -66,7 +94,7 @@ func add(breakpointType, filename string, lineNo, id int, state string) {
 	breakpointState := (state == BreakpointEnabledState)
 
 	if breakpointType == Line_type_breakpoint {
-		list.AddLine(filename, lineNo, id, breakpointState)
+		established.AddLine(filename, lineNo, id, breakpointState)
 	}
 }
 

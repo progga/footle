@@ -10,7 +10,7 @@ import (
 	"strconv"
 )
 
-var list breakpointList = make(breakpointList)
+var established breakpointList = make(breakpointList)
 var pending Queue
 
 /**
@@ -24,7 +24,7 @@ func SendPending(DBGpCmds chan string) {
 
 	// As well as pending breakpoints, breakpoints from the previous session have
 	// to be set again.
-	for _, v := range list {
+	for _, v := range established {
 		pending.push(*v)
 	}
 
@@ -64,8 +64,8 @@ func RemovePending(breakpointId string) (err error) {
 				pending.delete(breakpointIndex)
 			}
 		}
-	} else if _, exists := list[breakpointIdNum]; exists {
-		delete(list, breakpointIdNum)
+	} else if _, exists := established[breakpointIdNum]; exists {
+		delete(established, breakpointIdNum)
 	}
 
 	return err
@@ -82,7 +82,7 @@ func BroadcastPending(DBGpMessages chan message.Message) {
 
 	fakeMsg := FakeMessage{}
 	fakeMsg.init("breakpoint_list")
-	fakeMsg.AddExistingBreakpoints(list)
+	fakeMsg.AddExistingBreakpoints(established)
 	fakeMsg.AddPendingBreakpoints(pending)
 
 	msg := fakeMsg.GetMsg()
