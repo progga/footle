@@ -14,6 +14,7 @@ import (
 	"os"
 	"path/filepath"
 	"server/config"
+	"server/core/breakpoint"
 	footlecmd "server/core/cmd"
 	"server/dbgp/command"
 	"server/dbgp/message"
@@ -72,6 +73,7 @@ func Listen(out chan string, config config.Config) {
 
 	http.HandleFunc("/steering-wheel", makeReceiveHandler(out))
 	http.HandleFunc("/message-stream", makeTransmitHandler(arrival, departure))
+	http.HandleFunc("/breakpoints", makeBreakpointListingHandler(codeDir))
 
 	address := fmt.Sprintf(":%d", port)
 	http.ListenAndServe(address, nil)
@@ -234,6 +236,31 @@ func makeFormattedFileHandler(port int) http.HandlerFunc {
 
 		writeStream.Header().Set("Content-Type", "text/html")
 		io.WriteString(writeStream, output)
+	}
+}
+
+/**
+ * Prepare handler for listing breakpoints.
+ *
+ * This is useful during UI initialization where only the new UI client needs to
+ * process the breakpoint list.  This saves existing UI clients from the burden
+ * of reprocessing the breakpoints every time a new HTTP UI client is added.
+ */
+func makeBreakpointListingHandler(codeDir string) http.HandlerFunc {
+
+	return func(writeStream http.ResponseWriter, request *http.Request) {
+
+		msgWBreakpoint := breakpoint.PrepareFakeMsg()
+		adjustedMsg := adjustFilepath(msgWBreakpoint, codeDir)
+
+		if jsonMsg, err := json.Marshal(adjustedMsg); err == nil {
+			writeStream.Header().Set("Content-Type", "application/json")
+			writeStream.Header().Set("Cache-control", "no-cache")
+
+			fmt.Fprintf(writeStream, "%s", jsonMsg)
+		} else {
+			fmt.Fprintf(writeStream, "%s", err)
+		}
 	}
 }
 
