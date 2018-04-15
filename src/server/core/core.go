@@ -10,6 +10,7 @@ import (
 	"os"
 	"server/config"
 	"server/core/breakpoint"
+	footlecmd "server/core/cmd"
 	conn "server/core/connection"
 	"server/dbgp/command"
 	"server/dbgp/message"
@@ -33,7 +34,7 @@ func ProcessUICmds(CmdsFromUIs, DBGpCmds chan string, DBGpMessages chan message.
 			continue
 		}
 
-		if cmdAlias == "on" || cmdAlias == "off" || cmdAlias == "continue" || cmdAlias == "update_source" {
+		if footlecmd.Is(cmdAlias) {
 			processFootleCmds(cmdAlias, cmdArgs, DBGpMessages, DBGpConnection)
 		} else if DBGpCmdName, err := command.Extract(cmd); err == nil {
 			processDBGpCmds(DBGpCmdName, cmdArgs, DBGpCmds, DBGpMessages, DBGpConnection)

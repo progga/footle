@@ -14,6 +14,7 @@ import (
 	"os"
 	"path/filepath"
 	"server/config"
+	footlecmd "server/core/cmd"
 	"server/dbgp/command"
 	"server/dbgp/message"
 	"server/http/file"
@@ -119,7 +120,7 @@ func makeReceiveHandler(out chan string) http.HandlerFunc {
  * command out of it.  This command is then written to the output channel so
  * that it can be sent to the DBGp engine.
  */
-func receive(writeStream http.ResponseWriter, request *http.Request, out chan string) {
+func receive(writeStream http.ResponseWriter, request *http.Request, debugger chan string) {
 
 	cmd := request.FormValue("cmd")
 
@@ -130,11 +131,11 @@ func receive(writeStream http.ResponseWriter, request *http.Request, out chan st
 		return
 	}
 
-	isFootleCmd := (cmdAlias == "on" || cmdAlias == "off" || cmdAlias == "continue" || cmdAlias == "update_source")
+	isFootleCmd := footlecmd.Is(cmdAlias)
 
 	err = command.Validate(cmdAlias, cmdArgs)
-
 	isInvalidDBGpCmd := !isFootleCmd && err != nil
+
 	if isInvalidDBGpCmd {
 		fmt.Fprintf(writeStream, "%s", err)
 
@@ -143,7 +144,7 @@ func receive(writeStream http.ResponseWriter, request *http.Request, out chan st
 
 	fmt.Fprintf(writeStream, "Got it.")
 
-	out <- cmd
+	debugger <- cmd
 }
 
 /**

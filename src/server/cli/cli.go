@@ -11,6 +11,7 @@ import (
 	"io"
 	"log"
 	"server/config"
+	footlecmd "server/core/cmd"
 	"server/dbgp/command"
 	"server/dbgp/message"
 )
@@ -70,7 +71,7 @@ func RunUI(out chan<- string, bye chan struct{}) {
 		} else if cmd == "no-verbose" {
 			config.GoSilent()
 			continue
-		} else if cmd == "on" || cmd == "off" || cmd == "continue" || cmdAlias == "update_source" {
+		} else if footlecmd.Is(cmdAlias) {
 			// Commands for controlling Footle.
 			out <- cmd
 			continue

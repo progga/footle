@@ -31,9 +31,10 @@ func Is(cmdName string) (result bool) {
 /**
  * Validate the given command and its argument.
  */
-func Validate(cmdName string, args []string) (valid bool, err error) {
+func Validate(cmdName string, args []string) (err error) {
 
 	argCount := len(args)
+	valid := false
 
 	if (cmdName == "on" || cmdName == "off" || cmdName == "continue") && argCount == 0 {
 		valid = true
@@ -42,7 +43,7 @@ func Validate(cmdName string, args []string) (valid bool, err error) {
 	}
 
 	if valid {
-		return valid, err
+		return err
 	}
 
 	cmd := cmdName + strings.Join(args, " ")
@@ -55,5 +56,5 @@ func Validate(cmdName string, args []string) (valid bool, err error) {
 		err = fmt.Errorf("Invalid command: %s", cmd)
 	}
 
-	return valid, err
+	return err
 }
