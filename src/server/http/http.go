@@ -130,11 +130,11 @@ func receive(writeStream http.ResponseWriter, request *http.Request, out chan st
 		return
 	}
 
-	isInternalCmd := (cmdAlias == "on" || cmdAlias == "off" || cmdAlias == "continue" || cmdAlias == "broadcast")
+	isFootleCmd := (cmdAlias == "on" || cmdAlias == "off" || cmdAlias == "continue" || cmdAlias == "update_source")
 
 	err = command.Validate(cmdAlias, cmdArgs)
 
-	isInvalidDBGpCmd := !isInternalCmd && err != nil
+	isInvalidDBGpCmd := !isFootleCmd && err != nil
 	if isInvalidDBGpCmd {
 		fmt.Fprintf(writeStream, "%s", err)
 

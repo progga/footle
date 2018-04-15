@@ -70,7 +70,7 @@ func RunUI(out chan<- string, bye chan struct{}) {
 		} else if cmd == "no-verbose" {
 			config.GoSilent()
 			continue
-		} else if cmd == "on" || cmd == "off" || cmd == "continue" || cmdAlias == "broadcast" {
+		} else if cmd == "on" || cmd == "off" || cmd == "continue" || cmdAlias == "update_source" {
 			// Commands for controlling Footle.
 			out <- cmd
 			continue

@@ -33,8 +33,8 @@ func ProcessUICmds(CmdsFromUIs, DBGpCmds chan string, DBGpMessages chan message.
 			continue
 		}
 
-		if cmdAlias == "on" || cmdAlias == "off" || cmdAlias == "continue" || cmdAlias == "broadcast" {
-			processInternalFootleCmds(cmdAlias, cmdArgs, DBGpMessages, DBGpConnection)
+		if cmdAlias == "on" || cmdAlias == "off" || cmdAlias == "continue" || cmdAlias == "update_source" {
+			processFootleCmds(cmdAlias, cmdArgs, DBGpMessages, DBGpConnection)
 		} else if DBGpCmdName, err := command.Extract(cmd); err == nil {
 			processDBGpCmds(DBGpCmdName, cmdArgs, DBGpCmds, DBGpMessages, DBGpConnection)
 		} else {
@@ -110,7 +110,7 @@ func processDBGpCmds(cmdName string, cmdArgs []string, DBGpCmds chan string, DBG
 /**
  * Processing of Footle's internal commands.
  */
-func processInternalFootleCmds(cmdAlias string, cmdArgs []string, DBGpMessages chan message.Message, DBGpConnection *conn.Connection) {
+func processFootleCmds(cmdAlias string, cmdArgs []string, DBGpMessages chan message.Message, DBGpConnection *conn.Connection) {
 
 	if cmdAlias == "on" {
 		DBGpConnection.Activate()
@@ -127,8 +127,8 @@ func processInternalFootleCmds(cmdAlias string, cmdArgs []string, DBGpMessages c
 
 		fakeCmd := message.Properties{Command: "continue"}
 		broadcastFakeMsg(fakeCmd, "stopped", DBGpMessages)
-	} else if cmdAlias == "broadcast" && cmdArgs[0] == "update_source" && len(cmdArgs) == 2 {
-		filename := cmdArgs[1]
+	} else if cmdAlias == "update_source" && len(cmdArgs) == 1 {
+		filename := cmdArgs[0]
 
 		config := config.Get()
 		absoluteFilename := toAbsolutePath(filename, config)
@@ -137,7 +137,7 @@ func processInternalFootleCmds(cmdAlias string, cmdArgs []string, DBGpMessages c
 			log.Printf("File doesn't exist: %s", filename)
 		}
 
-		fakeCmd := message.Properties{Command: "update_source", Filename: filename}
+		fakeCmd := message.Properties{Command: cmdAlias, Filename: filename}
 		broadcastFakeMsg(fakeCmd, "", DBGpMessages)
 	}
 }
