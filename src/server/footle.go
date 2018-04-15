@@ -8,7 +8,7 @@
 package main
 
 import (
-	"server/cmdline"
+	"server/cli"
 	"server/config"
 	"server/core"
 	conn "server/core/connection"
@@ -65,8 +65,8 @@ func launchUIs(config config.Config, MsgsForCmdLineUI, MsgsForHTTPUI *chan messa
 	if config.HasCmdLine() {
 		*MsgsForCmdLineUI = make(chan message.Message)
 
-		go cmdline.RunUI(CmdsFromUI, bye)
-		go cmdline.UpdateUIStatus(*MsgsForCmdLineUI)
+		go cli.RunUI(CmdsFromUI, bye)
+		go cli.UpdateUIStatus(*MsgsForCmdLineUI)
 	}
 
 	if config.HasHTTP() {

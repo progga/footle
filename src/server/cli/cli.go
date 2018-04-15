@@ -2,7 +2,7 @@
  * Command line user interface for a DBGp debugger.
  */
 
-package cmdline
+package cli
 
 import (
 	"encoding/base64"
