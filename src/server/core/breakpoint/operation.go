@@ -80,11 +80,22 @@ func RemovePending(breakpointId string) (err error) {
  */
 func BroadcastPending(DBGpMessages chan message.Message) {
 
+	msg := PrepareFakeMsg()
+	DBGpMessages <- msg
+}
+
+/**
+ * Prepare a response comprising breakpoints.
+ *
+ * This message comprises existing and pending breakpoints.
+ */
+func PrepareFakeMsg() (msg message.Message) {
+
 	fakeMsg := FakeMessage{}
 	fakeMsg.init("breakpoint_list")
 	fakeMsg.AddExistingBreakpoints(established)
 	fakeMsg.AddPendingBreakpoints(pending)
 
-	msg := fakeMsg.GetMsg()
-	DBGpMessages <- msg
+	msg = fakeMsg.GetMsg()
+	return msg
 }
