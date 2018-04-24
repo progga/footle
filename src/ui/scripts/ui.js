@@ -32,6 +32,7 @@ jQuery(function () {
   // iframe is loaded again when a directory is opened.
   jQuery('iframe').on('load', setupFileList)
 
+  setupTabRefresher()
   setupTabCloser()
   setupContinuationControls()
   setupStateControl()
@@ -66,6 +67,8 @@ function processMsg (msg) {
     displaySingleVar(msg.Context.Local)
   } else if (msg.MessageType === 'response' && msg.Properties.Command === 'stack_get') {
     displayStackTrace(msg.Stacktrace)
+  } else if (msg.MessageType === 'response' && msg.Properties.Command === 'update_source') {
+    updateSourceFile(msg.Properties.Filename)
   } else if (msg.MessageType === 'response' && msg.State === 'awake') {
     toggleOnOffbuttons()
     removePreviousBreak()
