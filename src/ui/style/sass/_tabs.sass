@@ -15,5 +15,14 @@
     width: 100%
     background-color: white
 
-.tab-closer
-  padding-left: .5em
+/* Display a refresh icon before the filename in tab links . */
+.tab-refresh::after
+  // Unicode code point for Clockwise gapped circle arrow.
+  content: "\27f3"
+  padding-right: .25em
+
+/* Display a close icon after the filename in tab links . */
+.tab-closer::after
+  // Unicode code point for Heavy ballot x (bold cross).
+  content: "\2718"
+  padding-left: .25em
