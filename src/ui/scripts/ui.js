@@ -38,6 +38,7 @@ jQuery(function () {
   setupStateControl()
   setupBreakpointTrigger()
   setupVariableInteraction()
+  initBreakpoints()
 
   // Process responses from the server.
   var sse = new EventSource('/message-stream')
@@ -95,4 +96,14 @@ function updateExecutionState (state) {
   }
 
   jQuery('.execution-states').attr('data-state', state)
+}
+
+/**
+ * Fetch and process existing breakpoints.
+ *
+ * Fetch existing breakpoints from the server.  Then arrange for the breakpoints
+ * to be fully processed and displayed.
+ */
+function initBreakpoints () {
+  jQuery.getJSON('breakpoints', processMsg)
 }
