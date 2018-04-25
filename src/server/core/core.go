@@ -59,6 +59,7 @@ func ProcessDBGpMessages(DBGpCmds chan string, DBGpMessages, MsgsForCmdLineUI, M
 		if state == "stopping" {
 			endSession(DBGpCmds)
 		} else if state == "starting" {
+			setInitialDBGpConfig(DBGpCmds)
 			breakpoint.SendPending(DBGpCmds)
 			proceedWithSession(DBGpCmds)
 		} else if state == "" && (msg.Properties.Command == "breakpoint_set" || msg.Properties.Command == "breakpoint_remove") {
@@ -176,6 +177,23 @@ func broadcastFakeMsg(prop message.Properties, state string, DBGpMessages chan m
 	fakeMsg.State = state
 
 	DBGpMessages <- fakeMsg
+}
+
+/**
+ * Initial configuration.
+ *
+ * At the moment, set only the max_children feature which determines the maximum
+ * number of array items returned by the DBGp engine.
+ */
+func setInitialDBGpConfig(DBGpCmds chan string) {
+
+	configCmd, err := command.Prepare("feature_set", []string{"max_children", "128"})
+
+	if err != nil {
+		return
+	}
+
+	DBGpCmds <- configCmd
 }
 
 /**

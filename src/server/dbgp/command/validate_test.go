@@ -253,3 +253,30 @@ func TestValidateContextGetArgs(t *testing.T) {
 		t.Error("Failed to spot noninteger stack depth.")
 	}
 }
+
+/**
+ * Tests for validateFeatureSetArgs().
+ *
+ * We expect exactly two arguments.
+ *
+ * Format: feature_set foo bar
+ */
+func TestValidateFeatureSetArgs(t *testing.T) {
+
+	// Pass case.
+	err := validateFeatureSetArgs([]string{"foo", "bar"})
+	if err != nil {
+		t.Error(err)
+	}
+
+	// Fail case.
+	err = validateFeatureSetArgs([]string{})
+	if err == nil {
+		t.Error("Failed to spot lack of arguments.")
+	}
+
+	err = validateFeatureSetArgs([]string{"foo"})
+	if err == nil {
+		t.Error("Failed to spot insufficient number of arguments.")
+	}
+}

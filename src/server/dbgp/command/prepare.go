@@ -77,6 +77,9 @@ func PrepareDBGpCmd(cmd string, args []string) (DBGpCmd string, err error) {
 	case "property_get":
 		DBGpCmd, err = preparePropertyGetCmd(args, TxId)
 
+	case "feature_set":
+		DBGpCmd, err = prepareFeatureSetCmd(args, TxId)
+
 	case "stack_get":
 		DBGpCmd, err = prepareCmdNoArgs("stack_get", TxId)
 
@@ -264,6 +267,25 @@ func preparePropertyGetCmd(args []string, TxId int) (DBGpCmd string, err error) 
 	variableName = escapseRule.Replace(variableName)
 
 	DBGpCmd = fmt.Sprintf("property_get -i %d -n \"%s\"\x00", TxId, variableName)
+
+	return DBGpCmd, err
+}
+
+/**
+ * DBGp feature_set command.
+ *
+ * Example: feature_set -i 9 -n FOO -v bar
+ */
+func prepareFeatureSetCmd(args []string, TxId int) (DBGpCmd string, err error) {
+
+	if len(args) != 2 {
+		err = fmt.Errorf("Incorrect number of args for feature_set.")
+		return DBGpCmd, err
+	}
+
+	featureName := args[0]
+	featureValue := args[1]
+	DBGpCmd = fmt.Sprintf("feature_set -i %d -n %s -v %s\x00", TxId, featureName, featureValue)
 
 	return DBGpCmd, err
 }

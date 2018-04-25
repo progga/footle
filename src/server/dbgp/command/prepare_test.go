@@ -275,6 +275,31 @@ func TestPrepareContextGetCmd(t *testing.T) {
 	_, err := prepareContextGetCmd(args, TxId)
 
 	if err == nil {
-		t.Error("Failed to spot invalid stack depth.", expected, cmd)
+		t.Error("Failed to spot invalid stack depth.")
+	}
+}
+
+/**
+ * Tests for prepareFeatureSetCmd().
+ *
+ * Format: feature_set -i 9 -n FOO -v bar
+ */
+func TestPrepareFeatureSetCmd(t *testing.T) {
+
+	// Pass case.
+	args := []string{"foo", "bar"}
+	TxId := 5
+	cmd, err := prepareFeatureSetCmd(args, TxId)
+
+	expected := "feature_set -i 5 -n foo -v bar\x00"
+	if cmd != expected {
+		t.Errorf("feature_set command preparation failed.  Expected: %s, got: %s", expected, cmd)
+	}
+
+	// Fail case.
+	args = []string{}
+	_, err = prepareFeatureSetCmd(args, TxId)
+	if err == nil {
+		t.Error("Failed to spot missing arguments.")
 	}
 }

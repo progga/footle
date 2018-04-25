@@ -51,6 +51,9 @@ func Validate(cmd string, args []string) (err error) {
 	case "property_get":
 		err = validatePropertyGetArgs(args)
 
+	case "feature_set":
+		err = validateFeatureSetArgs(args)
+
 	case "stack_get":
 		err = validateCmdWithNoArg("stack_get", args)
 
@@ -241,6 +244,23 @@ func validateContextGetArgs(args []string) (err error) {
 		_, err = strconv.Atoi(args[1])
 	} else if argCount > 2 {
 		err = fmt.Errorf("Too many arguments.")
+	}
+
+	return err
+}
+
+/**
+ * feature_set command.
+ *
+ * Acceptable command format: feature_set feature-name feature-value
+ */
+func validateFeatureSetArgs(args []string) (err error) {
+
+	argCount := len(args)
+	if argCount != 2 {
+		err = fmt.Errorf("The feature_set command takes two arguments.")
+
+		return err
 	}
 
 	return err
