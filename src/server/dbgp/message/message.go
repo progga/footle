@@ -93,13 +93,11 @@ func prepareResponseMessage(response Response) (message Message) {
 /**
  * Extract variable values.
  */
-func prepareVariables(vars []VariableDetails) (variables map[string]Variable) {
+func prepareVariables(vars []VariableDetails) (variables []Variable) {
 
 	if len(vars) == 0 {
 		return
 	}
-
-	variables = make(map[string]Variable)
 
 	for _, varDetails := range vars {
 		children := prepareVariables(varDetails.Variables)
@@ -112,7 +110,8 @@ func prepareVariables(vars []VariableDetails) (variables map[string]Variable) {
 
 		varValue, isBase64 := extractVariableValue(varDetails)
 
-		variables[varDetails.Fullname] = Variable{
+		variables = append(variables, Variable{
+			Fullname:          varDetails.Fullname,
 			DisplayName:       varDetails.Name,
 			VarType:           varDetails.VarType,
 			Value:             varValue, // Useful for basic types only.
@@ -122,7 +121,7 @@ func prepareVariables(vars []VariableDetails) (variables map[string]Variable) {
 			ChildCount:        varDetails.NumChildren,
 			HasLoadedChildren: hasLoadedChildren,
 			IsBase64:          isBase64,
-		}
+		})
 	}
 
 	return

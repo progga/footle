@@ -29,18 +29,19 @@ type Properties struct {
 }
 
 type Context struct {
-	Local    map[string]Variable
-	Global   map[string]Variable
-	Constant map[string]string
+	Local    []Variable
+	Global   []Variable
+	Constant []string
 }
 
 type Variable struct {
+	Fullname          string
 	DisplayName       string // Short name is useful for display purposes.
 	VarType           string
 	Value             string // Only for basic types such as int, float, string, etc.
 	AccessModifier    string // private, protected, public, etc.
 	IsCompositeType   bool   // Is it an array, object, structure, etc.?
-	Children          map[string]Variable
+	Children          []Variable
 	ChildCount        int
 	HasLoadedChildren bool // DBGp servers return children upto a certain depth.
 	IsBase64          bool

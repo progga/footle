@@ -389,16 +389,15 @@ func adjustFilepath(response message.Message, codeDir string) message.Message {
  *
  * Let's not burden HTTP clients with HTML escaping.
  */
-func escapeVarValue(vars map[string]message.Variable) (variables map[string]message.Variable) {
+func escapeVarValue(vars []message.Variable) (variables []message.Variable) {
 
 	if len(vars) == 0 {
 		return
 	}
 
 	var escapedVar message.Variable
-	variables = make(map[string]message.Variable)
 
-	for varFullname, varDetails := range vars {
+	for _, varDetails := range vars {
 		escapedVar = varDetails
 		escapedVar.Value = html.EscapeString(varDetails.Value)
 
@@ -406,7 +405,7 @@ func escapeVarValue(vars map[string]message.Variable) (variables map[string]mess
 			escapedVar.Children = escapeVarValue(varDetails.Children)
 		}
 
-		variables[varFullname] = escapedVar
+		variables = append(variables, escapedVar)
 	}
 
 	return
