@@ -28,19 +28,21 @@ function updateVarsDisplay (varDetailList) {
  *   This may be an object, but it is expected to have only one property.
  */
 function displaySingleVar (varDetailList) {
-  var varFullname = Object.keys(varDetailList)[0]
-
-  if (varFullname === undefined) {
+  var hasNoSubstance = !(Array.isArray(varDetailList) && (varDetailList.length > 0))
+  if (hasNoSubstance) {
     return
   }
 
-  if (!varDetailList[varFullname].hasOwnProperty('Children')) {
+  var varDetail = varDetailList[0]
+
+  if (!varDetail.hasOwnProperty('Fullname') || !varDetail.hasOwnProperty('Children')) {
     return
   }
 
-  var childrenVars = varDetailList[varFullname].Children
+  var childrenVars = varDetail.Children
   var varListMarkup = listBasicVars(childrenVars)
 
+  var varFullname = varDetail.Fullname
   var varIdSelector = '#' + escapeSelector(varFullname)
   var varChildrenSelector = varIdSelector + ' > .variable-list'
 
@@ -86,18 +88,23 @@ function setupVariableInteraction () {
  * @return string
  */
 function listBasicVars (varDetailList) {
+  var hasNoSubstance = !(Array.isArray(varDetailList) && (varDetailList.length > 0))
+  if (hasNoSubstance) {
+    return
+  }
+
   var markup = ''
   var childrenMarkup = ''
 
-  for (var varFullname in varDetailList) {
-    var varDetail = varDetailList[varFullname]
+  for (let i = 0; i < varDetailList.length; i++) {
+    var varDetail = varDetailList[i]
     childrenMarkup = ''
 
     if (varDetail.IsCompositeType && varDetail.HasLoadedChildren) {
       childrenMarkup = listBasicVars(varDetail.Children)
     }
 
-    markup += prepareVarMarkup(varFullname, varDetail, childrenMarkup)
+    markup += prepareVarMarkup(varDetail, childrenMarkup)
   }
 
   markup = '<ul class="variable-list">' + markup + '</ul>'
@@ -108,12 +115,12 @@ function listBasicVars (varDetailList) {
 /**
  * Prepare the markup for a single variable.
  *
- * @param string varFullname
  * @param object varDetail
  * @return string
  */
-function prepareVarMarkup (varFullname, varDetail, childrenMarkup) {
+function prepareVarMarkup (varDetail, childrenMarkup) {
   var varType = varDetail.VarType
+  var varFullname = varDetail.Fullname
 
   // Example type description: string, string (private).
   if (varDetail.AccessModifier.length > 0) {
