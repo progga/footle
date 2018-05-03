@@ -177,31 +177,43 @@ func TestValidateRawDBGpArgs(t *testing.T) {
 /**
  * Tests for validatePropertyGetArgs().
  *
- * We expect just one argument (a variable name) to prepare the
- * property_get command.  When multiple arguments are given, they are joined
- * with a space character to form a single variable name.
+ * We expect at least one argument (a variable name) to prepare the
+ * property_get command.  When multiple arguments are given, there are two
+ * cases:
+ *   - The first one is *the* global context name.  Remaining arguments are
+ *     joined with a space character to form a single variable name.
+ *   - The first one is *not* the global context name.  So all the arguments are
+ *     joined with a space character to form a single variable name.
  */
 func TestValidatePropertyGetArgs(t *testing.T) {
 
-	// Pass case.
-	err := validatePropertyGetArgs([]string{"foo"})
+	// Pass case.  Single argument which must be a local variable name.
+	if err := validatePropertyGetArgs([]string{"foo"}); err != nil {
+		t.Error(err)
+	}
 
-	if err != nil {
+	// Pass case of global variable.
+	if err := validatePropertyGetArgs([]string{globalContextLabel, "foo"}); err != nil {
 		t.Error(err)
 	}
 
 	// Pass case where variable name has space characters.
-	err = validatePropertyGetArgs([]string{"foo['bar baz qux']"})
+	if err := validatePropertyGetArgs([]string{"foo['bar baz qux']"}); err != nil {
+		t.Error("Failed to verify variable name with space character.")
+	}
 
-	if err != nil {
+	// Pass case where global variable name has space characters.
+	if err := validatePropertyGetArgs([]string{globalContextLabel, "foo['bar baz qux']"}); err != nil {
 		t.Error("Failed to verify variable name with space character.")
 	}
 
 	// Fail case.  No argument.
-	err = validatePropertyGetArgs([]string{})
-
-	if err == nil {
+	if err := validatePropertyGetArgs([]string{}); err == nil {
 		t.Error("Failed to spot lack of arguments.")
+	}
+
+	if err := validatePropertyGetArgs([]string{globalContextLabel}); err == nil {
+		t.Error("Failed to spot missing variable name.")
 	}
 }
 

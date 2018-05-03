@@ -247,7 +247,7 @@ func prepareSourceCmd(args []string, TxId int) (DBGpCmd string, err error) {
  *
  * It fetches the value of a single variable.
  *
- * Example: property_get -i 9 -n "foo"
+ * Example: property_get -i 9 -c 0 -n "foo", property_get -i 9 -c 1 -n "foo"
  */
 func preparePropertyGetCmd(args []string, TxId int) (DBGpCmd string, err error) {
 
@@ -256,17 +256,36 @@ func preparePropertyGetCmd(args []string, TxId int) (DBGpCmd string, err error) 
 		return DBGpCmd, err
 	}
 
-	// Some variable names may contain a space character (e.g. foo["bar buz"]).
-	// Such names will appear as separate argument items.  We reconstruct the
-	// original variable name by joining the items.
-	variableName := strings.Join(args, space)
+	hasGlobalContext := (args[0] == globalContextLabel)
+	hasLocalContext := (args[0] == localContextLabel)
+	hasContext := (hasGlobalContext || hasLocalContext)
+	if hasContext && len(args) < 2 {
+		err = fmt.Errorf("Insufficient number of args for property_get.")
+		return DBGpCmd, err
+	}
+
+	var variableName string
+	var contextId int
+
+	if hasContext {
+		// Some variable names may contain a space character (e.g. foo["bar buz"]).
+		// Such names will appear as separate argument items.  We reconstruct the
+		// original variable name by joining the items.
+		variableName = strings.Join(args[1:], space)
+	} else {
+		variableName = strings.Join(args, space)
+	}
 
 	// Escapse following chars with backslash: single quote, double quote, null,
 	// and backslash as per the DBGp protocol.
 	escapseRule := strings.NewReplacer(`'`, `\'`, `"`, `\"`, "\x00", "\\\x00", `\`, `\\`)
 	variableName = escapseRule.Replace(variableName)
 
-	DBGpCmd = fmt.Sprintf("property_get -i %d -n \"%s\"\x00", TxId, variableName)
+	if hasGlobalContext {
+		contextId = globalContextId
+	}
+
+	DBGpCmd = fmt.Sprintf("property_get -i %d -c %d -n \"%s\"\x00", TxId, contextId, variableName)
 
 	return DBGpCmd, err
 }

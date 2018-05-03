@@ -201,7 +201,7 @@ func TestPrepareRawDBGpCmd(t *testing.T) {
  * Tests for preparePropertyGetCmd().
  *
  * The preparePropertyGetCmd() expects a variable name as well as the
- * transaction Id.
+ * transaction Id.  It may optionally be given a global or local context name.
  *
  * It is safe to always wrap the variable name in double quotes in case the
  * name contains a space or null (unlikely case) character.  We escape the
@@ -217,7 +217,7 @@ func TestPreparePropertyGetCmd(t *testing.T) {
 	TxId := 4
 	cmd, _ := preparePropertyGetCmd(args, TxId)
 
-	expected := "property_get -i 4 -n \"foo\"\x00"
+	expected := "property_get -i 4 -c 0 -n \"foo\"\x00"
 	if cmd != expected {
 		t.Errorf("property_get command preparation failed.  Expected: %s, got: %s", expected, cmd)
 	}
@@ -228,7 +228,37 @@ func TestPreparePropertyGetCmd(t *testing.T) {
 	TxId = 44
 	cmd, _ = preparePropertyGetCmd(args, TxId)
 
-	expected = "property_get -i 44 -n \"foo[\\'bar baz\\'\\\x00\\\\]\"\x00"
+	expected = "property_get -i 44 -c 0 -n \"foo[\\'bar baz\\'\\\x00\\\\]\"\x00"
+	if cmd != expected {
+		t.Errorf("property_get command preparation failed.  Expected: %s, got: %s", expected, cmd)
+	}
+
+	// Pass case where global context name is used to fetch a global variable.
+	args = []string{globalContextLabel, "foo"}
+	TxId = 4
+	cmd, _ = preparePropertyGetCmd(args, TxId)
+
+	expected = "property_get -i 4 -c 1 -n \"foo\"\x00"
+	if cmd != expected {
+		t.Errorf("property_get command preparation failed.  Expected: %s, got: %s", expected, cmd)
+	}
+
+	// Pass case where local context name is used to fetch a local variable.
+	args = []string{localContextLabel, "qux"}
+	TxId = 4
+	cmd, _ = preparePropertyGetCmd(args, TxId)
+
+	expected = "property_get -i 4 -c 0 -n \"qux\"\x00"
+	if cmd != expected {
+		t.Errorf("property_get command preparation failed.  Expected: %s, got: %s", expected, cmd)
+	}
+
+	// Pass case where we attempt to fetch a local variable named "global".
+	args = []string{localContextLabel, "global"}
+	TxId = 4
+	cmd, _ = preparePropertyGetCmd(args, TxId)
+
+	expected = "property_get -i 4 -c 0 -n \"global\"\x00"
 	if cmd != expected {
 		t.Errorf("property_get command preparation failed.  Expected: %s, got: %s", expected, cmd)
 	}
@@ -240,6 +270,16 @@ func TestPreparePropertyGetCmd(t *testing.T) {
 
 	if err == nil {
 		t.Error("Failed to spot lack of a variable name.")
+	}
+
+	// Fail case where we attempt to fetch a local variable named "global" without
+	// mentioning the context name.
+	args = []string{"global"}
+	TxId = 4
+	cmd, _ = preparePropertyGetCmd(args, TxId)
+
+	if err == nil {
+		t.Error("Failed to spot lack of a context name.")
 	}
 }
 

@@ -209,11 +209,20 @@ func validateRawDBGpArgs(args []string) (err error) {
 
 /**
  * Validate the property_get command.
+ *
+ * Format: property_get VARIABLE-NAME, property_get global GLOBAL-VARIABLE-NAME,
+ * property_get local LOCAL-VARIABLE-NAME,
  */
 func validatePropertyGetArgs(args []string) (err error) {
 
 	if len(args) < 1 {
-		err = fmt.Errorf("The \"property_get\" command takes a variable name as an argument.")
+		err = fmt.Errorf("The \"property_get\" command takes an *optional* global or local context name and a variable name as its arguments.")
+		return err
+	}
+
+	if (args[0] == globalContextLabel || args[0] == localContextLabel) && len(args) < 2 {
+		err = fmt.Errorf("The \"property_get\" command needs at least a variable name as its argument.")
+
 		return err
 	}
 
@@ -224,7 +233,7 @@ func validatePropertyGetArgs(args []string) (err error) {
  * Validate the arguments for the context_get command.
  *
  * Acceptable command formats: context_get, context_get local/global,
- * context local/global N
+ * context_get local/global STACK-DEPTH-NUM
  */
 func validateContextGetArgs(args []string) (err error) {
 
@@ -235,7 +244,7 @@ func validateContextGetArgs(args []string) (err error) {
 	}
 
 	if argCount == 1 && (args[0] != localContextLabel && args[0] != globalContextLabel) {
-		err = fmt.Errorf("Invalid context.  Acceptable values: %s, %s.  %s given.", localContextLabel, globalContextLabel, args[0])
+		err = fmt.Errorf("Invalid context name.  Acceptable values: %s, %s.  %s given.", localContextLabel, globalContextLabel, args[0])
 
 		return err
 	}
