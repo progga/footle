@@ -12,6 +12,14 @@ import (
 )
 
 /**
+ * Identifier for local or global variable.
+ *
+ * Returned as part of the list of variables i.e. context.
+ */
+const localContextId = 0
+const globalContextId = 1
+
+/**
  * Parse dbgp XML message.
  */
 func Decode(xmlContent string) (message Message, err error) {
@@ -85,7 +93,11 @@ func prepareResponseMessage(response Response) (message Message) {
 		}
 	}
 
-	message.Context.Local = prepareVariables(response.Variables)
+	if response.ContextId == localContextId {
+		message.Context.Local = prepareVariables(response.Variables)
+	} else if response.ContextId == globalContextId {
+		message.Context.Global = prepareVariables(response.Variables)
+	}
 
 	return message
 }

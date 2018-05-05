@@ -62,6 +62,7 @@ type Init struct {
 type Response struct {
 	XMLName       xml.Name `xml:"response"`
 	Command       string   `xml:"command,attr"`
+	ContextId     int      `xml:"context,attr"`
 	TransactionId int      `xml:"transaction_id,attr"`
 	Status        string   `xml:"status,attr"`
 	Reason        string   `xml:"reason,attr"`
