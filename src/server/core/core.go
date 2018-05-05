@@ -91,6 +91,12 @@ func processDBGpCmds(cmdName string, cmdArgs []string, DBGpCmds chan string, DBG
 		cmdArgs[0] = toAbsoluteUri(cmdArgs[0], config)
 	}
 
+	if (cmdName == "run" || cmdName == "step_over") && DBGpConnection.IsOnAir() {
+		fakeCmd := message.Properties{Command: "run"}
+		fakeState := "running"
+		broadcastFakeMsg(fakeCmd, fakeState, DBGpMessages)
+	}
+
 	if cmdName == "breakpoint_set" && !DBGpConnection.IsOnAir() {
 		// Example command from UI: breakpoint_set index.php 18
 		filename := cmdArgs[0]
