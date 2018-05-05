@@ -52,8 +52,9 @@
     border-top-color: red
   &[data-state=asleep]
     border-top-color: $panel-divider-border
-  &[data-state=started]
-    border-top-color: green
+  &[data-state=started],
+  &[data-state=running]
+    border-top-color: lightgreen
   &[data-state=break]
     border-top-color: #ffbf00 // Amber
   &[data-state=stopped]
