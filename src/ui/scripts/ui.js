@@ -63,7 +63,7 @@ function processMsg (msg) {
   } else if (msg.MessageType === 'response' && msg.State === 'stopped') {
     removePreviousBreak()
   } else if (msg.MessageType === 'response' && msg.Properties.Command === 'context_get') {
-    updateVarsDisplay(msg.Context.Local)
+    updateVarsDisplay(msg.Context)
   } else if (msg.MessageType === 'response' && msg.Properties.Command === 'property_get') {
     displaySingleVar(msg.Context.Local)
   } else if (msg.MessageType === 'response' && msg.Properties.Command === 'stack_get') {

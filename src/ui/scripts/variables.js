@@ -11,10 +11,22 @@
  *
  * @param object varDetailList
  */
-function updateVarsDisplay (varDetailList) {
-  var varListMarkup = listBasicVars(varDetailList)
+function updateVarsDisplay (variables) {
+  var hasLocalVarDetails = Array.isArray(variables.Local) && (variables.Local.length > 0)
+  var hasGlobalVarDetails = Array.isArray(variables.Global) && (variables.Global.length > 0)
+  var varListMarkup
 
-  jQuery('.variables').html(varListMarkup)
+  if (hasLocalVarDetails) {
+    varListMarkup = listBasicVars(variables.Local)
+
+    jQuery('.variables').html(varListMarkup)
+    jQuery('.variables').attr('data-var-context', 'local')
+  } else if (hasGlobalVarDetails) {
+    varListMarkup = listBasicVars(variables.Global)
+
+    jQuery('.variables').html(varListMarkup)
+    jQuery('.variables').attr('data-var-context', 'global')
+  }
 }
 
 /**
@@ -71,8 +83,9 @@ function setupVariableInteraction () {
     var hasNotYetLoadedChildren = jQuery(this).is('.expanded[data-has-loaded-children="false"]')
     if (hasNotYetLoadedChildren) {
       var varName = jQuery(this).attr('data-var-fullname')
+      var varContext = jQuery(event.delegateTarget).attr('data-var-context')
 
-      sendCommand('property_get', [varName])
+      sendCommand('property_get', [varContext, varName])
     }
 
     // We do *not* want to expand/collapse the parent variables of the clicked
