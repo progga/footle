@@ -18,9 +18,9 @@ type Config struct {
 /**
  * Getter for path of source code to debug.
  */
-func (c Config) GetDocroot() string {
+func (c Config) GetCodebase() string {
 
-	return c.GetArg("docroot")
+	return c.GetArg("codebase")
 }
 
 /**
@@ -31,13 +31,13 @@ func (c Config) GetDocroot() string {
  * will start with the remote path.
  *
  * Example:
- *   Docroot in Footle's machine: /home/foo/bar/
- *   Docroot in DBGp engine's machine: /var/www/html/
- *   In this case /var/www/html/ is the remote docroot.
+ *   Codebase in Footle's machine: /home/foo/bar/
+ *   Codebase in DBGp engine's machine: /var/www/html/
+ *   In this case /var/www/html/ is the remote codebase.
  */
-func (c Config) GetRemoteDocroot() string {
+func (c Config) GetRemoteCodebase() string {
 
-	return c.GetArg("remote-docroot")
+	return c.GetArg("remote-codebase")
 }
 
 /**
@@ -49,10 +49,10 @@ func (c Config) GetRemoteDocroot() string {
  */
 func (c Config) DetermineCodeDir() (codeDir string) {
 
-	codeDir = c.GetRemoteDocroot()
+	codeDir = c.GetRemoteCodebase()
 
 	if codeDir == "" {
-		codeDir = c.GetDocroot()
+		codeDir = c.GetCodebase()
 	}
 
 	return codeDir

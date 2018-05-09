@@ -53,7 +53,7 @@ func init() {
  */
 func Listen(out chan string, config config.Config) {
 
-	codeDir := config.GetDocroot()
+	codeDir := config.GetCodebase()
 	port := config.GetHTTPPort()
 
 	uiPath, err := determineUIPath()

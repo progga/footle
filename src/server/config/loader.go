@@ -34,10 +34,10 @@ func Get() Config {
 	config.flags = make(map[string]bool)
 
 	// Now load the configuration passed from the command line.
-	docroot, remoteDocroot, verbosity, httpPort, DBGpPort, hasCmdLine, hasHTTP := getFlagsAndArgs()
+	codebase, remoteCodebase, verbosity, httpPort, DBGpPort, hasCmdLine, hasHTTP := getFlagsAndArgs()
 
-	config.SetArg("docroot", docroot)
-	config.SetArg("remote-docroot", remoteDocroot)
+	config.SetArg("codebase", codebase)
+	config.SetArg("remote-codebase", remoteCodebase)
 	config.SetArg("http-port", strconv.Itoa(httpPort))
 	config.SetArg("dbgp-port", strconv.Itoa(DBGpPort))
 	config.SetArg("verbosity", verbosity)
@@ -63,7 +63,9 @@ func Get() Config {
  * Return the values of these flags and arguments.
  *
  * Arg:
- *  - docroot : Docroot of code that will be debugged.
+ *  - codebase: Parent directory of code that will be debugged.
+ *  - Remote codebase: This is what the debugger engine sees when the engine is
+ *    in a remote machine.
  *  - HTTP port: Network port of the HTTP interface.
  *  - DBGp port: Network port to listen for the DBGp server.
  *
@@ -72,10 +74,10 @@ func Get() Config {
  *  - nohttp : No HTTP.
  *  - v, vv, vvv: Verbosity level.
  */
-func getFlagsAndArgs() (docroot, remoteDocroot, verbosity string, httpPort, DBGpPort int, hasCmdLine, hasHTTP bool) {
+func getFlagsAndArgs() (codebase, remoteCodebase, verbosity string, httpPort, DBGpPort int, hasCmdLine, hasHTTP bool) {
 
-	docrootArg := flag.String("docroot", "", "[Optional] Path of directory whose code you want to debug; e.g. /var/www/html/ (default is current dir)")
-	remoteDocrootArg := flag.String("docroot-remote", "", "[Optional] When Footle and the DBGp server (e.g. xdebug) are in different machines, this is the path of the source code directory in the remote machine.  This scenario is *not* recommended.  Try as a last resort.")
+	codebaseArg := flag.String("codebase", "", "[Optional] Path of directory whose code you want to debug; e.g. /var/www/html/ (default is current dir)")
+	remoteCodebaseArg := flag.String("codebase-remote", "", "[Optional] When Footle and the DBGp server (e.g. xdebug) are in different machines, this is the path of the source code directory in the remote machine.  This scenario is *not* recommended.  Try as a last resort.")
 	DBGpPortArg := flag.Int("port-dbgp", 9000, "[Optional] Network port to listen for the DBGp server.")
 	httpPortArg := flag.Int("port-http", 9090, "[Optional] Network port for Footle's Web interface.")
 	hasCmdLineFlag := flag.Bool("cmdline", false, "[Optional] Launch command line debugger.")
@@ -87,20 +89,20 @@ func getFlagsAndArgs() (docroot, remoteDocroot, verbosity string, httpPort, DBGp
 
 	flag.Parse()
 
-	docroot = *docrootArg
-	remoteDocroot = *remoteDocrootArg
+	codebase = *codebaseArg
+	remoteCodebase = *remoteCodebaseArg
 	httpPort = *httpPortArg
 	DBGpPort = *DBGpPortArg
 	hasCmdLine = *hasCmdLineFlag
 	hasHTTP = !*noHTTPFlag
 
-	if docroot == "" {
+	if codebase == "" {
 		currentDir, err := os.Getwd()
 
 		if err == nil {
-			docroot = currentDir
+			codebase = currentDir
 		}
-	} else if _, err := os.Stat(docroot); os.IsNotExist(err) {
+	} else if _, err := os.Stat(codebase); os.IsNotExist(err) {
 		log.Fatal(err)
 	}
 
