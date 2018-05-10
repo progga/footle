@@ -34,12 +34,13 @@ func Get() Config {
 	config.flags = make(map[string]bool)
 
 	// Now load the configuration passed from the command line.
-	codebase, remoteCodebase, verbosity, httpPort, DBGpPort, hasCmdLine, hasHTTP := getFlagsAndArgs()
+	codebase, remoteCodebase, uiPath, verbosity, httpPort, DBGpPort, hasCmdLine, hasHTTP := getFlagsAndArgs()
 
 	config.SetArg("codebase", codebase)
 	config.SetArg("remote-codebase", remoteCodebase)
 	config.SetArg("http-port", strconv.Itoa(httpPort))
 	config.SetArg("dbgp-port", strconv.Itoa(DBGpPort))
+	config.SetArg("ui-path", uiPath)
 	config.SetArg("verbosity", verbosity)
 
 	if hasCmdLine {
@@ -68,18 +69,21 @@ func Get() Config {
  *    in a remote machine.
  *  - HTTP port: Network port of the HTTP interface.
  *  - DBGp port: Network port to listen for the DBGp server.
+ *  - UI path: Location of the HTTP UI.
  *
  * Flag:
  *  - cmdline: We want the command line.
  *  - nohttp : No HTTP.
  *  - v, vv, vvv: Verbosity level.
  */
-func getFlagsAndArgs() (codebase, remoteCodebase, verbosity string, httpPort, DBGpPort int, hasCmdLine, hasHTTP bool) {
+func getFlagsAndArgs() (codebase, remoteCodebase, uiPath, verbosity string, httpPort, DBGpPort int, hasCmdLine, hasHTTP bool) {
 
 	codebaseArg := flag.String("codebase", "", "[Optional] Path of directory whose code you want to debug; e.g. /var/www/html/ (default is current dir)")
 	remoteCodebaseArg := flag.String("codebase-remote", "", "[Optional] When Footle and the DBGp server (e.g. xdebug) are in different machines, this is the path of the source code directory in the remote machine.  This scenario is *not* recommended.  Try as a last resort.")
 	DBGpPortArg := flag.Int("port-dbgp", 9000, "[Optional] Network port to listen for the DBGp server.")
 	httpPortArg := flag.Int("port-http", 9090, "[Optional] Network port for Footle's Web interface.")
+	uiPathArg := flag.String("ui-path", "../ui/", "[Optional] Location of an alternate HTTP UI.  Rarely needed.")
+
 	hasCmdLineFlag := flag.Bool("cmdline", false, "[Optional] Launch command line debugger.")
 	noHTTPFlag := flag.Bool("nohttp", false, "[Optional] Do *not* launch HTTP interface of the debugger.")
 
@@ -93,6 +97,7 @@ func getFlagsAndArgs() (codebase, remoteCodebase, verbosity string, httpPort, DB
 	remoteCodebase = *remoteCodebaseArg
 	httpPort = *httpPortArg
 	DBGpPort = *DBGpPortArg
+	uiPath = *uiPathArg
 	hasCmdLine = *hasCmdLineFlag
 	hasHTTP = !*noHTTPFlag
 

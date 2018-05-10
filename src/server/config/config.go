@@ -75,6 +75,14 @@ func (c Config) GetDBGpPort() int {
 }
 
 /**
+ * Getter for alternate HTTP UI path.
+ */
+func (c Config) GetUIPath() string {
+
+	return c.GetArg("ui-path")
+}
+
+/**
  * Return value of configuration item as an integer.
  *
  * Useful for fetching numeric configurations such as port number.
