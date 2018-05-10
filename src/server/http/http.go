@@ -21,8 +21,6 @@ import (
 	"server/http/file"
 )
 
-const DOCROOT_PATH = "../../ui/"
-
 type client chan<- string
 
 /**
@@ -56,7 +54,7 @@ func Listen(out chan string, config config.Config) {
 	codeDir := config.GetCodebase()
 	port := config.GetHTTPPort()
 
-	uiPath, err := determineUIPath()
+	uiPath, err := determineUIPath(config)
 	if nil != err {
 		log.Fatal(err)
 	}
@@ -297,7 +295,17 @@ func manageClients(httpClientList map[client]bool, arrival, departure <-chan cli
 /**
  * Find document root of the HTML UI.
  */
-func determineUIPath() (uiPath string, err error) {
+func determineUIPath(config config.Config) (uiPath string, err error) {
+
+	uiDocrootPath := config.GetUIPath()
+	if filepath.IsAbs(uiDocrootPath) {
+		if isDir(uiDocrootPath) {
+			return uiDocrootPath, err
+		} else {
+			err = fmt.Errorf("The %s directory does not exist.", uiDocrootPath)
+			return uiDocrootPath, err
+		}
+	}
 
 	binPath, err := os.Executable()
 	if nil != err {
@@ -309,9 +317,29 @@ func determineUIPath() (uiPath string, err error) {
 		return uiPath, err
 	}
 
-	uiPath = realBinPath + "/" + DOCROOT_PATH
+	// /bar/baz/footle/bin/footle + .. = /bar/baz/footle/bin
+	// So /bar/baz/footle/bin/footle + .. + "../ui" = /bar/baz/footle/ui
+	uiPath = filepath.Join(realBinPath, "..", uiDocrootPath)
+	if isDir(uiPath) {
+		return uiPath, err
+	} else {
+		err = fmt.Errorf("The %s directory does not exist.", uiPath)
+		return uiPath, err
+	}
+}
 
-	return uiPath, err
+/**
+ * Does the given directory exist?
+ */
+func isDir(path string) bool {
+
+	fileinfo, err := os.Stat(path)
+
+	if os.IsNotExist(err) || !fileinfo.IsDir() {
+		return false
+	}
+
+	return true
 }
 
 /**
