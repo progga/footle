@@ -10,6 +10,7 @@ import (
 	"github.com/chzyer/readline"
 	"io"
 	"log"
+	"server/cli/help"
 	"server/config"
 	footlecmd "server/core/cmd"
 	"server/dbgp/command"
@@ -70,6 +71,10 @@ func RunUI(out chan<- string, bye chan struct{}) {
 			continue
 		} else if cmd == "no-verbose" {
 			config.GoSilent()
+			continue
+		} else if cmdAlias == "help" {
+			helpObj := help.Get()
+			fmt.Print(helpObj.Me(cmdArgs))
 			continue
 		} else if footlecmd.Is(cmdAlias) {
 			// Commands for controlling Footle.
