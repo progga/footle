@@ -24,11 +24,11 @@ function updateSourceFile (filepath) {
 
   jQuery(fileContentElement).load(formattedFilepath, function () {
     var fileTabLinkElementSelector = '#' + escapeSelector(filepath)
-    jQuery(fileTabLinkElementSelector).addClass('uk-animation-shake')
+    jQuery(fileTabLinkElementSelector).addClass('uk-animation-slide-top')
 
     // Remove the animation so that it can be applied again.
     window.setTimeout(function () {
-      jQuery(fileTabLinkElementSelector).removeClass('uk-animation-shake')
+      jQuery(fileTabLinkElementSelector).removeClass('uk-animation-slide-top')
     }, 1000) // Because the uk-shake animation lasts for 500ms.
   })
 }
