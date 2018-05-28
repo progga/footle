@@ -7,7 +7,6 @@ package file
 import (
 	"bufio"
 	"bytes"
-	"fmt"
 	"html/template"
 	"io"
 	"net/http"
@@ -34,10 +33,15 @@ func init() {
  *
  * Prepare HTML markup for the given file.  The file content is HTML escaped.
  */
-func GrabIt(path string, port int) (formattedFile string, err error) {
+func GrabIt(codebase http.Dir, path string) (formattedFile string, err error) {
 
-	lines, err := grabFileLines(path, port)
+	fileDesc, err := codebase.Open(path)
+	if err != nil {
+		return formattedFile, err
+	}
+	defer fileDesc.Close()
 
+	lines, err := readFileLines(fileDesc)
 	formattedFile = formatFile(lines)
 
 	return formattedFile, err
@@ -45,22 +49,16 @@ func GrabIt(path string, port int) (formattedFile string, err error) {
 
 /**
  * Prepare a list of lines for the given file.
- *
- * For now, fetch the file over HTTP.  This should be replaced with a local file
- * operation once we have better understanding of the security implications.
  */
-func grabFileLines(path string, port int) (lines []string, err error) {
+func grabFileLines(codebase http.Dir, path string) (lines []string, err error) {
 
-	fileUrl := fmt.Sprintf("http://0.0.0.0:%d/files/%s", port, path)
-	response, err := http.Get(fileUrl)
-
+	fileDesc, err := codebase.Open(path)
 	if err != nil {
 		return lines, err
 	}
+	defer fileDesc.Close()
 
-	defer response.Body.Close()
-
-	lines, err = readFileLines(response.Body)
+	lines, err = readFileLines(fileDesc)
 
 	return lines, err
 }

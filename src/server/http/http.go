@@ -67,7 +67,7 @@ func Listen(out chan string, config config.Config) {
 	// Serve the files that will be debugged.
 	http.Handle("/files/", http.StripPrefix("/files/", http.FileServer(http.Dir(codeDir))))
 	// HTML markup for the same files.
-	http.HandleFunc("/formatted-file/", makeFormattedFileHandler(port))
+	http.HandleFunc("/formatted-file/", makeFormattedFileHandler(http.Dir(codeDir)))
 
 	http.HandleFunc("/steering-wheel", makeReceiveHandler(out))
 	http.HandleFunc("/message-stream", makeTransmitHandler(arrival, departure))
@@ -219,13 +219,13 @@ func transmit(writeStream http.ResponseWriter, request *http.Request, arrival, d
  *   ...
  * </div>
  */
-func makeFormattedFileHandler(port int) http.HandlerFunc {
+func makeFormattedFileHandler(codebase http.Dir) http.HandlerFunc {
 
 	return func(writeStream http.ResponseWriter, request *http.Request) {
 
 		filePath := request.URL.Path[len("/formatted-file/"):]
 
-		output, err := file.GrabIt(filePath, port)
+		output, err := file.GrabIt(codebase, filePath)
 
 		if nil != err {
 			http.Error(writeStream, err.Error(), http.StatusInternalServerError)
