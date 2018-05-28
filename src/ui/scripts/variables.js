@@ -55,7 +55,7 @@ function displaySingleVar (varDetailList) {
   var varListMarkup = listBasicVars(childrenVars)
 
   var varFullname = varDetail.Fullname
-  var varIdSelector = '#' + escapeSelector(varFullname)
+  var varIdSelector = '#' + escapeSelector(escape(varFullname))
   var varChildrenSelector = varIdSelector + ' > .variable-list'
 
   jQuery(varChildrenSelector).replaceWith(varListMarkup)
@@ -82,7 +82,7 @@ function setupVariableInteraction () {
 
     var hasNotYetLoadedChildren = jQuery(this).is('.expanded[data-has-loaded-children="false"]')
     if (hasNotYetLoadedChildren) {
-      var varName = jQuery(this).attr('data-var-fullname')
+      var varName = unescape(jQuery(this).attr('data-var-fullname'))
       var varContext = jQuery(event.delegateTarget).attr('data-var-context')
 
       sendCommand('property_get', [varContext, varName])
@@ -144,8 +144,8 @@ function prepareVarMarkup (varDetail, childrenMarkup) {
     childrenMarkup = '<ul class="variable-list wait--loading-children uk-icon-refresh uk-icon-spin"></ul>'
   }
 
-  var markup = '<li id="' + varFullname + '"' +
-                 ' class="variable" data-var-fullname="' + varFullname + '"' +
+  var markup = '<li id="' + escape(varFullname) + '"' +
+                 ' class="variable" data-var-fullname="' + escape(varFullname) + '"' +
                  ' data-is-composite="' + varDetail.IsCompositeType + '"' +
                  ' data-has-loaded-children="' + varDetail.HasLoadedChildren + '">' +
                  '<span class="variable__display-name">' + varDetail.DisplayName + '</span>' +
