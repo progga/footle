@@ -10,7 +10,7 @@
 #
 # Required tools:
 # - Go >= 1.8: https://golang.org/doc/install
-# - Go dep: go get -u github.com/golang/dep/cmd/dep
+# - Go dep: https://github.com/golang/dep#installation
 # - Node.js and npm: https://github.com/creationix/nvm
 #
 # Useful make commands:
