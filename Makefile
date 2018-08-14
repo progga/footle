@@ -12,8 +12,6 @@
 # - Go >= 1.8: https://golang.org/doc/install
 # - Go dep: go get -u github.com/golang/dep/cmd/dep
 # - Node.js and npm: https://github.com/creationix/nvm
-# - Bower: npm install --global bower
-# - Sassc: https://github.com/sass/sassc
 #
 # Useful make commands:
 # - make: Compiles Footle for the current platform.
@@ -101,7 +99,14 @@ ${SERVER_SRC_DIR_PATH}/vendor: ${SERVER_SRC_DIR_PATH}/Gopkg.toml
 
 ### Compile and prepare the UI #################################################
 # Prepare HTML-based UI.
-ui: ui-libs markup style script font
+ui: ui-dev-dependencies ui-libs markup style script font
+
+# Node.js packages.
+ui-dev-dependencies: ${UI_SRC_DIR_PATH}/node_modules
+
+${UI_SRC_DIR_PATH}/node_modules: ${UI_SRC_DIR_PATH}/package-lock.json
+	cd ${UI_SRC_DIR_PATH}; \
+	npm install
 
 # Bower dependencies need to be installed in both UI src and UI build.  This
 # is because some libs are needed during the build process.
@@ -109,11 +114,11 @@ ui-libs: ${UI_SRC_LIBS_DIR}/bower_components ${UI_BUILD_LIBS_DIR}/bower_componen
 
 ${UI_SRC_LIBS_DIR}/bower_components: ${UI_SRC_LIBS_DIR}/bower.json
 	cd ${UI_SRC_LIBS_DIR}; \
-	bower install
+	npx bower install
 
 ${UI_BUILD_LIBS_DIR}/bower_components: ${UI_BUILD_LIBS_DIR}/bower.json
 	cd ${UI_BUILD_LIBS_DIR}; \
-	bower install
+	npx bower install
 
 ${UI_BUILD_LIBS_DIR}/bower.json: ${UI_SRC_LIBS_DIR}/bower.json
 	mkdir -p ${UI_BUILD_LIBS_DIR}
@@ -123,7 +128,7 @@ ${UI_BUILD_LIBS_DIR}/bower.json: ${UI_SRC_LIBS_DIR}/bower.json
 style: ${UI_CSS_DIR}/ui.css
 ${UI_CSS_DIR}/ui.css: ${UI_SASS_FILES}
 	mkdir -p ${UI_CSS_DIR}
-	sassc -am ${UI_SASS_DIR}/ui.sass $@
+	npx node-sass --indented-syntax --source-map true ${UI_SASS_DIR}/ui.sass $@
 
 # Copy index.html
 markup: ${UI_HTML_BUILD_PATH}
