@@ -3,7 +3,7 @@ Footle
 Footle is a [debugger front-end](https://en.wikipedia.org/wiki/Debugger#Debugger_front-ends) for the Xdebug PHP debugger.  It offers a browser-based user interface for Xdebug.  The goal is to make interactive debugging easy for PHP newcomers.
 
 ## Development status
-Footle is heavily under construction.  It works, but user experience is not good enough yet.  Also, it cannot deal with multiple debugging sessions.
+Footle is heavily under construction.  It works, but user experience is not good enough yet.  Also, it cannot cope with multiple simultaneous debugging sessions.
 
 ## Installation
 - Open Footle's [release page](https://github.com/progga/footle/releases)
@@ -39,7 +39,7 @@ This makes two assumptions:
 - To inspect local and global variables, use the two buttons labelled *Locals* and *Globals*
 
 ## Supported platforms
-Footle is cross-platform.  We prepare distributions for FreeBSD, GNU/Linux, MacOS, and Windows.  Minimum web browser requirement is [Firefox 52 ESR](https://en.wikipedia.org/wiki/History_of_Firefox#Extended_Support_Release).  Recent browsers of other flavours may work although none are tested.
+Footle is cross-platform.  We prepare distributions for FreeBSD, GNU/Linux, MacOS, and Windows.  Minimum web browser requirement is [Firefox 52 ESR](https://en.wikipedia.org/wiki/History_of_Firefox#Extended_Support_Release).  Recent browsers of other flavours may work although none are tested as yet.
 
 ## Licence
 [Simplified BSD licence](https://en.wikipedia.org/wiki/BSD_licenses#2-clause).  It effectively means you can do whatever you want with Footle.
