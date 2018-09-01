@@ -31,7 +31,7 @@ func SendCmdsToDBGpEngine(DBGpConnection *conn.Connection, in <-chan string) {
 				log.Fatal(err)
 			}
 		} else {
-			log.Println("Inactive connection.")
+			log.Println("Cannot speak to an inactive connection.")
 		}
 	}
 }
