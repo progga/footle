@@ -79,7 +79,7 @@ func Get() Config {
 func getFlagsAndArgs() (codebase, remoteCodebase, uiPath, verbosity string, httpPort, DBGpPort int, hasCmdLine, hasHTTP bool) {
 
 	codebaseArg := flag.String("codebase", "", "[Optional] Path of directory whose code you want to debug; e.g. /var/www/html/ (default is current dir)")
-	remoteCodebaseArg := flag.String("codebase-remote", "", "[Optional] When Footle and the DBGp server (e.g. xdebug) are in different machines, this is the path of the source code directory in the remote machine.  This scenario is *not* recommended.  Try as a last resort.")
+	remoteCodebaseArg := flag.String("codebase-remote", "", "[Optional] When Footle and the DBGp server (e.g. xdebug) are in different machines, this is the path of the source code directory in the remote machine.  This scenario is *not* recommended.  Try as a last resort.  Footle assumes that a copy of the source code is present in the local machine.  To tell Footle where this copy is, either run footle from inside the copy or use the -codebase option.")
 	DBGpPortArg := flag.Int("port-dbgp", 9000, "[Optional] Network port to listen for the DBGp server.")
 	httpPortArg := flag.Int("port-http", 1234, "[Optional] Network port for Footle's Web interface.")
 	uiPathArg := flag.String("ui-path", "../ui/", "[Optional] Location of an alternate HTTP UI.  Rarely needed.")
