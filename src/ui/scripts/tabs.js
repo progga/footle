@@ -37,13 +37,13 @@ function addTab (filepath, postTabOpenAction) {
     }
 
     /* Tab link. */
-    var tabLink = jQuery('<li id="' + filepath + '" class="tab-selector" data-filepath="' + filepath + '" title="' + filepath + '"><a href="#"><span class="tab-refresh"></span>' + filename + '<span class="tab-closer"></span></a></li>')
+    var tabLink = jQuery(`<li id="${filepath}" class="tab-selector" data-filepath="${filepath}" title="${filepath}"><a href="#"><span class="tab-refresh" title="Reload"></span>${filename}<span class="tab-closer" title="Close"></span></a></li>`)
     // Make sure to add a jQuery object instead of plain markup so that we can
     // use the object later.
     jQuery('#tab-selector-wrapper').append(tabLink)
 
     /* Tab content. */
-    var tabContent = '<li id="body-of-' + filepath + '" class="tab-content" data-filepath="' + filepath + '"><div class="file-content">' + data + '</div></li>'
+    var tabContent = `<li id="body-of-${filepath}" class="tab-content" data-filepath="${filepath}"><div class="file-content">${data}</div></li>`
     jQuery('#tab-content-wrapper').append(tabContent)
 
     /* Record the presence of a tab for this file. */
