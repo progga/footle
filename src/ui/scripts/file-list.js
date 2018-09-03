@@ -10,7 +10,7 @@
 'use strict'
 
 /**
- * Setup click handler on all *file* links in the file browser.
+ * Setup file browser and recent file list.
  *
  * @param object ignoredEvent
  *    Optional, it is okay to call a Javascript function without its arguments.
@@ -18,10 +18,15 @@
 function setupFileList (ignoredEvent) {
   setupFileLinks()
   improveFileListUX()
+
+  let recentFiles = new RecentFiles(localStorage).get()
+  displayRecentFiles(recentFiles)
 }
 
 /**
- * Load file list or file.
+ * Setup click handler on all *file* links.
+ *
+ * These file links are found as part of the file browser and recent file list.
  *
  * When a directory name has been clicked, load its file list.  When a filename
  * has been clicked, open that file in a new tab.
@@ -31,7 +36,17 @@ function setupFileList (ignoredEvent) {
  */
 function setupFileLinks () {
   jQuery('pre', window.file_browser.document).on('click', 'a:not([href$="/"])', function (event) {
-    var relativeFilepath = this.pathname.replace('/files/', '')
+    let relativeFilepath = this.pathname.replace('/files/', '')
+    addTab(relativeFilepath)
+
+    return false
+  })
+
+  jQuery('.file-list--recent').on('click', '.file--recent__link', function (event) {
+    // Even though we don't use absolute filenames in recent file links, that's
+    // what we get here.  But we don't want a leading slash in the filepath for
+    // display purposes.
+    let relativeFilepath = this.pathname.replace(/^\//, '')
     addTab(relativeFilepath)
 
     return false
@@ -124,4 +139,35 @@ function prepareBreadcrumbMarkup (crumbs) {
   breadcrumb += '<li class="label--dir uk-active"><span>' + lastCrumb.dir + '</span></li></ul>'
 
   return breadcrumb
+}
+
+/**
+ * We want to list the last five files opened.
+ *
+ * These are the files that have been explicitely opened by clicking their
+ * names.  Files opened *automatically* as part of the step through execution
+ * process are excluded from this list.
+ */
+function displayRecentFiles (filelist) {
+  let listMarkup = filelist.map(filename => `<li class="file--recent"><a href="${filename}" class="file--recent__link">${filename}</a></li>`).join('\n')
+
+  jQuery('.file-list--recent').html(listMarkup)
+
+  // Only display the "Recent files" header when we have got some such files.
+  if (filelist.length) {
+    jQuery('.recent-files__header').removeClass('uk-invisible')
+  }
+}
+
+/**
+ * The list of recent files is constantly updated.
+ *
+ * Everytime a filename is *clicked*, it moves to the top of the list.
+ */
+function updateRecentFiles (filename) {
+  let recentFiles = new RecentFiles(localStorage)
+  recentFiles.add(filename)
+
+  let filelist = recentFiles.get()
+  displayRecentFiles(filelist)
 }

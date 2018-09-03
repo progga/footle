@@ -1,12 +1,27 @@
 
 /**
  * @file
- * Style rules for main Footle UI.
+ * Style rules for file browser and recent file list.
  */
 
-iframe.file_browser
-  position: absolute
-  height: 80%
+/**
+ * File browser takes up 70% of the tab height.
+ *
+ * The remaining height is enough to list the five recently opened files.
+ */
+.file-content--browser
+  max-height: 90%
+iframe.file-browser
+  height: 70%
+
+.recent-files > h2
+  font-size: 1em
+  font-weight: bold
+  line-height: 1.5em
+  margin: 1em 0 0 .75em
+.recent-files > h2 + .file-list--recent
+  margin-top: 0
+  padding-left: 2em;
 
 /**
  * Applies inside the file list iframe when this stylehsheet is added into the

@@ -52,6 +52,9 @@ function addTab (filepath, postTabOpenAction) {
     /* Activate tab. */
     openTabForFile(filepath)
 
+    /* Update recent file list. */
+    updateRecentFiles(filepath)
+
     // The tab content area should start after the fix positioned tab
     // selector area.
     adjustTabContentPosition()
