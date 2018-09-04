@@ -44,7 +44,7 @@ function setupStateControl () {
  *
  * @see Markup for the "On" button.
  */
-function toggleOnOffbuttons() {
+function toggleOnOffbuttons () {
   jQuery('[name="button--on"], [name="button--off"]').toggleClass('uk-hidden')
 }
 
@@ -67,4 +67,20 @@ function setupCommandNControl (commandsNSelectors) {
       sendCommand(event.data)
     })
   }
+}
+
+/**
+ * Disable all buttons except the on and off buttons.
+ *
+ * This is for better UX.
+ */
+function disableControls () {
+  jQuery('.button--control[name!="button--on"][name!="button--off"]').attr('disabled', true)
+}
+
+/**
+ * Enable all buttons.
+ */
+function enableControls () {
+  jQuery('.button--control').attr('disabled', false)
 }
