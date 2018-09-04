@@ -37,7 +37,7 @@ function setupFileList (ignoredEvent) {
 function setupFileLinks () {
   jQuery('pre', window.file_browser.document).on('click', 'a:not([href$="/"])', function (event) {
     let relativeFilepath = this.pathname.replace('/files/', '')
-    addTab(relativeFilepath)
+    addTab(relativeFilepath, (filename, filepath) => updateRecentFiles(filepath))
 
     return false
   })
@@ -47,7 +47,7 @@ function setupFileLinks () {
     // what we get here.  But we don't want a leading slash in the filepath for
     // display purposes.
     let relativeFilepath = this.pathname.replace(/^\//, '')
-    addTab(relativeFilepath)
+    addTab(relativeFilepath, (filename, filepath) => updateRecentFiles(filepath))
 
     return false
   })
