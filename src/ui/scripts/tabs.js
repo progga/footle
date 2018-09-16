@@ -7,7 +7,7 @@
  * of filenames and their corresponding tabs.
  */
 
-'use strict'
+import sendCommand from './server-commands'
 
 /**
  * List of files and their corresponding tab elements.
@@ -227,3 +227,5 @@ function adjustTabContentPosition () {
   var tabSelectorHeight = jQuery('#tab-selector-wrapper').outerHeight(true)
   jQuery('#tab').css('padding-top', tabSelectorHeight)
 }
+
+export {addTab, getTabContentElement, getTabContentElementForFile, hasFileTabMapping, setupTabRefresher, setupTabCloser}

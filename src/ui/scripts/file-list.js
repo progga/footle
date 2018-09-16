@@ -7,7 +7,8 @@
  * styling to improve the appearance of the file list.
  */
 
-'use strict'
+import {addTab} from './tabs'
+import RecentFiles from './recent-files'
 
 /**
  * Setup file browser and recent file list.
@@ -171,3 +172,5 @@ function updateRecentFiles (filename) {
   let filelist = recentFiles.get()
   displayRecentFiles(filelist)
 }
+
+export default setupFileList

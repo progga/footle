@@ -15,7 +15,7 @@
 #
 # Useful make commands:
 # - make: Compiles Footle for the current platform.
-# - make dist: Cross compiles for FreeBSD, Linux, Mac, and Windows.
+# - make dist: Cross compiles for FreeBSD, Linux, macOS, and Windows.
 # - make clean: Removes build for the current platform.
 # - make distclean: Removes all cross compiled builds.
 # - make realclean: Removes all types of builds.

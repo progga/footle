@@ -9,7 +9,8 @@
  * Only line number based breakpoints are supported at the moment.
  */
 
-'use strict'
+import {addTab, getTabContentElement, hasFileTabMapping} from './tabs'
+import sendCommand from './server-commands'
 
 /**
  * List of breakpoints.
@@ -250,3 +251,5 @@ function removeBreakpointHighlighting (filename, lineNo) {
   var lineNoClass = '.line__' + lineNo
   jQuery(lineNoClass, tabContent).removeClass('breakpoint').removeData('breakpoint-id')
 }
+
+export {setupBreakpointTrigger, refreshBreakpoints}

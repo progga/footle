@@ -4,10 +4,8 @@
  * Functions common to all elements.
  */
 
-'use strict'
-
 /**
- * Escapse CSS selector.
+ * Escape CSS selector.
  *
  * @param string selector
  * @return string
@@ -31,3 +29,5 @@ function escapeSelector (selector) {
 
   return escapedSelector
 }
+
+export {escapeSelector}

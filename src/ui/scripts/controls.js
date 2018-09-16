@@ -4,6 +4,8 @@
  * Actions for continuation and state display commands.
  */
 
+import sendCommand from './server-commands'
+
 /**
  * Prepare handlers for continuation buttons.
  *
@@ -84,3 +86,5 @@ function disableControls () {
 function enableControls () {
   jQuery('.button--control').attr('disabled', false)
 }
+
+export {setupContinuationControls, setupStateControl, toggleOnOffbuttons, disableControls, enableControls}
