@@ -56,16 +56,18 @@ UI_HTML_SRC_PATH = ${UI_SRC_DIR_PATH}/index.html
 UI_HTML_BUILD_PATH = ${UI_BUILD_DIR_PATH}/index.html
 
 UI_SASS_DIR = ${UI_SRC_DIR_PATH}/style/sass
-UI_CSS_DIR = ${UI_BUILD_DIR_PATH}/style/css
+UI_CSS_DIR = ${UI_BUILD_DIR_PATH}/build/style/css
 UI_SASS_FILES = $(shell find ${UI_SASS_DIR} -type f)
 
 UI_SCRIPT_SRC_DIR_PATH = ${UI_SRC_DIR_PATH}/scripts
-UI_SCRIPT_BUILD_DIR_PATH = ${UI_BUILD_DIR_PATH}/scripts
+UI_SCRIPT_BUILD_DIR_PATH = ${UI_BUILD_DIR_PATH}/build/scripts
 UI_SCRIPT_SRC_FILES = $(shell find ${UI_SCRIPT_SRC_DIR_PATH} -type f)
 
 UI_FONT_ORIG_DIR = ${UI_BUILD_DIR_PATH}/libs/bower_components/uikit/fonts
-UI_FONT_REQUIRED_DIR = ${UI_BUILD_DIR_PATH}/style/fonts
+UI_FONT_REQUIRED_DIR = ${UI_BUILD_DIR_PATH}/build/style/fonts
 
+UI_CSS_RELEASE_BUILD_DIR = ${UI_SRC_DIR_PATH}/build/release/style/css
+UI_SCRIPT_RELEASE_BUILD_DIR = ${UI_SRC_DIR_PATH}/build/release/scripts
 
 # Compile Footle server's Go code and Footle UI's CSS/HTML/Javascript code.
 all: Server ui
@@ -126,9 +128,13 @@ ${UI_BUILD_LIBS_DIR}/bower.json: ${UI_SRC_LIBS_DIR}/bower.json
 
 # Prepare CSS whenever *any* Sass file changes.
 style: ${UI_CSS_DIR}/ui.css
-${UI_CSS_DIR}/ui.css: ${UI_SASS_FILES}
-	mkdir -p ${UI_CSS_DIR}
-	npx node-sass --indented-syntax --source-map true ${UI_SASS_DIR}/ui.sass $@
+${UI_CSS_DIR}/ui.css: ${UI_CSS_RELEASE_BUILD_DIR}/ui.css
+	mkdir --parents ${UI_CSS_DIR}
+	cp $< $@
+
+${UI_CSS_RELEASE_BUILD_DIR}/ui.css: ${UI_SASS_FILES}
+	cd ${UI_SRC_DIR_PATH}; \
+	npm run build:release:style
 
 # Copy index.html
 markup: ${UI_HTML_BUILD_PATH}
@@ -136,10 +142,14 @@ ${UI_HTML_BUILD_PATH}: ${UI_HTML_SRC_PATH}
 	cp $< $@
 
 # Copy Javascript whenever *any* script file changes.
-script: ${UI_SCRIPT_BUILD_DIR_PATH} 
-${UI_SCRIPT_BUILD_DIR_PATH}: ${UI_SCRIPT_SRC_DIR_PATH}
-	cp -r ${UI_SCRIPT_SRC_DIR_PATH}/. $@
-	touch $@
+script: ${UI_SCRIPT_BUILD_DIR_PATH}/ui-bundle.js
+${UI_SCRIPT_BUILD_DIR_PATH}/ui-bundle.js: ${UI_SCRIPT_RELEASE_BUILD_DIR}/ui-bundle.js
+	mkdir --parents ${UI_SCRIPT_BUILD_DIR_PATH}
+	cp $< $@
+
+${UI_SCRIPT_RELEASE_BUILD_DIR}/ui-bundle.js: ${UI_SCRIPT_SRC_FILES}
+	cd ${UI_SRC_DIR_PATH}; \
+	npm run build:release:script
 
 # Relocate uikit's "fonts" directory.  Otherwise it won't be found by the
 # web browser.
