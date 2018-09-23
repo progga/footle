@@ -63,7 +63,7 @@ function improveFileListUX () {
 
   // Load stylesheet for file links which are inside the file browser iframe.
   // Show the file list once the stylesheet has been loaded.
-  jQuery('head', window.file_browser.document).append(jQuery('<link rel="stylesheet" href="/style/css/ui.css" />').on('load', function () {
+  jQuery('head', window.file_browser.document).append(jQuery('<link rel="stylesheet" href="/build/style/css/ui.css" />').on('load', function () {
     jQuery('body', window.file_browser.document).addClass('file-list')
     jQuery('body', window.file_browser.document).show()
   }))

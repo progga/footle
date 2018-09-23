@@ -5,9 +5,9 @@
   "main": "scripts/ui.js",
   "scripts": {
     "build:script": "webpack -d",
-    "build:style": "node-sass --indented-syntax --source-map true style/sass/ui.sass build/style/ui.css",
-    "build:release:script": "webpack -p --entry ./scripts/ui.js --output ../../footle/ui/build/scripts/ui-bundle.js",
-    "build:release:style": "node-sass --indented-syntax style/sass/ui.sass ../../footle/ui/build/style/ui.css"
+    "build:style": "node-sass --indented-syntax --source-map true style/sass/ui.sass build/style/css/ui.css",
+    "build:release:script": "webpack -p --entry ./scripts/ui.js --output build/release/scripts/ui-bundle.js",
+    "build:release:style": "node-sass --indented-syntax style/sass/ui.sass build/release/style/css/ui.css"
   },
   "author": "Progga",
   "license": "BSD-2-Clause",
