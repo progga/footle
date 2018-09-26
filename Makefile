@@ -146,6 +146,7 @@ script: ${UI_SCRIPT_BUILD_DIR_PATH}/ui-bundle.js
 ${UI_SCRIPT_BUILD_DIR_PATH}/ui-bundle.js: ${UI_SCRIPT_RELEASE_BUILD_DIR}/ui-bundle.js
 	mkdir --parents ${UI_SCRIPT_BUILD_DIR_PATH}
 	cp $< $@
+	cp ${UI_SCRIPT_RELEASE_BUILD_DIR}/ui-bundle.js.map ${UI_SCRIPT_BUILD_DIR_PATH}/ui-bundle.js.map
 
 ${UI_SCRIPT_RELEASE_BUILD_DIR}/ui-bundle.js: ${UI_SCRIPT_SRC_FILES}
 	cd ${UI_SRC_DIR_PATH}; \

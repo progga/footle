@@ -4,9 +4,9 @@
   "description": "Web-based UI for the Footle PHP debugger.",
   "main": "scripts/ui.js",
   "scripts": {
-    "build:script": "webpack -d",
+    "build:script": "webpack",
     "build:style": "node-sass --indented-syntax --source-map true style/sass/ui.sass build/style/css/ui.css",
-    "build:release:script": "webpack -p --entry ./scripts/ui.js --output build/release/scripts/ui-bundle.js",
+    "build:release:script": "webpack -p --devtool source-map --entry ./scripts/ui.js --output build/release/scripts/ui-bundle.js",
     "build:release:style": "node-sass --indented-syntax style/sass/ui.sass build/release/style/css/ui.css"
   },
   "author": "Progga",
