@@ -10,7 +10,7 @@
  * *** Js Syntax: ES2015 (AKA ES6) ***
  */
 
-import setupFileList from './file-list.js'
+import {setupFileList, setupRecentFileList} from './file-list.js'
 import {setupBreakpointTrigger, refreshBreakpoints} from './breakpoints.js'
 import {updateBreak, removePreviousBreak} from './breaks.js'
 import {setupContinuationControls, setupStateControl, toggleOnOffbuttons, disableControls, enableControls} from './controls.js'
@@ -39,6 +39,7 @@ jQuery(function () {
   // iframe is loaded again when a directory is opened.
   jQuery('iframe').on('load', setupFileList)
 
+  setupRecentFileList()
   setupTabRefresher()
   setupTabCloser()
   setupContinuationControls()

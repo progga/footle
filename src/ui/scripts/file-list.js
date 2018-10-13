@@ -11,7 +11,7 @@ import {addTab} from './tabs.js'
 import RecentFiles from './recent-files.js'
 
 /**
- * Setup file browser and recent file list.
+ * Setup file browser.
  *
  * @param object ignoredEvent
  *    Optional, it is okay to call a Javascript function without its arguments.
@@ -22,6 +22,21 @@ function setupFileList (ignoredEvent) {
 
   let recentFiles = new RecentFiles(localStorage).get()
   displayRecentFiles(recentFiles)
+}
+
+/**
+ * Attach click handlers to filenames listed as recently used.
+ */
+function setupRecentFileList () {
+  jQuery('.file-list--recent').off('click', '.file--recent__link').on('click', '.file--recent__link', function (event) {
+    // Even though we don't use absolute filenames in recent file links, that's
+    // what we get here.  But we don't want a leading slash in the filepath for
+    // display purposes.
+    let relativeFilepath = this.pathname.replace(/^\//, '')
+    addTab(relativeFilepath, (filename, filepath) => updateRecentFiles(filepath))
+
+    return false
+  })
 }
 
 /**
@@ -36,18 +51,8 @@ function setupFileList (ignoredEvent) {
  * is the parent directory link.
  */
 function setupFileLinks () {
-  jQuery('pre', window.file_browser.document).on('click', 'a:not([href$="/"])', function (event) {
+  jQuery('pre', window.file_browser.document).off('click', 'a:not([href$="/"])').on('click', 'a:not([href$="/"])', function (event) {
     let relativeFilepath = this.pathname.replace('/files/', '')
-    addTab(relativeFilepath, (filename, filepath) => updateRecentFiles(filepath))
-
-    return false
-  })
-
-  jQuery('.file-list--recent').on('click', '.file--recent__link', function (event) {
-    // Even though we don't use absolute filenames in recent file links, that's
-    // what we get here.  But we don't want a leading slash in the filepath for
-    // display purposes.
-    let relativeFilepath = this.pathname.replace(/^\//, '')
     addTab(relativeFilepath, (filename, filepath) => updateRecentFiles(filepath))
 
     return false
@@ -58,6 +63,10 @@ function setupFileLinks () {
  * Add current dir name and parent dir link for better UX.
  */
 function improveFileListUX () {
+  const hasFinishedSetup = window.file_browser.document.querySelector('body > ul.breadcrumb--file-path:first-child')
+  if (hasFinishedSetup) {
+    return
+  }
   // Hide file list until stylesheet is ready and all modification is complete.
   jQuery('body', window.file_browser.document).hide()
 
@@ -173,4 +182,4 @@ function updateRecentFiles (filename) {
   displayRecentFiles(filelist)
 }
 
-export default setupFileList
+export {setupFileList, setupRecentFileList}
