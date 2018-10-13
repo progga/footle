@@ -33,3 +33,5 @@ function displayStackTrace (callStack) {
   // an empty table.
   jQuery('.stacktrace').removeClass('uk-hidden')
 }
+
+export default displayStackTrace

@@ -4,7 +4,8 @@
  * Variable display.
  */
 
-'use strict'
+import sendCommand from './server-commands.js'
+import {escapeSelector} from './common.js'
 
 /**
  * Display variables.
@@ -156,3 +157,5 @@ function prepareVarMarkup (varDetail, childrenMarkup) {
 
   return markup
 }
+
+export {displaySingleVar, setupVariableInteraction, updateVarsDisplay}

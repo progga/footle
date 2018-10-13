@@ -4,7 +4,8 @@
  * Update source code for a displayed file.
  */
 
-'use strict'
+import {hasFileTabMapping, getTabContentElementForFile} from './tabs.js'
+import {escapeSelector} from './common.js'
 
 /**
  * Update the displayed source code of the given file.
@@ -32,3 +33,5 @@ function updateSourceFile (filepath) {
     }, 1000) // Because the uk-shake animation lasts for 500ms.
   })
 }
+
+export default updateSourceFile

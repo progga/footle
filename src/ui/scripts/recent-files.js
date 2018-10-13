@@ -4,8 +4,6 @@
  * Manage the recently opened file list.
  */
 
-'use strict'
-
 /**
  * Class for managing the recently opened file list.
  */
@@ -52,3 +50,5 @@ class RecentFiles {
     return updated
   }
 }
+
+export default RecentFiles

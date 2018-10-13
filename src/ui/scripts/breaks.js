@@ -4,7 +4,7 @@
  * Break management.
  */
 
-'use strict'
+import {addTab, getTabContentElementForFile, hasFileTabMapping} from './tabs.js'
 
 var filenameOfLastBreak = ''
 var lineNoOfLastBreak = -1
@@ -176,3 +176,5 @@ function isInViewport (element) {
 
   return isInViewport
 }
+
+export {updateBreak, removePreviousBreak}

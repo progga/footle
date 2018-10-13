@@ -10,7 +10,14 @@
  * *** Js Syntax: ES2015 (AKA ES6) ***
  */
 
-'use strict'
+import setupFileList from './file-list.js'
+import {setupBreakpointTrigger, refreshBreakpoints} from './breakpoints.js'
+import {updateBreak, removePreviousBreak} from './breaks.js'
+import {setupContinuationControls, setupStateControl, toggleOnOffbuttons, disableControls, enableControls} from './controls.js'
+import updateSourceFile from './source.js'
+import displayStackTrace from './stacktrace.js'
+import {setupTabRefresher, setupTabCloser} from './tabs.js'
+import {displaySingleVar, setupVariableInteraction, updateVarsDisplay} from './variables.js'
 
 /**
  * Onload event handler.

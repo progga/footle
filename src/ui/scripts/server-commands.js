@@ -25,3 +25,5 @@ function sendCommand (command, args) {
     console.log(errorThrown)
   })
 }
+
+export default sendCommand
