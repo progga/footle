@@ -7,7 +7,7 @@
  * of filenames and their corresponding tabs.
  */
 
-import sendCommand from './server-commands.js'
+import * as server from './server-commands.js'
 
 /**
  * List of files and their corresponding tab elements.
@@ -22,16 +22,16 @@ var fileTabMapping = {}
  * @param callback postTabOpenAction
  *    Call this function once the tab is fully prepared.
  */
-function addTab (filepath, postTabOpenAction) {
+function add (filepath, postTabOpenAction) {
   var filename = filepath.split(/[\\/]/).pop()
   var formattedFilepath = '/formatted-file/' + filepath
 
-  if (hasFileTabMapping(filepath)) {
+  if (hasFileMapping(filepath)) {
     return
   }
 
   jQuery.get(formattedFilepath, function (data) {
-    if (hasFileTabMapping(filepath)) {
+    if (hasFileMapping(filepath)) {
       // The mapping may have been updated in the meantime.  Hence this recheck.
       return
     }
@@ -47,14 +47,14 @@ function addTab (filepath, postTabOpenAction) {
     jQuery('#tab-content-wrapper').append(tabContent)
 
     /* Record the presence of a tab for this file. */
-    addFileTabMapping(filepath, tabLink)
+    addFileMapping(filepath, tabLink)
 
     /* Activate tab. */
-    openTabForFile(filepath)
+    open(filepath)
 
     // The tab content area should start after the fix positioned tab
     // selector area.
-    adjustTabContentPosition()
+    adjustContentPosition()
 
     if (postTabOpenAction) {
       postTabOpenAction(filename, filepath, data)
@@ -65,25 +65,25 @@ function addTab (filepath, postTabOpenAction) {
 /**
  * Reload a tab's content when its refresh link is clicked.
  */
-function setupTabRefresher () {
+function setupRefresher () {
   jQuery('#tab-selector-wrapper').on('click', '.tab-refresh', function (event) {
     event.preventDefault()
     event.stopPropagation()
 
     var filepath = this.offsetParent.id
-    sendCommand('update_source', [filepath])
+    server.sendCommand('update_source', [filepath])
   })
 }
 
 /**
  * Close a tab when its close link is clicked.
  */
-function setupTabCloser () {
+function setupCloser () {
   jQuery('#tab-selector-wrapper').on('click', '.tab-closer', function (event) {
     event.preventDefault()
     event.stopPropagation()
 
-    removeTabForFile(this.offsetParent.id)
+    remove(this.offsetParent.id)
   })
 }
 
@@ -94,7 +94,7 @@ function setupTabCloser () {
  * @param object tabElement
  *    jQuery object for a tab.
  */
-function addFileTabMapping (filepath, tabElement) {
+function addFileMapping (filepath, tabElement) {
   fileTabMapping[filepath] = tabElement
 }
 
@@ -103,8 +103,8 @@ function addFileTabMapping (filepath, tabElement) {
  *
  * @param string filepath
  */
-function removeFileTabMapping (filepath) {
-  if (!hasFileTabMapping(filepath)) {
+function removeFileMapping (filepath) {
+  if (!hasFileMapping(filepath)) {
     return
   }
 
@@ -119,7 +119,7 @@ function removeFileTabMapping (filepath) {
  * @param string filepath
  * @return bool
  */
-function hasFileTabMapping (filepath) {
+function hasFileMapping (filepath) {
   if (fileTabMapping.hasOwnProperty(filepath)) {
     return fileTabMapping[filepath]
   }
@@ -132,8 +132,8 @@ function hasFileTabMapping (filepath) {
  *
  * @param string filepath
  */
-function openTabForFile (filepath) {
-  if (!hasFileTabMapping(filepath)) {
+function open (filepath) {
+  if (!hasFileMapping(filepath)) {
     return
   }
 
@@ -149,21 +149,21 @@ function openTabForFile (filepath) {
  *
  * @param string filepath
  */
-function removeTabForFile (filepath) {
+function remove (filepath) {
   var tabElement
 
-  if (!(tabElement = hasFileTabMapping(filepath))) {
+  if (!(tabElement = hasFileMapping(filepath))) {
     return
   }
 
   /* Delete tab and its content */
-  var tabContentElement = getTabContentElement(tabElement)
+  var tabContentElement = getContentElement(tabElement)
   tabElement.remove()
   tabContentElement.remove()
 
-  removeFileTabMapping(filepath)
+  removeFileMapping(filepath)
 
-  adjustTabContentPosition()
+  adjustContentPosition()
 
   /* When we are closing the active tab, return to file browser in first tab. */
   var isActiveTab = tabElement.hasClass('uk-active')
@@ -187,7 +187,7 @@ function removeTabForFile (filepath) {
  * @return object
  *    jQuery object for the given tab's body.
  */
-function getTabContentElement (tabElement) {
+function getContentElement (tabElement) {
   var tabIndex = tabElement.index()
   var tabContentElement = jQuery('.tab-content').get(tabIndex)
 
@@ -200,7 +200,7 @@ function getTabContentElement (tabElement) {
  * @param string filename
  * @return object/null
  */
-function getTabContentElementForFile (filename) {
+function getContentElementForFile (filename) {
   var tabContentId = 'body-of-' + filename
 
   var tabContent = document.getElementById(tabContentId)
@@ -223,9 +223,9 @@ function getTabContentElementForFile (filename) {
  *
  * @todo Adjust top padding on window resize.
  */
-function adjustTabContentPosition () {
+function adjustContentPosition () {
   var tabSelectorHeight = jQuery('#tab-selector-wrapper').outerHeight(true)
   jQuery('#tab').css('padding-top', tabSelectorHeight)
 }
 
-export {addTab, getTabContentElement, getTabContentElementForFile, hasFileTabMapping, setupTabRefresher, setupTabCloser}
+export {add, getContentElement, getContentElementForFile, hasFileMapping, setupRefresher, setupCloser}

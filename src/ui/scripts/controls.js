@@ -4,7 +4,7 @@
  * Actions for continuation and state display commands.
  */
 
-import sendCommand from './server-commands.js'
+import * as server from './server-commands.js'
 
 /**
  * Prepare handlers for continuation buttons.
@@ -66,7 +66,7 @@ function setupCommandNControl (commandsNSelectors) {
     jQuery(selector).click(command, function (event) {
       event.preventDefault()
 
-      sendCommand(event.data)
+      server.sendCommand(event.data)
     })
   }
 }
@@ -76,15 +76,15 @@ function setupCommandNControl (commandsNSelectors) {
  *
  * This is for better UX.
  */
-function disableControls () {
+function disable () {
   jQuery('.button--control[name!="button--on"][name!="button--off"]').attr('disabled', true)
 }
 
 /**
  * Enable all buttons.
  */
-function enableControls () {
+function enable () {
   jQuery('.button--control').attr('disabled', false)
 }
 
-export {setupContinuationControls, setupStateControl, toggleOnOffbuttons, disableControls, enableControls}
+export {setupContinuationControls, setupStateControl, toggleOnOffbuttons, disable, enable}

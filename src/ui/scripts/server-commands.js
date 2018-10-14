@@ -26,4 +26,4 @@ function sendCommand (command, args) {
   })
 }
 
-export default sendCommand
+export {sendCommand}

@@ -7,7 +7,7 @@
  * styling to improve the appearance of the file list.
  */
 
-import {addTab} from './tabs.js'
+import * as tab from './tabs.js'
 import RecentFiles from './recent-files.js'
 
 /**
@@ -16,7 +16,7 @@ import RecentFiles from './recent-files.js'
  * @param object ignoredEvent
  *    Optional, it is okay to call a Javascript function without its arguments.
  */
-function setupFileList (ignoredEvent) {
+function setup (ignoredEvent) {
   setupFileLinks()
   improveFileListUX()
 
@@ -27,13 +27,13 @@ function setupFileList (ignoredEvent) {
 /**
  * Attach click handlers to filenames listed as recently used.
  */
-function setupRecentFileList () {
+function setupRecent () {
   jQuery('.file-list--recent').off('click', '.file--recent__link').on('click', '.file--recent__link', function (event) {
     // Even though we don't use absolute filenames in recent file links, that's
     // what we get here.  But we don't want a leading slash in the filepath for
     // display purposes.
     let relativeFilepath = this.pathname.replace(/^\//, '')
-    addTab(relativeFilepath, (filename, filepath) => updateRecentFiles(filepath))
+    tab.add(relativeFilepath, (filename, filepath) => updateRecentFiles(filepath))
 
     return false
   })
@@ -53,7 +53,7 @@ function setupRecentFileList () {
 function setupFileLinks () {
   jQuery('pre', window.file_browser.document).off('click', 'a:not([href$="/"])').on('click', 'a:not([href$="/"])', function (event) {
     let relativeFilepath = this.pathname.replace('/files/', '')
-    addTab(relativeFilepath, (filename, filepath) => updateRecentFiles(filepath))
+    tab.add(relativeFilepath, (filename, filepath) => updateRecentFiles(filepath))
 
     return false
   })
@@ -182,4 +182,4 @@ function updateRecentFiles (filename) {
   displayRecentFiles(filelist)
 }
 
-export {setupFileList, setupRecentFileList}
+export {setup, setupRecent}

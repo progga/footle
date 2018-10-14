@@ -10,14 +10,14 @@
  * *** Js Syntax: ES2015 (AKA ES6) ***
  */
 
-import {setupFileList, setupRecentFileList} from './file-list.js'
-import {setupBreakpointTrigger, refreshBreakpoints} from './breakpoints.js'
-import {updateBreak, removePreviousBreak} from './breaks.js'
-import {setupContinuationControls, setupStateControl, toggleOnOffbuttons, disableControls, enableControls} from './controls.js'
-import updateSourceFile from './source.js'
-import displayStackTrace from './stacktrace.js'
-import {setupTabRefresher, setupTabCloser} from './tabs.js'
-import {displaySingleVar, setupVariableInteraction, updateVarsDisplay} from './variables.js'
+import * as filelist from './file-list.js'
+import * as breakpoint from './breakpoints.js'
+import * as breaks from './breaks.js'
+import * as control from './controls.js'
+import * as source from './source.js'
+import * as stacktrace from './stacktrace.js'
+import * as tab from './tabs.js'
+import * as variable from './variables.js'
 
 /**
  * Onload event handler.
@@ -34,19 +34,19 @@ jQuery(function () {
   /* We have missed the very first "load" event for the iframe.  So we
      need to explicitely call setupFileList() for setting up the click
      handlers on the file links inside the file browser. */
-  setupFileList()
+  filelist.setup()
 
   // iframe is loaded again when a directory is opened.
-  jQuery('iframe').on('load', setupFileList)
+  jQuery('iframe').on('load', filelist.setup)
 
-  setupRecentFileList()
-  setupTabRefresher()
-  setupTabCloser()
-  setupContinuationControls()
-  setupStateControl()
-  setupBreakpointTrigger()
-  setupVariableInteraction()
-  disableControls()
+  filelist.setupRecent()
+  tab.setupRefresher()
+  tab.setupCloser()
+  control.setupContinuationControls()
+  control.setupStateControl()
+  breakpoint.setupTrigger()
+  variable.setupInteraction()
+  control.disable()
   initBreakpoints()
 
   // Process responses from the server.
@@ -66,28 +66,28 @@ jQuery(function () {
  */
 function processMsg (msg) {
   if (msg.MessageType === 'response' && msg.State === 'break' && msg.Properties.Filename) {
-    updateBreak(msg.Properties.Filename, msg.Properties.LineNumber)
-    enableControls()
+    breaks.update(msg.Properties.Filename, msg.Properties.LineNumber)
+    control.enable()
   } else if (msg.MessageType === 'response' && msg.Properties.Command === 'breakpoint_list') {
-    refreshBreakpoints(msg.Breakpoints)
+    breakpoint.refresh(msg.Breakpoints)
   } else if (msg.MessageType === 'response' && msg.State === 'stopped') {
-    removePreviousBreak()
-    disableControls()
+    breaks.removePrevious()
+    control.disable()
   } else if (msg.MessageType === 'response' && msg.Properties.Command === 'context_get') {
-    updateVarsDisplay(msg.Context)
+    variable.updateDisplay(msg.Context)
   } else if (msg.MessageType === 'response' && msg.Properties.Command === 'property_get') {
-    displaySingleVar(msg.Context.Local)
+    variable.displaySingle(msg.Context.Local)
   } else if (msg.MessageType === 'response' && msg.Properties.Command === 'stack_get') {
-    displayStackTrace(msg.Stacktrace)
+    stacktrace.display(msg.Stacktrace)
   } else if (msg.MessageType === 'response' && msg.Properties.Command === 'update_source') {
-    updateSourceFile(msg.Properties.Filename)
+    source.update(msg.Properties.Filename)
   } else if (msg.MessageType === 'response' && msg.State === 'awake') {
-    toggleOnOffbuttons()
-    removePreviousBreak()
+    control.toggleOnOffbuttons()
+    breaks.removePrevious()
   } else if (msg.MessageType === 'response' && msg.State === 'asleep') {
-    toggleOnOffbuttons()
-    removePreviousBreak()
-    disableControls()
+    control.toggleOnOffbuttons()
+    breaks.removePrevious()
+    control.disable()
   } else if (msg.MessageType === 'init') {
   }
 

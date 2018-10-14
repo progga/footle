@@ -4,15 +4,15 @@
  * Variable display.
  */
 
-import sendCommand from './server-commands.js'
-import {escapeSelector} from './common.js'
+import * as server from './server-commands.js'
+import * as util from './common.js'
 
 /**
  * Display variables.
  *
  * @param object varDetailList
  */
-function updateVarsDisplay (variables) {
+function updateDisplay (variables) {
   var hasLocalVarDetails = Array.isArray(variables.Local) && (variables.Local.length > 0)
   var hasGlobalVarDetails = Array.isArray(variables.Global) && (variables.Global.length > 0)
   var varListMarkup
@@ -40,7 +40,7 @@ function updateVarsDisplay (variables) {
  *   Record of a single variable and its children upto a certain depth.
  *   This may be an object, but it is expected to have only one property.
  */
-function displaySingleVar (varDetailList) {
+function displaySingle (varDetailList) {
   var hasNoSubstance = !(Array.isArray(varDetailList) && (varDetailList.length > 0))
   if (hasNoSubstance) {
     return
@@ -56,7 +56,7 @@ function displaySingleVar (varDetailList) {
   var varListMarkup = listBasicVars(childrenVars)
 
   var varFullname = varDetail.Fullname
-  var varIdSelector = '#' + escapeSelector(escape(varFullname))
+  var varIdSelector = '#' + util.escapeSelector(escape(varFullname))
   var varChildrenSelector = varIdSelector + ' > .variable-list'
 
   jQuery(varChildrenSelector).replaceWith(varListMarkup)
@@ -69,7 +69,7 @@ function displaySingleVar (varDetailList) {
  * Current events:
  * - Click handler for collapsing/uncollapsing the variable tree.
  */
-function setupVariableInteraction () {
+function setupInteraction () {
   // When a variable with children is clicked, collapse it.
   jQuery('.variables').on('click', '.variable[data-is-composite="true"]', function (event) {
     // Has the click been on a variable with children?  Only act on clicks
@@ -86,7 +86,7 @@ function setupVariableInteraction () {
       var varName = unescape(jQuery(this).attr('data-var-fullname'))
       var varContext = jQuery(event.delegateTarget).attr('data-var-context')
 
-      sendCommand('property_get', [varContext, varName])
+      server.sendCommand('property_get', [varContext, varName])
     }
 
     // We do *not* want to expand/collapse the parent variables of the clicked
@@ -118,7 +118,7 @@ function listBasicVars (varDetailList) {
       childrenMarkup = listBasicVars(varDetail.Children)
     }
 
-    markup += prepareVarMarkup(varDetail, childrenMarkup)
+    markup += prepareMarkup(varDetail, childrenMarkup)
   }
 
   markup = '<ul class="variable-list">' + markup + '</ul>'
@@ -132,7 +132,7 @@ function listBasicVars (varDetailList) {
  * @param object varDetail
  * @return string
  */
-function prepareVarMarkup (varDetail, childrenMarkup) {
+function prepareMarkup (varDetail, childrenMarkup) {
   var varType = varDetail.VarType
   var varFullname = varDetail.Fullname
 
@@ -158,4 +158,4 @@ function prepareVarMarkup (varDetail, childrenMarkup) {
   return markup
 }
 
-export {displaySingleVar, setupVariableInteraction, updateVarsDisplay}
+export {displaySingle, setupInteraction, updateDisplay}

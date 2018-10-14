@@ -8,7 +8,7 @@
  *
  * @param array callStack
  */
-function displayStackTrace (callStack) {
+function display (callStack) {
   jQuery('.stacktrace > .traces').empty()
 
   if (callStack.length === 0) {
@@ -34,4 +34,4 @@ function displayStackTrace (callStack) {
   jQuery('.stacktrace').removeClass('uk-hidden')
 }
 
-export default displayStackTrace
+export {display}

@@ -4,7 +4,7 @@
  * Break management.
  */
 
-import {addTab, getTabContentElementForFile, hasFileTabMapping} from './tabs.js'
+import * as tab from './tabs.js'
 
 var filenameOfLastBreak = ''
 var lineNoOfLastBreak = -1
@@ -17,13 +17,13 @@ var lineNoOfLastBreak = -1
  * @param string filename
  * @param int lineNo
  */
-function updateBreak (filename, lineNo) {
-  removePreviousBreak()
+function update (filename, lineNo) {
+  removePrevious()
 
-  displayNewBreak(filename, lineNo)
+  displayNew(filename, lineNo)
   displayFileWithNewBreak(filename)
 
-  recordBreak(filename, lineNo)
+  record(filename, lineNo)
 }
 
 /**
@@ -35,7 +35,7 @@ function updateBreak (filename, lineNo) {
  * @param string filename
  * @param int lineNo
  */
-function recordBreak (filename, lineNo) {
+function record (filename, lineNo) {
   if (filename) {
     filenameOfLastBreak = filename
   }
@@ -54,7 +54,7 @@ function recordBreak (filename, lineNo) {
  * @param string filename
  */
 function displayFileWithNewBreak (filename) {
-  addTab(filename, redrawCurrentBreak)
+  tab.add(filename, redrawCurrent)
 }
 
 /**
@@ -63,8 +63,8 @@ function displayFileWithNewBreak (filename) {
  * ...so that the latest one can be drawn.  At any point, there can be only one
  * break.  The display should reflect that.
  */
-function removePreviousBreak () {
-  removeBreak(filenameOfLastBreak, lineNoOfLastBreak)
+function removePrevious () {
+  remove(filenameOfLastBreak, lineNoOfLastBreak)
 }
 
 /**
@@ -72,8 +72,8 @@ function removePreviousBreak () {
  *
  * This is needed just after opening a new file with a break.
  */
-function redrawCurrentBreak () {
-  displayNewBreak(filenameOfLastBreak, lineNoOfLastBreak)
+function redrawCurrent () {
+  displayNew(filenameOfLastBreak, lineNoOfLastBreak)
 }
 
 /**
@@ -82,8 +82,8 @@ function redrawCurrentBreak () {
  * @param string filename
  * @param int lineNo
  */
-function removeBreak (filename, lineNo) {
-  var tabContentForFile = getTabContentElementForFile(filename)
+function remove (filename, lineNo) {
+  var tabContentForFile = tab.getContentElementForFile(filename)
   var tabContentIsAbsent = (tabContentForFile === undefined)
 
   if (tabContentIsAbsent) {
@@ -100,8 +100,8 @@ function removeBreak (filename, lineNo) {
  * @param string filename
  * @param int lineNo
  */
-function displayNewBreak (filename, lineNo) {
-  var tabContentForFile = getTabContentElementForFile(filename)
+function displayNew (filename, lineNo) {
+  var tabContentForFile = tab.getContentElementForFile(filename)
   var tabContentIsAbsent = (tabContentForFile === null)
 
   if (tabContentIsAbsent) {
@@ -109,7 +109,7 @@ function displayNewBreak (filename, lineNo) {
   }
 
   // Open the tab when it is not already open.
-  var tabNavElement = hasFileTabMapping(filename)
+  var tabNavElement = tab.hasFileMapping(filename)
   var isActiveTab = tabNavElement.hasClass('uk-active')
   if (!isActiveTab) {
     tabNavElement.click()
@@ -177,4 +177,4 @@ function isInViewport (element) {
   return isInViewport
 }
 
-export {updateBreak, removePreviousBreak}
+export {update, removePrevious}

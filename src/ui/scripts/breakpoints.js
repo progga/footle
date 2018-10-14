@@ -9,8 +9,8 @@
  * Only line number based breakpoints are supported at the moment.
  */
 
-import {addTab, getTabContentElement, hasFileTabMapping} from './tabs.js'
-import sendCommand from './server-commands.js'
+import * as tab from './tabs.js'
+import * as server from './server-commands.js'
 
 /**
  * List of breakpoints.
@@ -35,7 +35,7 @@ var existingBreakpointList = new Map()
  * stored as a data attribute of this parent using an attribute name of
  * "breakpoint-id".
  */
-function setupBreakpointTrigger () {
+function setupTrigger () {
   jQuery('.tab').on('click', '.tab-content', function (event) {
     var hasClickedLineNoWOBreakpoint = event.target.classList.contains('line__number') && !jQuery(event.target).parent('.line.breakpoint').length
     var hasClickedLineNoWBreakpoint = event.target.classList.contains('line__number') && jQuery(event.target).parent('.line.breakpoint').length
@@ -52,9 +52,9 @@ function setupBreakpointTrigger () {
     var breakpointId = jQuery(event.target).parent('.line.breakpoint').data('breakpoint-id')
 
     if (hasClickedLineNoWOBreakpoint) {
-      sendCommand('breakpoint_set', [filepath, lineNo])
+      server.sendCommand('breakpoint_set', [filepath, lineNo])
     } else if (hasClickedLineNoWBreakpoint && breakpointId) {
-      sendCommand('breakpoint_remove', [breakpointId])
+      server.sendCommand('breakpoint_remove', [breakpointId])
     }
   })
 }
@@ -65,7 +65,7 @@ function setupBreakpointTrigger () {
  * @param array newBreakpointList
  *    List of breakpoint objects containing filename and lineNo.
  */
-function refreshBreakpoints (newBreakpointList) {
+function refresh (newBreakpointList) {
   addNewBreakpoints(newBreakpointList)
   removeDeletedBreakpoints(newBreakpointList)
 
@@ -151,7 +151,7 @@ function addBreakpoint (breakpoint) {
   var breakpointId = breakpoint.Id
 
   addBreakpointMapping(filename, lineNo, breakpointId)
-  addTab(filename, highlightBreakpoints)
+  tab.add(filename, highlightBreakpoints)
 }
 
 /**
@@ -220,13 +220,13 @@ function highlightBreakpoints () {
  * @param int breakpointId
  */
 function highlightABreakpoint (filename, lineNo, breakpointId) {
-  var tabNavElement = hasFileTabMapping(filename)
+  var tabNavElement = tab.hasFileMapping(filename)
 
   if (!tabNavElement) {
     return
   }
 
-  var tabContent = getTabContentElement(tabNavElement)
+  var tabContent = tab.getContentElement(tabNavElement)
 
   var lineNoClass = '.line__' + lineNo
   jQuery(lineNoClass, tabContent).addClass('breakpoint').data('breakpoint-id', breakpointId)
@@ -241,15 +241,15 @@ function highlightABreakpoint (filename, lineNo, breakpointId) {
  * @param int lineNo
  */
 function removeBreakpointHighlighting (filename, lineNo) {
-  var tabNavElement = hasFileTabMapping(filename)
+  var tabNavElement = tab.hasFileMapping(filename)
 
   if (!tabNavElement) {
     return
   }
-  var tabContent = getTabContentElement(tabNavElement)
+  var tabContent = tab.getContentElement(tabNavElement)
 
   var lineNoClass = '.line__' + lineNo
   jQuery(lineNoClass, tabContent).removeClass('breakpoint').removeData('breakpoint-id')
 }
 
-export {setupBreakpointTrigger, refreshBreakpoints}
+export {setupTrigger, refresh}
