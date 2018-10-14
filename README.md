@@ -39,7 +39,7 @@ This makes two assumptions:
 - To inspect local and global variables, use the two buttons labelled *Locals* and *Globals*
 
 ## Supported platforms
-Footle is cross-platform.  We prepare distributions for FreeBSD, GNU/Linux, MacOS, and Windows.  Minimum web browser requirement is [Firefox 52 ESR](https://en.wikipedia.org/wiki/History_of_Firefox#Extended_Support_Release).  Recent browsers of other flavours may work although none are tested as yet.
+Footle is cross-platform.  We prepare distributions for FreeBSD, GNU/Linux, MacOS, and Windows.  Minimum web browser requirement is [Firefox 60 ESR](https://en.wikipedia.org/wiki/History_of_Firefox#Rapid_release_with_ESR).  Recent browsers of other flavours may work although none are tested as yet.
 
 ## Licence
 [Simplified BSD licence](https://en.wikipedia.org/wiki/BSD_licenses#2-clause).  It effectively means you can do whatever you want with Footle.
