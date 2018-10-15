@@ -107,6 +107,7 @@ ui-dev-dependencies: ${UI_SRC_DIR_PATH}/node_modules
 ${UI_SRC_DIR_PATH}/node_modules: ${UI_SRC_DIR_PATH}/package-lock.json
 	cd ${UI_SRC_DIR_PATH}; \
 	npm install
+	touch $@
 
 # Bower dependencies need to be installed in both UI src and UI build.  This
 # is because some libs are needed during the build process.
