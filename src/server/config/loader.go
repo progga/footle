@@ -72,7 +72,7 @@ func Get() Config {
  *  - UI path: Location of the HTTP UI.
  *
  * Flag:
- *  - cmdline: We want the command line.
+ *  - cli: We want the command line.
  *  - nohttp : No HTTP.
  *  - v, vv, vvv: Verbosity level.
  */
@@ -84,7 +84,7 @@ func getFlagsAndArgs() (codebase, remoteCodebase, uiPath, verbosity string, http
 	httpPortArg := flag.Int("port-http", 1234, "[Optional] Network port for Footle's Web interface.")
 	uiPathArg := flag.String("ui-path", "../ui/", "[Optional] Location of an alternate HTTP UI.  Rarely needed.")
 
-	hasCmdLineFlag := flag.Bool("cmdline", false, "[Optional] Launch command line debugger.")
+	hasCmdLineFlag := flag.Bool("cli", false, "[Optional] Launch command line debugger.")
 	noHTTPFlag := flag.Bool("nohttp", false, "[Optional] Do *not* launch HTTP interface of the debugger.")
 
 	LowVerbosityFlag := flag.Bool("v", false, "[Optional] Low verbosity.  Unused.")
