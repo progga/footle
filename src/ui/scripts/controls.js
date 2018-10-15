@@ -19,6 +19,7 @@ function setupContinuationControls () {
     'step_out': '[name="button--step-out"]',
     'run': '[name="button--run"]',
     'continue': '[name="button--continue"]',
+    'stop': '[name="button--stop"]',
     'on': '[name="button--on"]',
     'off': '[name="button--off"]'
   }
