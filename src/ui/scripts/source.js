@@ -4,6 +4,7 @@
  * Update source code for a displayed file.
  */
 
+import * as breakpoint from './breakpoints.js'
 import * as tab from './tabs.js'
 import * as util from './common.js'
 
@@ -31,6 +32,8 @@ function update (filepath) {
     window.setTimeout(function () {
       jQuery(fileTabLinkElementSelector).removeClass('uk-animation-slide-top')
     }, 1000) // Because the uk-shake animation lasts for 500ms.
+
+    breakpoint.highlightAFile(filepath)
   })
 }
 

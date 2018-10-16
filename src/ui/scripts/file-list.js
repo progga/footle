@@ -7,6 +7,7 @@
  * styling to improve the appearance of the file list.
  */
 
+import * as breakpoint from './breakpoints.js'
 import * as tab from './tabs.js'
 import RecentFiles from './recent-files.js'
 
@@ -33,7 +34,7 @@ function setupRecent () {
     // what we get here.  But we don't want a leading slash in the filepath for
     // display purposes.
     let relativeFilepath = this.pathname.replace(/^\//, '')
-    tab.add(relativeFilepath, (filename, filepath) => updateRecentFiles(filepath))
+    tab.add(relativeFilepath, postFileOpenTasks)
 
     return false
   })
@@ -53,10 +54,22 @@ function setupRecent () {
 function setupFileLinks () {
   jQuery('pre', window.file_browser.document).off('click', 'a:not([href$="/"])').on('click', 'a:not([href$="/"])', function (event) {
     let relativeFilepath = this.pathname.replace('/files/', '')
-    tab.add(relativeFilepath, (filename, filepath) => updateRecentFiles(filepath))
+    tab.add(relativeFilepath, postFileOpenTasks)
 
     return false
   })
+}
+
+/**
+ * Things we want to do once a file is opened in a tab.
+ *
+ * At the moment, we are:
+ * - Updating the recently used file list.
+ * - Redrawing any existing breakpoints.
+ */
+function postFileOpenTasks (filename, filepath) {
+  updateRecentFiles(filepath)
+  breakpoint.highlightAFile(filepath)
 }
 
 /**

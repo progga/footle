@@ -3,7 +3,7 @@
  * @file
  * Breakpoint management.
  *
- * Keep track of breakpoint Ids and their associated filenames and lineNos.
+ * Keep track of breakpoint Ids and their associated filepaths and lineNos.
  * Update the UI to reflect the current status of the breakpoints.
  *
  * Only line number based breakpoints are supported at the moment.
@@ -15,11 +15,11 @@ import * as server from './server-commands.js'
 /**
  * List of breakpoints.
  *
- * This helps to maintain association between breakpoint Ids, filenames,
+ * This helps to maintain association between breakpoint Ids, filepaths,
  * and line numbers.
  *
  * Key: breakpointId
- * Value: Map; key: filename, lineNo
+ * Value: Map; key: filepath, lineNo
  */
 var existingBreakpointList = new Map()
 
@@ -63,25 +63,25 @@ function setupTrigger () {
  * Highlight new ones, remove deleted ones.
  *
  * @param array newBreakpointList
- *    List of breakpoint objects containing filename and lineNo.
+ *    List of breakpoint objects containing filepath and lineNo.
  */
 function refresh (newBreakpointList) {
   addNewBreakpoints(newBreakpointList)
   removeDeletedBreakpoints(newBreakpointList)
 
-  highlightBreakpoints()
+  highlight()
 }
 
 /**
  * Add newly created breakpoints.
  *
  * @param array newBreakpointList
- *    List of breakpoint objects containing filename and lineNo.
+ *    List of breakpoint objects containing filepath and lineNo.
  *
  * @see existingBreakpointList
  */
 function addNewBreakpoints (newBreakpointList) {
-  for (var breakpointIndex in newBreakpointList) {
+  for (const breakpointIndex in newBreakpointList) {
     var breakpoint = newBreakpointList[breakpointIndex]
     var breakpointId = breakpoint.Id
     var isNewBreakpoint = !existingBreakpointList.has(breakpointId)
@@ -96,7 +96,7 @@ function addNewBreakpoints (newBreakpointList) {
  * Remove newly deleted breakpoints.
  *
  * @param array newBreakpointList
- *    List of breakpoint objects containing filename and lineNo.
+ *    List of breakpoint objects containing filepath and lineNo.
  *
  * @see existingBreakpointList
  */
@@ -105,10 +105,10 @@ function removeDeletedBreakpoints (newBreakpointList) {
     var isRemoved = isRemovedBreakpoint(existingBreakpointId, newBreakpointList)
 
     if (isRemoved) {
-      var filename = breakpointDetails.filename
+      var filepath = breakpointDetails.filepath
       var lineNo = breakpointDetails.lineNo
 
-      removeBreakpoint(filename, lineNo, existingBreakpointId)
+      removeBreakpoint(filepath, lineNo, existingBreakpointId)
     }
   }
 }
@@ -121,7 +121,7 @@ function removeDeletedBreakpoints (newBreakpointList) {
  *
  * @param int existingBreakpointId
  * @param array newBreakpointList
- *    List of breakpoint objects containing filename and lineNo.
+ *    List of breakpoint objects containing filepath and lineNo.
  * @return bool
  */
 function isRemovedBreakpoint (existingBreakpointId, newBreakpointList) {
@@ -146,24 +146,24 @@ function isRemovedBreakpoint (existingBreakpointId, newBreakpointList) {
  * @param object breakpoint
  */
 function addBreakpoint (breakpoint) {
-  var filename = breakpoint.Filename
+  var filepath = breakpoint.Filename
   var lineNo = breakpoint.LineNo
   var breakpointId = breakpoint.Id
 
-  addBreakpointMapping(filename, lineNo, breakpointId)
-  tab.add(filename, highlightBreakpoints)
+  addBreakpointMapping(filepath, lineNo, breakpointId)
+  tab.add(filepath, highlight)
 }
 
 /**
  * Remove a breakpoint record and its highlighting.
  *
- * @param string filename
+ * @param string filepath
  * @param int lineNo
  * @param int breakpointId
  */
-function removeBreakpoint (filename, lineNo, breakpointId) {
-  removeBreakpointMapping(breakpointId)
-  removeBreakpointHighlighting(filename, lineNo)
+function removeBreakpoint (filepath, lineNo, breakpointId) {
+  removeMapping(breakpointId)
+  removeHighlighting(filepath, lineNo)
 }
 
 /**
@@ -171,17 +171,17 @@ function removeBreakpoint (filename, lineNo, breakpointId) {
  *
  * Update the existingBreakpointList global variable.
  *
- * @param string filename
+ * @param string filepath
  * @param int lineNo
  * @param int breakpointId
  */
-function addBreakpointMapping (filename, lineNo, breakpointId) {
+function addBreakpointMapping (filepath, lineNo, breakpointId) {
   if (existingBreakpointList.has(breakpointId)) {
     return
   }
 
   existingBreakpointList.set(breakpointId, {
-    'filename': filename,
+    'filepath': filepath,
     'lineNo': lineNo
   })
 }
@@ -189,24 +189,40 @@ function addBreakpointMapping (filename, lineNo, breakpointId) {
 /**
  * Remove breakpoint record.
  *
- * @param string filename
- * @param int lineNo
+ * @param int breakpointId
  *
  * @see existingBreakpointList
  */
-function removeBreakpointMapping (breakpointId) {
+function removeMapping (breakpointId) {
   existingBreakpointList.delete(breakpointId)
 }
 
 /**
  * Update breakpoint highlighting.
  */
-function highlightBreakpoints () {
+function highlight () {
   for (const [breakpointId, breakpointDetails] of existingBreakpointList) {
-    var filename = breakpointDetails.filename
+    var filepath = breakpointDetails.filepath
     var lineNo = breakpointDetails.lineNo
 
-    highlightABreakpoint(filename, lineNo, breakpointId)
+    highlightABreakpoint(filepath, lineNo, breakpointId)
+  }
+}
+
+/**
+ * Update breakpoint highlighting for the given file.
+ *
+ * @param string targetFilepath
+ *    This is the file where we want to redraw the breakpoints.
+ */
+function highlightAFile (targetFilepath) {
+  for (const [breakpointId, breakpointDetails] of existingBreakpointList) {
+    var filepath = breakpointDetails.filepath
+    var lineNo = breakpointDetails.lineNo
+
+    if (filepath === targetFilepath) {
+      highlightABreakpoint(filepath, lineNo, breakpointId)
+    }
   }
 }
 
@@ -215,12 +231,12 @@ function highlightBreakpoints () {
  *
  * Also, save the breakpoint Id as a data attribute of the highlighted element.
  *
- * @param string filename
+ * @param string filepath
  * @param int lineNo
  * @param int breakpointId
  */
-function highlightABreakpoint (filename, lineNo, breakpointId) {
-  var tabNavElement = tab.hasFileMapping(filename)
+function highlightABreakpoint (filepath, lineNo, breakpointId) {
+  var tabNavElement = tab.hasFileMapping(filepath)
 
   if (!tabNavElement) {
     return
@@ -237,11 +253,11 @@ function highlightABreakpoint (filename, lineNo, breakpointId) {
  *
  * Also remove the breakpoint-id data attribute from the highlighted element.
  *
- * @param string filename
+ * @param string filepath
  * @param int lineNo
  */
-function removeBreakpointHighlighting (filename, lineNo) {
-  var tabNavElement = tab.hasFileMapping(filename)
+function removeHighlighting (filepath, lineNo) {
+  var tabNavElement = tab.hasFileMapping(filepath)
 
   if (!tabNavElement) {
     return
@@ -252,4 +268,4 @@ function removeBreakpointHighlighting (filename, lineNo) {
   jQuery(lineNoClass, tabContent).removeClass('breakpoint').removeData('breakpoint-id')
 }
 
-export {setupTrigger, refresh}
+export {highlightAFile, setupTrigger, refresh}

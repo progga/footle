@@ -31,7 +31,7 @@ import * as variable from './variables.js'
  *     Footle server.
  */
 jQuery(function () {
-  /* We have missed the very first "load" event for the iframe.  So we
+  /* We may have missed the very first "load" event for the iframe.  So we
      need to explicitely call setupFileList() for setting up the click
      handlers on the file links inside the file browser. */
   filelist.setup()
