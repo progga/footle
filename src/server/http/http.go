@@ -193,6 +193,8 @@ func transmit(writeStream http.ResponseWriter, request *http.Request, arrival, d
 
 	closedConnectionNotification := writeStream.(http.CloseNotifier).CloseNotify()
 
+	// When this HTTP client departs, remove it from the active client list.
+	// @see manageClients()
 	go func() {
 		<-closedConnectionNotification
 		departure <- myEar
