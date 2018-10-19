@@ -1,5 +1,7 @@
 /**
  * Tests for the HTTP interface.
+ *
+ * We *must* run "go generate http.go" before trying the tests in this file.
  */
 
 package http
@@ -33,12 +35,13 @@ func (writer mockResponseRecorder) Flush()                   {}
 /**
  * Tests for receive().
  *
- * Tests both the output text and DBGp command coming out of receive().
+ * Tests both the output text and the extracted command name coming out of
+ * receive().
  */
 func TestReceive(t *testing.T) {
 
 	// Fail case. "foo" is an invalid command.
-	formValues := url.Values{"msg": {"foo"}}
+	formValues := url.Values{"cmd": {"foo"}}
 	formReader := strings.NewReader(formValues.Encode())
 	request := httptest.NewRequest("POST", "/steering-wheel", formReader)
 	request.Header.Add("Content-Type", "application/x-www-form-urlencoded; param=value")
@@ -54,8 +57,8 @@ func TestReceive(t *testing.T) {
 		t.Errorf("receive(foo) says: %s", response)
 	}
 
-	// Pass case that uses the "status" command.
-	formValues = url.Values{"msg": {"status"}}
+	// Pass case that receives the "status" command.
+	formValues = url.Values{"cmd": {"status"}}
 	formReader = strings.NewReader(formValues.Encode())
 	request = httptest.NewRequest("POST", "/steering-wheel", formReader)
 	request.Header.Add("Content-Type", "application/x-www-form-urlencoded; param=value")
@@ -72,24 +75,7 @@ func TestReceive(t *testing.T) {
 		t.Errorf("receive(status) says: %s", response)
 	}
 
-	expectedCmd := "status -i 1\x00"
-	if expectedCmd != DBGpCmd {
-		t.Errorf("receive(status) commanded: %s", DBGpCmd)
-	}
-
-	// Another pass case.  The DBGp transaction ID should increase.
-	writer = httptest.NewRecorder()
-	go receive(writer, request, commands)
-	DBGpCmd = <-commands
-
-	expectedResponse = "Got it."
-	response = writer.Body.String()
-
-	if expectedResponse != response {
-		t.Errorf("receive(status) says: %s", response)
-	}
-
-	expectedCmd = "status -i 2\x00"
+	expectedCmd := "status"
 	if expectedCmd != DBGpCmd {
 		t.Errorf("receive(status) commanded: %s", DBGpCmd)
 	}

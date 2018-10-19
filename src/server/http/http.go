@@ -2,6 +2,13 @@
  * Provides the HTTP interface for the debugger.
  */
 
+/**
+ * Embed UI files in a Go source file: go generate this-file
+ * This package will not build without this Go source file.
+ * For the following directive to work, go-bindata has to be in $PATH
+ */
+//go:generate go-bindata -pkg uibundle -prefix "../../../build/footle/" -o uibundle/ui_bundle.go ../../../build/footle/ui/...
+
 package http
 
 import (
@@ -19,7 +26,18 @@ import (
 	"server/dbgp/command"
 	"server/dbgp/message"
 	"server/http/file"
+	"server/http/uibundle"
+
+	"github.com/elazarl/go-bindata-assetfs"
 )
+
+/**
+ * Name of the top level directory for embedded UI files.
+ *
+ * UI files are embedded in the footle binary.  To access this embedded file
+ * system, we need to know the name of the top level directory.
+ */
+const EMBEDDED_UI_DIR = "ui"
 
 type client chan<- string
 
@@ -49,12 +67,12 @@ func init() {
  *
  * Uses global variable "clientList."
  */
-func Listen(out chan string, config config.Config) {
+func Listen(out chan string, conf config.Config) {
 
-	codeDir := config.GetCodebase()
-	port := config.GetHTTPPort()
+	codeDir := conf.GetCodebase()
+	port := conf.GetHTTPPort()
 
-	uiPath, err := determineUIPath(config)
+	uiResource, err := findUI(conf)
 	if nil != err {
 		log.Fatal(err)
 	}
@@ -63,7 +81,7 @@ func Listen(out chan string, config config.Config) {
 	departure := make(chan client)
 	go manageClients(clientList, arrival, departure)
 
-	http.Handle("/", http.FileServer(http.Dir(uiPath)))
+	http.Handle("/", http.FileServer(uiResource))
 	// Serve the files that will be debugged.
 	http.Handle("/files/", http.StripPrefix("/files/", http.FileServer(http.Dir(codeDir))))
 	// HTML markup for the same files.
@@ -295,38 +313,31 @@ func manageClients(httpClientList map[client]bool, arrival, departure <-chan cli
 }
 
 /**
- * Find document root of the HTML UI.
+ * Find the HTML UI.
+ *
+ * The UI files are embedded in the footle binary.  That is what we serve by
+ * default.  But this can be overridden while invoking footle from the command
+ * line using the "-ui-path" cli option.  In that case we serve the UI files
+ * from a location given to the "-ui-path" option.
  */
-func determineUIPath(config config.Config) (uiPath string, err error) {
+func findUI(conf config.Config) (fs http.FileSystem, err error) {
 
-	uiDocrootPath := config.GetUIPath()
-	if filepath.IsAbs(uiDocrootPath) {
-		if isDir(uiDocrootPath) {
-			return uiDocrootPath, err
-		} else {
-			err = fmt.Errorf("The %s directory does not exist.", uiDocrootPath)
-			return uiDocrootPath, err
-		}
+	uiDocrootPath := conf.GetUIPath()
+
+	useEmbeddedUI := (uiDocrootPath == "")
+	if useEmbeddedUI {
+		embeddedUI := &assetfs.AssetFS{Asset: uibundle.Asset, AssetDir: uibundle.AssetDir, AssetInfo: uibundle.AssetInfo, Prefix: EMBEDDED_UI_DIR}
+
+		fs = embeddedUI
+		return fs, err
 	}
 
-	binPath, err := os.Executable()
-	if nil != err {
-		return uiPath, err
-	}
-
-	realBinPath, err := filepath.EvalSymlinks(binPath)
-	if nil != err {
-		return uiPath, err
-	}
-
-	// /bar/baz/footle/bin/footle + .. = /bar/baz/footle/bin
-	// So /bar/baz/footle/bin/footle + .. + "../ui" = /bar/baz/footle/ui
-	uiPath = filepath.Join(realBinPath, "..", uiDocrootPath)
-	if isDir(uiPath) {
-		return uiPath, err
+	if isDir(uiDocrootPath) {
+		fs = http.Dir(uiDocrootPath)
+		return fs, err
 	} else {
-		err = fmt.Errorf("The %s directory does not exist.", uiPath)
-		return uiPath, err
+		err = fmt.Errorf("The %s directory does not exist.", uiDocrootPath)
+		return fs, err
 	}
 }
 

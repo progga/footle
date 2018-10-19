@@ -2,23 +2,36 @@
 
 
 [[projects]]
+  digest = "1:ef15b38e9e9fecba7ae3e6e11d9a662f2c147acc25369d1b458d874f8cee17b1"
   name = "github.com/chzyer/readline"
   packages = ["."]
+  pruneopts = ""
   revision = "62c6fe6193755f722b8b8788aa7357be55a50ff1"
   version = "v1.4"
 
 [[projects]]
+  digest = "1:044b2f1eea2f5cfb0d3678baf60892734f59d5c2ea3932cb6ed894a97ccba15c"
+  name = "github.com/elazarl/go-bindata-assetfs"
+  packages = ["."]
+  pruneopts = ""
+  revision = "30f82fa23fd844bd5bb1e5f216db87fd77b5eb43"
+  version = "v1.0.0"
+
+[[projects]]
   branch = "release-branch.go1.8"
+  digest = "1:f87099a690af68a0233ef5ed5f9aef690b294d19a681ed5fd7a4bd7c6cf1abf2"
   name = "golang.org/x/net"
   packages = [
     "html",
     "html/atom",
-    "html/charset"
+    "html/charset",
   ]
+  pruneopts = ""
   revision = "186fd3fc8194a5e9980a82230d69c1ff7134229f"
 
 [[projects]]
   branch = "master"
+  digest = "1:9f9562b058a594dae0c8e2388c1a802664111736845bc08885246f0e4bf99bdd"
   name = "golang.org/x/text"
   packages = [
     "encoding",
@@ -37,13 +50,18 @@
     "language",
     "runes",
     "transform",
-    "unicode/cldr"
+    "unicode/cldr",
   ]
+  pruneopts = ""
   revision = "e19ae1496984b1c655b8044a65c0300a3c878dd3"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "e2533830ec0b452ffe5402662e465f3f47b0b07251ea97568ec0baad77a3ed4c"
+  input-imports = [
+    "github.com/chzyer/readline",
+    "github.com/elazarl/go-bindata-assetfs",
+    "golang.org/x/net/html/charset",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -6,3 +6,7 @@
 [[constraint]]
   branch = "release-branch.go1.8"
   name = "golang.org/x/net"
+
+[[constraint]]
+  name = "github.com/elazarl/go-bindata-assetfs"
+  version = "1.0.0"
