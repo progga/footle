@@ -7,7 +7,7 @@
  * This package will not build without this Go source file.
  * For the following directive to work, go-bindata has to be in $PATH
  */
-//go:generate go-bindata -pkg uibundle -prefix "../../../build/footle/" -o uibundle/ui_bundle.go ../../../build/footle/ui/...
+//go:generate go-bindata -pkg uibundle -prefix "../../../build/" -o uibundle/ui_bundle.go ../../../build/ui/...
 
 package http
 
