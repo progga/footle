@@ -84,13 +84,13 @@ all: ui server
 
 
 # Compile the Footle binary.
-server: godeps ${BIN_BUILD_DIR_PATH}/footle
+server: godeps embedded-ui ${BIN_BUILD_DIR_PATH}/footle
 
 # *Temporarily* set $GOPATH to Footle's top level dir so that Footle's Go
 # packages (e.g. server/config) can be located during compilation.  This
 # frees Footle from the Go workspace allowing it to reside anywhere
 # in the file system.
-${BIN_BUILD_DIR_PATH}/footle: embedded-ui ${GO_SRC_FILES}
+${BIN_BUILD_DIR_PATH}/footle: ${GO_UI_BUNDLE_SRC_FILE} ${GO_SRC_FILES}
 	GOPATH=${OUR_GO_PATH} go build -o ${BIN_BUILD_DIR_PATH}/footle ${SERVER_SRC_DIR_PATH}
 
 # Grab Go package dependencies.
@@ -156,7 +156,7 @@ ${UI_HTML_BUILD_PATH}: ${UI_HTML_SRC_PATH}
 
 # Copy Javascript whenever *any* script file changes.
 script: ${UI_SCRIPT_BUILD_DIR_PATH} 
-${UI_SCRIPT_BUILD_DIR_PATH}: ${UI_SCRIPT_SRC_DIR_PATH}
+${UI_SCRIPT_BUILD_DIR_PATH}: $(wildcard ${UI_SCRIPT_SRC_DIR_PATH} ${UI_SCRIPT_SRC_DIR_PATH}/*)
 	cp -r ${UI_SCRIPT_SRC_DIR_PATH}/. $@
 	touch $@
 
