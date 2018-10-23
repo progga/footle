@@ -205,7 +205,7 @@ function highlight () {
     var filepath = breakpointDetails.filepath
     var lineNo = breakpointDetails.lineNo
 
-    highlightABreakpoint(filepath, lineNo, breakpointId)
+    highlightBreakpoint(filepath, lineNo, breakpointId)
   }
 }
 
@@ -215,13 +215,13 @@ function highlight () {
  * @param string targetFilepath
  *    This is the file where we want to redraw the breakpoints.
  */
-function highlightAFile (targetFilepath) {
+function highlightFile (targetFilepath) {
   for (const [breakpointId, breakpointDetails] of existingBreakpointList) {
     var filepath = breakpointDetails.filepath
     var lineNo = breakpointDetails.lineNo
 
     if (filepath === targetFilepath) {
-      highlightABreakpoint(filepath, lineNo, breakpointId)
+      highlightBreakpoint(filepath, lineNo, breakpointId)
     }
   }
 }
@@ -235,7 +235,7 @@ function highlightAFile (targetFilepath) {
  * @param int lineNo
  * @param int breakpointId
  */
-function highlightABreakpoint (filepath, lineNo, breakpointId) {
+function highlightBreakpoint (filepath, lineNo, breakpointId) {
   var tabNavElement = tab.hasFileMapping(filepath)
 
   if (!tabNavElement) {
@@ -268,4 +268,4 @@ function removeHighlighting (filepath, lineNo) {
   jQuery(lineNoClass, tabContent).removeClass('breakpoint').removeData('breakpoint-id')
 }
 
-export {highlightAFile, setupTrigger, refresh}
+export {highlightFile, setupTrigger, refresh}

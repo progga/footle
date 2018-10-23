@@ -5,6 +5,7 @@
  */
 
 import * as tab from './tabs.js'
+import * as breakpoint from './breakpoints.js'
 
 var filenameOfLastBreak = ''
 var lineNoOfLastBreak = -1
@@ -51,10 +52,10 @@ function record (filename, lineNo) {
  * If the file with the break is not currently open in a tab, then open
  * it now.
  *
- * @param string filename
+ * @param string filepath
  */
-function displayFileWithNewBreak (filename) {
-  tab.add(filename, redrawCurrent)
+function displayFileWithNewBreak (filepath) {
+  tab.add(filepath, (filename, filepath) => { redrawCurrent(); breakpoint.highlightFile(filepath) })
 }
 
 /**

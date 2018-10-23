@@ -68,8 +68,8 @@ function setupFileLinks () {
  * - Redrawing any existing breakpoints.
  */
 function postFileOpenTasks (filename, filepath) {
-  updateRecentFiles(filepath)
-  breakpoint.highlightAFile(filepath)
+  updateRecent(filepath)
+  breakpoint.highlightFile(filepath)
 }
 
 /**
@@ -187,7 +187,7 @@ function displayRecentFiles (filelist) {
  *
  * Everytime a filename is *clicked*, it moves to the top of the list.
  */
-function updateRecentFiles (filename) {
+function updateRecent (filename) {
   let recentFiles = new RecentFiles(localStorage)
   recentFiles.add(filename)
 

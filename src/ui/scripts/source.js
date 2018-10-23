@@ -33,7 +33,7 @@ function update (filepath) {
       jQuery(fileTabLinkElementSelector).removeClass('uk-animation-slide-top')
     }, 1000) // Because the uk-shake animation lasts for 500ms.
 
-    breakpoint.highlightAFile(filepath)
+    breakpoint.highlightFile(filepath)
   })
 }
 
