@@ -47,7 +47,7 @@ jQuery(function () {
   breakpoint.setupTrigger()
   variable.setupInteraction()
   control.disable()
-  initBreakpoints()
+  initCurrentState()
 
   // Process responses from the server.
   var sse = new EventSource('/message-stream')
@@ -111,11 +111,15 @@ function updateExecutionState (state) {
 }
 
 /**
- * Fetch and process existing breakpoints.
+ * Fetch and process existing state and breakpoints.
  *
- * Fetch existing breakpoints from the server.  Then arrange for the breakpoints
- * to be fully processed and displayed.
+ * The state is represented in the form of a message.  This is the last message
+ * that changed Footle's state to one of awake, asleep, or break.  Depending on
+ * this message, display a break if needed.  Then activate or deactivate control
+ * buttons.
+ *
+ * Also grab the list of existing breakpoints and display them.
  */
-function initBreakpoints () {
-  jQuery.getJSON('breakpoints', processMsg)
+function initCurrentState () {
+  jQuery.getJSON('current-state', messages => messages.forEach(processMsg))
 }
