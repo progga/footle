@@ -21,8 +21,8 @@ import (
 	"os"
 	"path/filepath"
 	"server/config"
-	"server/core/breakpoint"
 	footlecmd "server/core/cmd"
+	"server/core/current-state"
 	"server/dbgp/command"
 	"server/dbgp/message"
 	"server/http/file"
@@ -89,7 +89,7 @@ func Listen(out chan string, conf config.Config) {
 
 	http.HandleFunc("/steering-wheel", makeReceiveHandler(out))
 	http.HandleFunc("/message-stream", makeTransmitHandler(arrival, departure))
-	http.HandleFunc("/breakpoints", makeBreakpointListingHandler(codeDir))
+	http.HandleFunc("/current-state", makeCurrentStateHandler(codeDir))
 
 	address := fmt.Sprintf(":%d", port)
 	http.ListenAndServe(address, nil)
@@ -180,7 +180,7 @@ func makeTransmitHandler(arrival, departure chan client) http.HandlerFunc {
 }
 
 /**
- * Serves the "/transmit" path.
+ * Serves the "/message-stream" path.
  *
  * Passes the output of DBGp commands to HTTP clients as Server sent events.
  * Also announces the arrival and departure of each HTTP client.
@@ -258,20 +258,26 @@ func makeFormattedFileHandler(codebase http.Dir) http.HandlerFunc {
 }
 
 /**
- * Prepare handler for listing breakpoints.
+ * Prepare handler for listing break and breakpoints.
  *
- * This is useful during UI initialization where only the new UI client needs to
- * process the breakpoint list.  This saves existing UI clients from the burden
- * of reprocessing the breakpoints every time a new HTTP UI client is added.
+ * These are useful during UI initialization.  The last state is used by UI
+ * clients to display breaks.
+ *
+ * The breakpoint list saves existing UI clients from the burden of reprocessing
+ * the breakpoints every time a new HTTP UI client is added.  Without this
+ * handler, everytime a new client would join, it would issue a command for a
+ * breakpoint list and every other client would have to process it.
  */
-func makeBreakpointListingHandler(codeDir string) http.HandlerFunc {
+func makeCurrentStateHandler(codeDir string) http.HandlerFunc {
 
 	return func(writeStream http.ResponseWriter, request *http.Request) {
 
-		msgWBreakpoint := breakpoint.PrepareFakeMsg()
-		adjustedMsg := adjustFilepath(msgWBreakpoint, codeDir)
+		stateMessages := currentstate.Get()
+		for i, msg := range stateMessages {
+			stateMessages[i] = adjustFilepath(msg, codeDir)
+		}
 
-		if jsonMsg, err := json.Marshal(adjustedMsg); err == nil {
+		if jsonMsg, err := json.Marshal(stateMessages); err == nil {
 			writeStream.Header().Set("Content-Type", "application/json")
 			writeStream.Header().Set("Cache-control", "no-cache")
 

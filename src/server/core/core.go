@@ -12,6 +12,7 @@ import (
 	"server/core/breakpoint"
 	footlecmd "server/core/cmd"
 	conn "server/core/connection"
+	"server/core/current-state"
 	"server/dbgp/command"
 	"server/dbgp/message"
 )
@@ -69,6 +70,7 @@ func ProcessDBGpMessages(DBGpCmds chan string, DBGpMessages, MsgsForCmdLineUI, M
 		}
 
 		broadcastMsgToUIs(msg, MsgsForCmdLineUI, MsgsForHTTPUI)
+		currentstate.SaveLastMsg(msg)
 	}
 }
 
@@ -170,7 +172,7 @@ func broadcastMsgToUIs(msg message.Message, toCmdLine, toHTTP chan<- message.Mes
  * Broadcast response for Footle's internal commands.
  *
  * Knowing about the execution states resulting from the internal commands
- * allows UIs to offer better UX.
+ * allow UIs to offer better UX.
  *
  * Example commands: on, off, continue, update_source.
  */
