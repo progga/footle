@@ -66,10 +66,8 @@ function setupTrigger () {
  *    List of breakpoint objects containing filepath and lineNo.
  */
 function refresh (newBreakpointList) {
-  addNewBreakpoints(newBreakpointList)
   removeDeletedBreakpoints(newBreakpointList)
-
-  highlight()
+  addNewBreakpoints(newBreakpointList)
 }
 
 /**
@@ -151,7 +149,7 @@ function addBreakpoint (breakpoint) {
   var breakpointId = breakpoint.Id
 
   addBreakpointMapping(filepath, lineNo, breakpointId)
-  tab.add(filepath, highlight)
+  tab.add(filepath, () => highlightBreakpoint(filepath, lineNo, breakpointId))
 }
 
 /**
@@ -195,18 +193,6 @@ function addBreakpointMapping (filepath, lineNo, breakpointId) {
  */
 function removeMapping (breakpointId) {
   existingBreakpointList.delete(breakpointId)
-}
-
-/**
- * Update breakpoint highlighting.
- */
-function highlight () {
-  for (const [breakpointId, breakpointDetails] of existingBreakpointList) {
-    var filepath = breakpointDetails.filepath
-    var lineNo = breakpointDetails.lineNo
-
-    highlightBreakpoint(filepath, lineNo, breakpointId)
-  }
 }
 
 /**

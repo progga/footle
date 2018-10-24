@@ -27,12 +27,20 @@ function add (filepath, postTabOpenAction) {
   var formattedFilepath = '/formatted-file/' + filepath
 
   if (hasFileMapping(filepath)) {
+    if (postTabOpenAction) {
+      postTabOpenAction(filename, filepath)
+    }
+
     return
   }
 
   jQuery.get(formattedFilepath, function (data) {
+    // The mapping may have been updated in the meantime.  Hence this recheck.
     if (hasFileMapping(filepath)) {
-      // The mapping may have been updated in the meantime.  Hence this recheck.
+      if (postTabOpenAction) {
+        postTabOpenAction(filename, filepath, data)
+      }
+
       return
     }
 

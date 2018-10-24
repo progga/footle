@@ -21,10 +21,8 @@ var lineNoOfLastBreak = -1
 function update (filename, lineNo) {
   removePrevious()
 
-  displayNew(filename, lineNo)
-  displayFileWithNewBreak(filename)
-
   record(filename, lineNo)
+  displayFileWithNewBreak(filename)
 }
 
 /**
@@ -49,8 +47,11 @@ function record (filename, lineNo) {
 /**
  * Display the break.
  *
- * If the file with the break is not currently open in a tab, then open
- * it now.
+ * If the file with the break is not currently open in a tab, then open it now.
+ *
+ * Besides breaks, we have to also draw the breakpoints because they are not
+ * present in a new tab.  For existing tabs, redrawing the breakpoints won't
+ * harm.
  *
  * @param string filepath
  */
@@ -109,7 +110,7 @@ function displayNew (filename, lineNo) {
     return
   }
 
-  // Open the tab when it is not already open.
+  // Switch to the tab when it is not already the current tab.
   var tabNavElement = tab.hasFileMapping(filename)
   var isActiveTab = tabNavElement.hasClass('uk-active')
   if (!isActiveTab) {
