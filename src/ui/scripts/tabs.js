@@ -1,7 +1,7 @@
 
 /**
  * @file
- *  Tab management.
+ * Tab management.
  *
  * Each source file is displayed in a tab.  To manage this, we keep a mapping
  * of filenames and their corresponding tabs.
@@ -92,6 +92,54 @@ function setupCloser () {
     event.stopPropagation()
 
     remove(this.offsetParent.id)
+  })
+}
+
+/**
+ * Arrange to restore scroll position when we return to a tab.
+ *
+ * UIKit does not keep track of the last scroll position of each tab.  To
+ * understand, take this sequence of steps:
+ * - Open tab A.
+ * - Scroll a few lines.  Note the position of the scrollbar.
+ * - Open tab B but do *not* scroll.
+ * - Return to tab A.
+ * The scrollbar will *not* be where it was when we last left tab A.  Here
+ * we attempt to fill this gap for the *vertical* scrollbar.  We are ignoring
+ * the horizontal one for now as that is less of a concern.
+ *
+ * Note:
+ * - The change.uk.tab UIKit event is not working in Footle although it
+ *   works elsewhere.  We are using the show.uk.switcher event instead.
+ * - UIKit 3 has a better solution as it offers more tab switch related events.
+ *   The "beforeshow", "show", and "beforehide" events (in that order) are
+ *   relevant.
+ */
+function setupScrollRestoration () {
+  let previousTab, lastScrolltop
+
+  // Before we switch tab, keep track of the scrolling position of the last tab.
+  jQuery('#tab-selector-wrapper').on('click', '.tab-selector', function (event) {
+    lastScrolltop = document.getElementsByTagName('body')[0].scrollTop
+  })
+
+  // We have just switched tab, so restore the scrolling position of this tab.
+  jQuery('#tab-selector-wrapper').on('show.uk.switcher', function (event, activeTab) {
+    let scrolltop = activeTab[0].getAttribute('data-last-scrolltop')
+    if (!scrolltop) {
+      scrolltop = 0
+    }
+    document.getElementsByTagName('body')[0].scrollTo(0, scrolltop)
+
+    // Now that we know the last scroll position of the *previous* tab, save it
+    // in that tab for later use.
+    if (previousTab) {
+      previousTab.setAttribute('data-last-scrolltop', lastScrolltop)
+    }
+
+    // Save this tab, because we will add its last scroll position to it *after*
+    // we switch to another tab.  See the conditional block above.
+    previousTab = activeTab[0]
   })
 }
 
@@ -236,4 +284,4 @@ function adjustContentPosition () {
   jQuery('#tab').css('padding-top', tabSelectorHeight)
 }
 
-export {add, getContentElement, getContentElementForFile, hasFileMapping, setupRefresher, setupCloser}
+export {add, getContentElement, getContentElementForFile, hasFileMapping, setupRefresher, setupCloser, setupScrollRestoration}

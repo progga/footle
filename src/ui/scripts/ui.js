@@ -42,6 +42,7 @@ jQuery(function () {
   filelist.setupRecent()
   tab.setupRefresher()
   tab.setupCloser()
+  tab.setupScrollRestoration()
   control.setupContinuationControls()
   control.setupStateControl()
   breakpoint.setupTrigger()
