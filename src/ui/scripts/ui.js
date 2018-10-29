@@ -14,6 +14,7 @@ import * as filelist from './file-list.js'
 import * as breakpoint from './breakpoints.js'
 import * as breaks from './breaks.js'
 import * as control from './controls.js'
+import * as feedback from './feedback.js'
 import * as source from './source.js'
 import * as stacktrace from './stacktrace.js'
 import * as tab from './tabs.js'
@@ -48,17 +49,45 @@ jQuery(function () {
   breakpoint.setupTrigger()
   variable.setupInteraction()
   control.disable()
-  initCurrentState()
+  feedback.init()
+  applyInitialState()
+  initServerMessageProcessing()
+})
 
-  // Process responses from the server.
-  var sse = new EventSource('/message-stream')
+/**
+ * Process responses from the Footle server.
+ */
+function initServerMessageProcessing () {
+  let sse = new EventSource('/message-stream')
+  let hasAttemptedReconnection = false
+
   jQuery(sse).on('message', function (event) {
     var msg = JSON.parse(event.originalEvent.data)
     console.log(msg)
 
     processMsg(msg)
   })
-})
+
+  // When a connection is lost, attempt reconnection only once.
+  jQuery(sse).on('error', function (event) {
+    console.log(event)
+
+    if (event.target.readyState === EventSource.CLOSED) {
+      feedback.show('Footle server has gone away. Try reloading this page.')
+
+      updateExecutionState('asleep')
+      hasAttemptedReconnection = false
+    } else if (event.target.readyState === EventSource.CONNECTING && hasAttemptedReconnection) {
+      sse.close()
+      feedback.show('Footle server has gone away. Try reloading this page.')
+
+      hasAttemptedReconnection = false
+      updateExecutionState('asleep')
+    } else if (event.target.readyState === EventSource.CONNECTING && !hasAttemptedReconnection) {
+      hasAttemptedReconnection = true
+    }
+  })
+}
 
 /**
  * Update UI based on debugger response.
@@ -121,6 +150,6 @@ function updateExecutionState (state) {
  *
  * Also grab the list of existing breakpoints and display them.
  */
-function initCurrentState () {
+function applyInitialState () {
   jQuery.getJSON('current-state', messages => messages.forEach(processMsg))
 }

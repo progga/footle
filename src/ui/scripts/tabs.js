@@ -62,7 +62,7 @@ function add (filepath, postTabOpenAction) {
 
     // The tab content area should start after the fix positioned tab
     // selector area.
-    adjustContentPosition()
+    recordTabHeight()
 
     if (postTabOpenAction) {
       postTabOpenAction(filename, filepath, data)
@@ -219,7 +219,7 @@ function remove (filepath) {
 
   removeFileMapping(filepath)
 
-  adjustContentPosition()
+  recordTabHeight()
 
   /* When we are closing the active tab, return to file browser in first tab. */
   var isActiveTab = tabElement.hasClass('uk-active')
@@ -277,11 +277,12 @@ function getContentElementForFile (filename) {
  * the tab selector.  To push it down, we adjust the top padding of the
  * *whole tab* area everytime the height of the tab selector area *may* change.
  *
+ * @see --tab-selector-height CSS variable.
  * @todo Adjust top padding on window resize.
  */
-function adjustContentPosition () {
-  var tabSelectorHeight = jQuery('#tab-selector-wrapper').outerHeight(true)
-  jQuery('#tab').css('padding-top', tabSelectorHeight)
+function recordTabHeight () {
+  const height = document.getElementById('tab-selector-wrapper').offsetHeight
+  document.querySelector(':root').style.setProperty('--tab-selector-height', `${height}px`)
 }
 
 export {add, getContentElement, getContentElementForFile, hasFileMapping, setupRefresher, setupCloser, setupScrollRestoration}

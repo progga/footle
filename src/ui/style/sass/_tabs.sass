@@ -4,14 +4,19 @@
  * Style rules for tabs, tab selectors and tab contents.
  */
 
+// :root should have been enough as the selector, but sass refuses to compile
+// it.  Hence html:root
+html:root
+  --tab-selector-height: 2.75em
+
 .tab--file
-  // @see adjustTabContentPosition()
-  padding-top: 2.75em
+  // @see recordTabHeight(), recordMessagesHeight()
+  padding-top: calc(var(--messages-height) + var(--tab-selector-height))
 
   // Sticky at the top.
   > .tab-nav
     position: fixed
-    top: 0
+    top: var(--messages-height)
     width: 100%
     background-color: white
 
