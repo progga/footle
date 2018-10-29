@@ -48,7 +48,9 @@ Press Ctrl-C to quit.
 - To inspect local and global variables, use the two buttons labelled *Locals* and *Globals*
 
 ## Supported platforms
-Footle is cross-platform.  We prepare distributions for FreeBSD, GNU/Linux, MacOS, and Windows.  Minimum web browser requirement is [Firefox 60 ESR](https://en.wikipedia.org/wiki/History_of_Firefox#Rapid_release_with_ESR).  Recent browsers of other flavours may work although none are tested as yet.
+Footle is cross-platform.  We prepare distributions for FreeBSD, GNU/Linux, MacOS, and Windows.  Minimum web browser requirement is [Firefox 60 ESR](https://en.wikipedia.org/wiki/History_of_Firefox#Rapid_release_with_ESR) or [Chromium](https://en.wikipedia.org/wiki/Chromium_(web_browser)) 69.  Recent browsers of other flavours may work although none are tested as yet.
+
+Footle is not fully responsive yet, so at least a tablet display is recommended.
 
 ## Issues
 Have a question about Footle?  Found a bug?  Please [file an issue](https://github.com/progga/footle/issues/new).
