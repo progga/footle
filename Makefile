@@ -194,27 +194,27 @@ cross-compile: linux32 linux64 freebsd64 macos64 win32 win64
 
 linux32: ${LINUX_32_BUILD_DIR_PATH}/footle
 ${LINUX_32_BUILD_DIR_PATH}/footle: ${GO_SRC_FILES}
-	GOPATH=${OUR_GO_PATH} GOOS=linux GOARCH=386 go build -o ${LINUX_32_BUILD_DIR_PATH}/footle ${SERVER_SRC_DIR_PATH}
+	GOPATH=${OUR_GO_PATH} GOOS=linux GOARCH=386 go build -o $@ ${SERVER_SRC_DIR_PATH}
 
 linux64: ${LINUX_64_BUILD_DIR_PATH}/footle
 ${LINUX_64_BUILD_DIR_PATH}/footle: ${GO_SRC_FILES}
-	GOPATH=${OUR_GO_PATH} GOOS=linux GOARCH=amd64 go build -o ${LINUX_64_BUILD_DIR_PATH}/footle ${SERVER_SRC_DIR_PATH}
+	GOPATH=${OUR_GO_PATH} GOOS=linux GOARCH=amd64 go build -o $@ ${SERVER_SRC_DIR_PATH}
 
 freebsd64: ${FREEBSD_64_BUILD_DIR_PATH}/footle
 ${FREEBSD_64_BUILD_DIR_PATH}/footle: ${GO_SRC_FILES}
-	GOPATH=${OUR_GO_PATH} GOOS=freebsd GOARCH=amd64 go build -o ${FREEBSD_64_BUILD_DIR_PATH}/footle ${SERVER_SRC_DIR_PATH}
+	GOPATH=${OUR_GO_PATH} GOOS=freebsd GOARCH=amd64 go build -o $@ ${SERVER_SRC_DIR_PATH}
 
 macos64: ${MACOS_64_BUILD_DIR_PATH}/footle
 ${MACOS_64_BUILD_DIR_PATH}/footle: ${GO_SRC_FILES}
-	GOPATH=${OUR_GO_PATH} GOOS=darwin GOARCH=amd64 go build -o ${MACOS_64_BUILD_DIR_PATH}/footle ${SERVER_SRC_DIR_PATH}
+	GOPATH=${OUR_GO_PATH} GOOS=darwin GOARCH=amd64 go build -o $@  ${SERVER_SRC_DIR_PATH}
 
-win32: ${WIN_32_BUILD_DIR_PATH}/footle
-${WIN_32_BUILD_DIR_PATH}/footle: ${GO_SRC_FILES}
-	GOPATH=${OUR_GO_PATH} GOOS=windows GOARCH=386 go build -o ${WIN_32_BUILD_DIR_PATH}/footle ${SERVER_SRC_DIR_PATH}
+win32: ${WIN_32_BUILD_DIR_PATH}/footle.exe
+${WIN_32_BUILD_DIR_PATH}/footle.exe: ${GO_SRC_FILES}
+	GOPATH=${OUR_GO_PATH} GOOS=windows GOARCH=386 go build -o $@ ${SERVER_SRC_DIR_PATH}
 
-win64: ${WIN_64_BUILD_DIR_PATH}/footle
-${WIN_64_BUILD_DIR_PATH}/footle: ${GO_SRC_FILES}
-	GOPATH=${OUR_GO_PATH} GOOS=windows GOARCH=amd64 go build -o ${WIN_64_BUILD_DIR_PATH}/footle ${SERVER_SRC_DIR_PATH}
+win64: ${WIN_64_BUILD_DIR_PATH}/footle.exe
+${WIN_64_BUILD_DIR_PATH}/footle.exe: ${GO_SRC_FILES}
+	GOPATH=${OUR_GO_PATH} GOOS=windows GOARCH=amd64 go build -o $@ ${SERVER_SRC_DIR_PATH}
 
 
 # Copy the README and LICENSE files inside every distribution.
