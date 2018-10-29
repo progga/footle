@@ -190,7 +190,7 @@ test-execution:
 #
 dist: cross-compile doc-copy tarball
 
-cross-compile: linux32 linux64 freebsd64 macos64 win32 win64
+cross-compile: embedded-ui linux32 linux64 freebsd64 macos64 win32 win64
 
 linux32: ${LINUX_32_BUILD_DIR_PATH}/footle
 ${LINUX_32_BUILD_DIR_PATH}/footle: ${GO_SRC_FILES}
