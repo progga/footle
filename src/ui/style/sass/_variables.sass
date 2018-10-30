@@ -26,7 +26,12 @@
   white-space: nowrap
 
   &[data-is-composite="true"]
-    list-style-type: disclosure-closed
+    //list-style-type: disclosure-closed
+    list-style-type: none
+
+    &:before
+      content: "\25B8" // Black right-pointing small triangle
+      margin: 0 .5em 0 -1em
 
   > .variable__display-name,
   > .variable__type,
@@ -47,7 +52,10 @@
       display: block
 
     &[data-is-composite="true"]
-      list-style-type: disclosure-open
+      //list-style-type: disclosure-open
+
+      &:before
+        content: "\25BE" // Black down-pointing small triangle
 
     > .wait--loading-children
       display: inline-block
