@@ -4,6 +4,8 @@
  * Manage commands sent to the Footle server.
  */
 
+import * as feedback from './feedback.js'
+
 /**
  * Send command to the Footle server.
  *
@@ -13,6 +15,8 @@
  *   [Optional] Any arguments needed by the command above.
  *
  * Example *Footle* command: breakpoint_set index.php 16
+ *
+ * All commands have a fixed response when successful: "Got it."
  */
 function sendCommand (command, args) {
   args = args || []
@@ -21,9 +25,17 @@ function sendCommand (command, args) {
 
   jQuery.post('steering-wheel', {
     'cmd': footleCommand
-  }).fail(function (jqXHR, textStatus, errorThrown) {
-    console.log(errorThrown)
+  }).done(function (data, textStatus, jqXHR) {
+    const cmdHasSucceeded = (data !== 'Got it.')
+    if (cmdHasSucceeded) {
+      feedback.show(`The "${footleCommand}" command failed.  More in console log.`)
+      console.log(jqXHR)
+    }
   })
+    .fail(function (jqXHR, textStatus, errorThrown) {
+      feedback.show(`The "${footleCommand}" command failed.  More in console log.`)
+      console.log(jqXHR)
+    })
 }
 
 export {sendCommand}

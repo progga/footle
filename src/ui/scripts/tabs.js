@@ -8,6 +8,7 @@
  */
 
 import * as server from './server-commands.js'
+import * as feedback from './feedback.js'
 
 /**
  * List of files and their corresponding tab elements.
@@ -23,8 +24,8 @@ var fileTabMapping = {}
  *    Call this function once the tab is fully prepared.
  */
 function add (filepath, postTabOpenAction) {
-  var filename = filepath.split(/[\\/]/).pop()
-  var formattedFilepath = '/formatted-file/' + filepath
+  let filename = filepath.split(/[\\/]/).pop()
+  let formattedFilepath = '/formatted-file/' + filepath
 
   if (hasFileMapping(filepath)) {
     if (postTabOpenAction) {
@@ -45,13 +46,13 @@ function add (filepath, postTabOpenAction) {
     }
 
     /* Tab link. */
-    var tabLink = jQuery(`<li id="${filepath}" class="tab-selector" data-filepath="${filepath}" title="${filepath}"><a href="#"><span class="tab-refresh" title="Reload"></span>${filename}<span class="tab-closer" title="Close"></span></a></li>`)
+    const tabLink = jQuery(`<li id="${filepath}" class="tab-selector" data-filepath="${filepath}" title="${filepath}"><a href="#"><span class="tab-refresh" title="Reload"></span>${filename}<span class="tab-closer" title="Close"></span></a></li>`)
     // Make sure to add a jQuery object instead of plain markup so that we can
     // use the object later.
     jQuery('#tab-selector-wrapper').append(tabLink)
 
     /* Tab content. */
-    var tabContent = `<li id="body-of-${filepath}" class="tab-content" data-filepath="${filepath}"><div class="file-content">${data}</div></li>`
+    const tabContent = `<li id="body-of-${filepath}" class="tab-content" data-filepath="${filepath}"><div class="file-content">${data}</div></li>`
     jQuery('#tab-content-wrapper').append(tabContent)
 
     /* Record the presence of a tab for this file. */
@@ -67,6 +68,9 @@ function add (filepath, postTabOpenAction) {
     if (postTabOpenAction) {
       postTabOpenAction(filename, filepath, data)
     }
+  }).fail(function (jqXHR, textStatus, errorThrown) {
+    feedback.show(`Failed to fetch file ${filename}.  More in console log.`)
+    console.log(jqXHR)
   })
 }
 
@@ -78,7 +82,7 @@ function setupRefresher () {
     event.preventDefault()
     event.stopPropagation()
 
-    var filepath = this.offsetParent.id
+    const filepath = this.offsetParent.id
     server.sendCommand('update_source', [filepath])
   })
 }
@@ -206,14 +210,14 @@ function open (filepath) {
  * @param string filepath
  */
 function remove (filepath) {
-  var tabElement
+  let tabElement
 
   if (!(tabElement = hasFileMapping(filepath))) {
     return
   }
 
   /* Delete tab and its content */
-  var tabContentElement = getContentElement(tabElement)
+  let tabContentElement = getContentElement(tabElement)
   tabElement.remove()
   tabContentElement.remove()
 
@@ -222,7 +226,7 @@ function remove (filepath) {
   recordTabHeight()
 
   /* When we are closing the active tab, return to file browser in first tab. */
-  var isActiveTab = tabElement.hasClass('uk-active')
+  const isActiveTab = tabElement.hasClass('uk-active')
   if (isActiveTab) {
     jQuery('.tab-selector').get(0).click()
   }
@@ -244,8 +248,8 @@ function remove (filepath) {
  *    jQuery object for the given tab's body.
  */
 function getContentElement (tabElement) {
-  var tabIndex = tabElement.index()
-  var tabContentElement = jQuery('.tab-content').get(tabIndex)
+  const tabIndex = tabElement.index()
+  let tabContentElement = jQuery('.tab-content').get(tabIndex)
 
   return tabContentElement
 }
@@ -257,9 +261,9 @@ function getContentElement (tabElement) {
  * @return object/null
  */
 function getContentElementForFile (filename) {
-  var tabContentId = 'body-of-' + filename
+  const tabContentId = 'body-of-' + filename
 
-  var tabContent = document.getElementById(tabContentId)
+  const tabContent = document.getElementById(tabContentId)
 
   if (tabContent) {
     return jQuery(tabContent)

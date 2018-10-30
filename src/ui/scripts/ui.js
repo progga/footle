@@ -62,7 +62,16 @@ function initServerMessageProcessing () {
   let hasAttemptedReconnection = false
 
   jQuery(sse).on('message', function (event) {
-    var msg = JSON.parse(event.originalEvent.data)
+    try {
+      var msg = JSON.parse(event.originalEvent.data)
+    } catch (e) {
+      feedback.show('Trouble parsing JSON formatted response from Footle server.  More in console log.')
+      console.log(e)
+      console.log('Response was: ' + event.originalEvent.data)
+
+      return
+    }
+
     console.log(msg)
 
     processMsg(msg)
@@ -152,4 +161,8 @@ function updateExecutionState (state) {
  */
 function applyInitialState () {
   jQuery.getJSON('current-state', messages => messages.forEach(processMsg))
+    .fail(function (jqXHR, textStatus, errorThrown) {
+      feedback.show('Failed to grab current state of Footle.  More in console log.')
+      console.log(jqXHR)
+    })
 }
