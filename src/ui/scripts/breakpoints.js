@@ -179,8 +179,8 @@ function addBreakpointMapping (filepath, lineNo, breakpointId) {
   }
 
   existingBreakpointList.set(breakpointId, {
-    'filepath': filepath,
-    'lineNo': lineNo
+    filepath: filepath,
+    lineNo: lineNo
   })
 }
 
@@ -254,4 +254,4 @@ function removeHighlighting (filepath, lineNo) {
   jQuery(lineNoClass, tabContent).removeClass('breakpoint').removeData('breakpoint-id')
 }
 
-export {highlightFile, setupTrigger, refresh}
+export { highlightFile, setupTrigger, refresh }

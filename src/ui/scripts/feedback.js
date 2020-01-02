@@ -41,4 +41,4 @@ function recordAreaHeight () {
   document.querySelector(':root').style.setProperty('--messages-height', `${messagesTotalHeight}px`)
 }
 
-export {init, show}
+export { init, show }

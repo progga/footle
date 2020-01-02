@@ -48,7 +48,7 @@ function displaySingle (varDetailList) {
 
   var varDetail = varDetailList[0]
 
-  if (!varDetail.hasOwnProperty('Fullname') || !varDetail.hasOwnProperty('Children')) {
+  if (!Object.prototype.hasOwnProperty.call(varDetail, 'Fullname') || !Object.prototype.hasOwnProperty.call(varDetail, 'Children')) {
     return
   }
 
@@ -158,4 +158,4 @@ function prepareMarkup (varDetail, childrenMarkup) {
   return markup
 }
 
-export {displaySingle, setupInteraction, updateDisplay}
+export { displaySingle, setupInteraction, updateDisplay }

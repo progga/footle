@@ -179,4 +179,4 @@ function isInViewport (element) {
   return isInViewport
 }
 
-export {update, removePrevious}
+export { update, removePrevious }

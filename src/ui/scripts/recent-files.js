@@ -20,9 +20,9 @@ class RecentFiles {
    * Fetch the existing list.
    */
   get () {
-    let word = this.storage.getItem('recent-files')
+    const word = this.storage.getItem('recent-files')
 
-    let recentFiles = word ? word.split(',') : []
+    const recentFiles = word ? word.split(',') : []
 
     return recentFiles
   }
@@ -31,11 +31,11 @@ class RecentFiles {
    * Add the given filename to the saved list.
    */
   add (filename) {
-    let recentFiles = this.get()
+    const recentFiles = this.get()
 
-    let moreRecentFiles = this.update(recentFiles, filename)
+    const moreRecentFiles = this.update(recentFiles, filename)
 
-    let hasChanged = !((recentFiles.length === moreRecentFiles) && moreRecentFiles.every((item, index) => item === recentFiles[index]))
+    const hasChanged = !((recentFiles.length === moreRecentFiles) && moreRecentFiles.every((item, index) => item === recentFiles[index]))
     if (hasChanged) {
       this.storage.setItem('recent-files', moreRecentFiles)
     }
@@ -45,7 +45,7 @@ class RecentFiles {
    * Add the given filename to a unique list of maximum five files.
    */
   update (recentFiles, filename) {
-    let updated = [...new Set([filename, ...recentFiles])].slice(0, this.fileCount)
+    const updated = [...new Set([filename, ...recentFiles])].slice(0, this.fileCount)
 
     return updated
   }
