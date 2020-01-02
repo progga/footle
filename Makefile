@@ -54,7 +54,7 @@ OUR_GO_PATH = $(shell pwd)
 # Location of HTML/CSS/Javascript-based UI code.
 UI_SRC_DIR_PATH = ./src/ui
 UI_BUILD_DIR_PATH  = ${BUILD_ROOT}/ui
-UI_SRC_FILES = $(shell find ${UI_SRC_DIR_PATH} ${UI_SRC_DIR_PATH}/node_modules/jquery/dist ${UI_SRC_DIR_PATH}/node_modules/uikit/dist ${UI_SRC_DIR_PATH}/node_modules/node-promise -path ${UI_SRC_DIR_PATH}/node_modules -prune -o -type f)
+UI_SRC_FILES = $(shell find ${UI_SRC_DIR_PATH} -path ${UI_SRC_DIR_PATH}/node_modules -prune -o -type f)
 
 UI_HTML_SRC_PATH = ${UI_SRC_DIR_PATH}/index.html
 UI_HTML_BUILD_PATH = ${UI_BUILD_DIR_PATH}/index.html
@@ -191,27 +191,27 @@ dist: cross-compile doc-copy tarball
 
 cross-compile: embedded-ui linux32 linux64 freebsd64 macos64 win32 win64
 
-linux32: ${LINUX_32_BUILD_DIR_PATH}/footle
+linux32: godeps ${LINUX_32_BUILD_DIR_PATH}/footle
 ${LINUX_32_BUILD_DIR_PATH}/footle: ${GO_SRC_FILES}
 	GOPATH=${OUR_GO_PATH} GOOS=linux GOARCH=386 go build -o $@ ${SERVER_SRC_DIR_PATH}
 
-linux64: ${LINUX_64_BUILD_DIR_PATH}/footle
+linux64: godeps ${LINUX_64_BUILD_DIR_PATH}/footle
 ${LINUX_64_BUILD_DIR_PATH}/footle: ${GO_SRC_FILES}
 	GOPATH=${OUR_GO_PATH} GOOS=linux GOARCH=amd64 go build -o $@ ${SERVER_SRC_DIR_PATH}
 
-freebsd64: ${FREEBSD_64_BUILD_DIR_PATH}/footle
+freebsd64: godeps ${FREEBSD_64_BUILD_DIR_PATH}/footle
 ${FREEBSD_64_BUILD_DIR_PATH}/footle: ${GO_SRC_FILES}
 	GOPATH=${OUR_GO_PATH} GOOS=freebsd GOARCH=amd64 go build -o $@ ${SERVER_SRC_DIR_PATH}
 
-macos64: ${MACOS_64_BUILD_DIR_PATH}/footle
+macos64: godeps ${MACOS_64_BUILD_DIR_PATH}/footle
 ${MACOS_64_BUILD_DIR_PATH}/footle: ${GO_SRC_FILES}
 	GOPATH=${OUR_GO_PATH} GOOS=darwin GOARCH=amd64 go build -o $@  ${SERVER_SRC_DIR_PATH}
 
-win32: ${WIN_32_BUILD_DIR_PATH}/footle.exe
+win32: godeps ${WIN_32_BUILD_DIR_PATH}/footle.exe
 ${WIN_32_BUILD_DIR_PATH}/footle.exe: ${GO_SRC_FILES}
 	GOPATH=${OUR_GO_PATH} GOOS=windows GOARCH=386 go build -o $@ ${SERVER_SRC_DIR_PATH}
 
-win64: ${WIN_64_BUILD_DIR_PATH}/footle.exe
+win64: godeps ${WIN_64_BUILD_DIR_PATH}/footle.exe
 ${WIN_64_BUILD_DIR_PATH}/footle.exe: ${GO_SRC_FILES}
 	GOPATH=${OUR_GO_PATH} GOOS=windows GOARCH=amd64 go build -o $@ ${SERVER_SRC_DIR_PATH}
 
