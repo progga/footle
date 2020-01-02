@@ -9,6 +9,7 @@ Footle is heavily under construction.  It works, but user experience is not good
 - Open Footle's [release page](https://github.com/progga/footle/releases)
 - Download the appropriate archive file for your platform.  e.g. footle-linux-64.tar.gz for 64-bit GNU/Linux environment.
 - Uncompress the archive file.  e.g. `tar xfz footle-linux-64.tar.gz`, `unzip footle-win-64.zip`, etc.
+- If you are using Xdebug **2.6** or prior, try an older [version of Footle](https://github.com/progga/footle/releases/tag/2018-11-26-dev).
 
 ## Usage
 ### Configuring Xdebug

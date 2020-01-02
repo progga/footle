@@ -43,7 +43,7 @@ type Variable struct {
 	IsCompositeType   bool   // Is it an array, object, structure, etc.?
 	Children          []Variable
 	ChildCount        int
-	HasLoadedChildren bool // DBGp servers return children upto a certain depth.
+	HasLoadedChildren bool // DBGp servers return children up to a certain depth.
 	IsBase64          bool
 }
 
@@ -76,7 +76,7 @@ type Response struct {
 }
 
 type ResponseMessage struct {
-	XMLName  xml.Name `xml:"http://xdebug.org/dbgp/xdebug message"`
+	XMLName  xml.Name `xml:"https://xdebug.org/dbgp/xdebug message"`
 	Filename string   `xml:"filename,attr"`
 	LineNo   int      `xml:"lineno,attr"`
 }

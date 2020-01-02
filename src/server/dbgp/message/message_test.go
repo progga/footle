@@ -13,14 +13,14 @@ func TestDecode(t *testing.T) {
 
 	xml :=
 		`<?xml version="1.0" encoding="iso-8859-1"?>
-<init xmlns="urn:debugger_protocol_v1" xmlns:xdebug="http://xdebug.org/dbgp/xdebug"
+<init xmlns="urn:debugger_protocol_v1" xmlns:xdebug="https://xdebug.org/dbgp/xdebug"
   fileuri="file:///srv/www/drupal/drupal8/index.php"
   language="PHP"
   protocol_version="1.0"
   appid="27891">
   <engine version="2.2.5"><![CDATA[Xdebug]]></engine>
   <author><![CDATA[Derick Rethans]]></author>
-  <url><![CDATA[http://xdebug.org]]></url>
+  <url><![CDATA[https://xdebug.org]]></url>
   <copyright><![CDATA[Copyright (c) 2002-2014 by Derick Rethans]]></copyright>
 </init>`
 
@@ -35,7 +35,7 @@ func TestDecode(t *testing.T) {
 
 	xml =
 		`<?xml version="1.0" encoding="iso-8859-1"?>
-<response xmlns="urn:debugger_protocol_v1" xmlns:xdebug="http://xdebug.org/dbgp/xdebug"
+<response xmlns="urn:debugger_protocol_v1" xmlns:xdebug="https://xdebug.org/dbgp/xdebug"
   command="run"
   transaction_id="3"
   status="break"
@@ -82,14 +82,14 @@ func TestDecodeInit(t *testing.T) {
 
 	xml :=
 		`<?xml version="1.0" encoding="iso-8859-1"?>
-<init xmlns="urn:debugger_protocol_v1" xmlns:xdebug="http://xdebug.org/dbgp/xdebug"
+<init xmlns="urn:debugger_protocol_v1" xmlns:xdebug="https://xdebug.org/dbgp/xdebug"
   fileuri="file:///srv/www/drupal/drupal8/index.php"
   language="PHP"
   protocol_version="1.0"
   appid="27891">
   <engine version="2.2.5"><![CDATA[Xdebug]]></engine>
   <author><![CDATA[Derick Rethans]]></author>
-  <url><![CDATA[http://xdebug.org]]></url>
+  <url><![CDATA[https://xdebug.org]]></url>
   <copyright><![CDATA[Copyright (c) 2002-2014 by Derick Rethans]]></copyright>
 </init>`
 
@@ -111,14 +111,14 @@ func TestDecodeResponse(t *testing.T) {
 	// Fail case.
 	xml :=
 		`<?xml version="1.0" encoding="iso-8859-1"?>
-<init xmlns="urn:debugger_protocol_v1" xmlns:xdebug="http://xdebug.org/dbgp/xdebug"
+<init xmlns="urn:debugger_protocol_v1" xmlns:xdebug="https://xdebug.org/dbgp/xdebug"
   fileuri="file:///srv/www/drupal/drupal8/index.php"
   language="PHP"
   protocol_version="1.0"
   appid="27891">
   <engine version="2.2.5"><![CDATA[Xdebug]]></engine>
   <author><![CDATA[Derick Rethans]]></author>
-  <url><![CDATA[http://xdebug.org]]></url>
+  <url><![CDATA[https://xdebug.org]]></url>
   <copyright><![CDATA[Copyright (c) 2002-2014 by Derick Rethans]]></copyright>
 </init>`
 
@@ -129,7 +129,7 @@ func TestDecodeResponse(t *testing.T) {
 	// DBGP "status" command.
 	xml =
 		`<?xml version="1.0" encoding="iso-8859-1"?>
-<response xmlns="urn:debugger_protocol_v1" xmlns:xdebug="http://xdebug.org/dbgp/xdebug"
+<response xmlns="urn:debugger_protocol_v1" xmlns:xdebug="https://xdebug.org/dbgp/xdebug"
   command="status"
   transaction_id="0"
   status="starting"
@@ -148,7 +148,7 @@ func TestDecodeResponse(t *testing.T) {
 	// DBGP "breakpoint_get" command.
 	xml =
 		`<?xml version="1.0" encoding="iso-8859-1"?>
-<response xmlns="urn:debugger_protocol_v1" xmlns:xdebug="http://xdebug.org/dbgp/xdebug" command="breakpoint_get" transaction_id="2">
+<response xmlns="urn:debugger_protocol_v1" xmlns:xdebug="https://xdebug.org/dbgp/xdebug" command="breakpoint_get" transaction_id="2">
   <breakpoint
     type="line"
     filename="file:///srv/www/drupal/drupal8/index.php"
@@ -186,7 +186,7 @@ func TestDecodeResponse(t *testing.T) {
 func TestDecodeResponseForStackGet(t *testing.T) {
 
 	xml :=
-		`<response xmlns="urn:debugger_protocol_v1" xmlns:xdebug="http://xdebug.org/dbgp/xdebug" command="stack_get" transaction_id="10">
+		`<response xmlns="urn:debugger_protocol_v1" xmlns:xdebug="https://xdebug.org/dbgp/xdebug" command="stack_get" transaction_id="10">
   <stack
     where="Drupal\Core\DrupalKernel::bootEnvironment"
     level="0"
