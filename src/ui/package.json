@@ -9,11 +9,19 @@
   "author": "Progga",
   "license": "BSD-2-Clause",
   "devDependencies": {
-    "bower": "^1.8.4",
     "node-sass": "^4.9.3",
     "standard": "^11.0.1"
   },
   "standard": {
-    "globals": ["CSS", "EventSource", "jQuery", "localStorage"]
+    "globals": [
+      "CSS",
+      "EventSource",
+      "jQuery",
+      "localStorage"
+    ]
+  },
+  "dependencies": {
+    "jquery": "^2.1.4",
+    "uikit": "^2.27.4"
   }
 }
