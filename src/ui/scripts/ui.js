@@ -58,7 +58,7 @@ jQuery(function () {
  * Process responses from the Footle server.
  */
 function initServerMessageProcessing () {
-  let sse = new EventSource('/message-stream')
+  const sse = new EventSource('/message-stream')
   let hasAttemptedReconnection = false
 
   jQuery(sse).on('message', function (event) {

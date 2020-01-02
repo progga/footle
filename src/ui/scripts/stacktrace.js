@@ -34,4 +34,4 @@ function display (callStack) {
   jQuery('.stacktrace').removeClass('uk-hidden')
 }
 
-export {display}
+export { display }

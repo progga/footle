@@ -24,8 +24,8 @@ var fileTabMapping = {}
  *    Call this function once the tab is fully prepared.
  */
 function add (filepath, postTabOpenAction) {
-  let filename = filepath.split(/[\\/]/).pop()
-  let formattedFilepath = '/formatted-file/' + filepath
+  const filename = filepath.split(/[\\/]/).pop()
+  const formattedFilepath = '/formatted-file/' + filepath
 
   if (hasFileMapping(filepath)) {
     if (postTabOpenAction) {
@@ -180,7 +180,7 @@ function removeFileMapping (filepath) {
  * @return bool
  */
 function hasFileMapping (filepath) {
-  if (fileTabMapping.hasOwnProperty(filepath)) {
+  if (Object.prototype.hasOwnProperty.call(fileTabMapping, filepath)) {
     return fileTabMapping[filepath]
   }
 
@@ -217,7 +217,7 @@ function remove (filepath) {
   }
 
   /* Delete tab and its content */
-  let tabContentElement = getContentElement(tabElement)
+  const tabContentElement = getContentElement(tabElement)
   tabElement.remove()
   tabContentElement.remove()
 
@@ -249,7 +249,7 @@ function remove (filepath) {
  */
 function getContentElement (tabElement) {
   const tabIndex = tabElement.index()
-  let tabContentElement = jQuery('.tab-content').get(tabIndex)
+  const tabContentElement = jQuery('.tab-content').get(tabIndex)
 
   return tabContentElement
 }
@@ -289,4 +289,4 @@ function recordTabHeight () {
   document.querySelector(':root').style.setProperty('--tab-selector-height', `${height}px`)
 }
 
-export {add, getContentElement, getContentElementForFile, hasFileMapping, setupRefresher, setupCloser, setupScrollRestoration}
+export { add, getContentElement, getContentElementForFile, hasFileMapping, setupRefresher, setupCloser, setupScrollRestoration }

@@ -30,4 +30,4 @@ function escapeSelector (selector) {
   return escapedSelector
 }
 
-export {escapeSelector}
+export { escapeSelector }

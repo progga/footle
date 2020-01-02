@@ -37,4 +37,4 @@ function update (filepath) {
   })
 }
 
-export {update}
+export { update }

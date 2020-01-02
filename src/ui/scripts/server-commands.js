@@ -24,7 +24,7 @@ function sendCommand (command, args) {
   var footleCommand = [command].concat(args).join(' ')
 
   jQuery.post('steering-wheel', {
-    'cmd': footleCommand
+    cmd: footleCommand
   }).done(function (data, textStatus, jqXHR) {
     const cmdHasSucceeded = (data !== 'Got it.')
     if (cmdHasSucceeded) {
@@ -38,4 +38,4 @@ function sendCommand (command, args) {
     })
 }
 
-export {sendCommand}
+export { sendCommand }

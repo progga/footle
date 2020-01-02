@@ -21,7 +21,7 @@ function setup (ignoredEvent) {
   setupFileLinks()
   improveFileListUX()
 
-  let recentFiles = new RecentFiles(localStorage).get()
+  const recentFiles = new RecentFiles(localStorage).get()
   displayRecentFiles(recentFiles)
 }
 
@@ -33,7 +33,7 @@ function setupRecent () {
     // Even though we don't use absolute filenames in recent file links, that's
     // what we get here.  But we don't want a leading slash in the filepath for
     // display purposes.
-    let relativeFilepath = this.pathname.replace(/^\//, '')
+    const relativeFilepath = this.pathname.replace(/^\//, '')
     tab.add(relativeFilepath, postFileOpenTasks)
 
     return false
@@ -53,7 +53,7 @@ function setupRecent () {
  */
 function setupFileLinks () {
   jQuery('pre', window.file_browser.document).off('click', 'a:not([href$="/"])').on('click', 'a:not([href$="/"])', function (event) {
-    let relativeFilepath = this.pathname.replace('/files/', '')
+    const relativeFilepath = this.pathname.replace('/files/', '')
     tab.add(relativeFilepath, postFileOpenTasks)
 
     return false
@@ -123,9 +123,9 @@ function prepareCrumbs (siteURL, currentDirURL) {
   var crumbs = []
 
   var pathPartsCumulative = []
-  for (let pathPart of relativePathParts) {
+  for (const pathPart of relativePathParts) {
     pathPartsCumulative.push(pathPart)
-    crumbs.push({dir: pathPart, url: siteURL + pathPartsCumulative.join('/')})
+    crumbs.push({ dir: pathPart, url: siteURL + pathPartsCumulative.join('/') })
   }
 
   return crumbs
@@ -155,7 +155,7 @@ function prepareBreadcrumbMarkup (crumbs) {
   var breadcrumb = '<ul class="breadcrumb--file-path uk-breadcrumb">'
   var lastCrumb = crumbList.pop()
 
-  for (let crumb of crumbList) {
+  for (const crumb of crumbList) {
     breadcrumb += '<li class="link--dir"><a href="' + crumb.url + '">' + crumb.dir + '</a></li>'
   }
 
@@ -172,7 +172,7 @@ function prepareBreadcrumbMarkup (crumbs) {
  * process are excluded from this list.
  */
 function displayRecentFiles (filelist) {
-  let listMarkup = filelist.map(filename => `<li class="file--recent"><a href="${filename}" class="file--recent__link">${filename}</a></li>`).join('\n')
+  const listMarkup = filelist.map(filename => `<li class="file--recent"><a href="${filename}" class="file--recent__link">${filename}</a></li>`).join('\n')
 
   jQuery('.file-list--recent').html(listMarkup)
 
@@ -188,11 +188,11 @@ function displayRecentFiles (filelist) {
  * Everytime a filename is *clicked*, it moves to the top of the list.
  */
 function updateRecent (filename) {
-  let recentFiles = new RecentFiles(localStorage)
+  const recentFiles = new RecentFiles(localStorage)
   recentFiles.add(filename)
 
-  let filelist = recentFiles.get()
+  const filelist = recentFiles.get()
   displayRecentFiles(filelist)
 }
 
-export {setup, setupRecent}
+export { setup, setupRecent }

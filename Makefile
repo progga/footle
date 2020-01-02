@@ -1,12 +1,11 @@
 #
 # @file
-# Footle's makefile.
+# Footle's Makefile.
 #
 # Known to work with GNU make in GNU/Linux.
 #
 # Puts all build output into the "build/" directory.  Successful builds should
-# produce *at least* an executable at "build/footle/bin/footle" and necessary
-# HTML markup in "build/footle/ui/"
+# produce *at least* an executable at "build/bin/footle".
 #
 # Required tools:
 # - Go >= 1.8: https://golang.org/doc/install
@@ -25,7 +24,7 @@
 
 BUILD_ROOT = ./build
 
-# Build director for the Footle binary for the current platform.
+# Build directory for the Footle binary for the current platform.
 BIN_BUILD_DIR_PATH = ${BUILD_ROOT}/bin
 
 # Cross platform builds go here.
@@ -57,13 +56,11 @@ UI_SRC_DIR_PATH = ./src/ui
 UI_BUILD_DIR_PATH  = ${BUILD_ROOT}/ui
 UI_SRC_FILES = $(shell find ${UI_SRC_DIR_PATH} -path ${UI_SRC_DIR_PATH}/node_modules -prune -o -type f)
 
-UI_SRC_LIBS_DIR = ${UI_SRC_DIR_PATH}/libs
-UI_BUILD_LIBS_DIR = ${UI_BUILD_DIR_PATH}/libs
-
 UI_HTML_SRC_PATH = ${UI_SRC_DIR_PATH}/index.html
 UI_HTML_BUILD_PATH = ${UI_BUILD_DIR_PATH}/index.html
 
 UI_SASS_DIR = ${UI_SRC_DIR_PATH}/style/sass
+UI_SASS_BUILD_DIR = ${UI_BUILD_DIR_PATH}/style/sass
 UI_CSS_DIR = ${UI_BUILD_DIR_PATH}/style/css
 UI_SASS_FILES = $(shell find ${UI_SASS_DIR} -type f)
 
@@ -71,12 +68,12 @@ UI_SCRIPT_SRC_DIR_PATH = ${UI_SRC_DIR_PATH}/scripts
 UI_SCRIPT_BUILD_DIR_PATH = ${UI_BUILD_DIR_PATH}/scripts
 UI_SCRIPT_SRC_FILES = $(shell find ${UI_SCRIPT_SRC_DIR_PATH} -type f)
 
-UI_FONT_ORIG_DIR = ${UI_BUILD_DIR_PATH}/libs/bower_components/uikit/fonts
+UI_FONT_ORIG_DIR = ${UI_BUILD_DIR_PATH}/node_modules/uikit/dist/fonts
 UI_FONT_REQUIRED_DIR = ${UI_BUILD_DIR_PATH}/style/fonts
 
 
 # Non-file targets.
-.PHONY: all server embedded-ui godeps ui ui-dev-dependencies ui-libs markup style script font test test-execution dist cross-compile linux32 linux64 freebsd64 macos64 win32 win64 doc-copy doc-copy-linux32 doc-copy-linux64 doc-copy-freebsd64 doc-copy-macos64 doc-copy-win32 doc-copy-win64 tarball tarball-linux32 tarball-linux64 tarball-freebsd64 tarball-macos64 zipball-win32 zipball-win64 realclean distclean clean
+.PHONY: all server embedded-ui godeps ui ui-dependencies markup style script font test test-execution dist cross-compile linux32 linux64 freebsd64 macos64 win32 win64 doc-copy doc-copy-linux32 doc-copy-linux64 doc-copy-freebsd64 doc-copy-macos64 doc-copy-win32 doc-copy-win64 tarball tarball-linux32 tarball-linux64 tarball-freebsd64 tarball-macos64 zipball-win32 zipball-win64 realclean distclean clean
 
 
 # Compile Footle server's Go code and Footle UI's CSS/HTML/Javascript code.
@@ -117,37 +114,39 @@ ${GO_UI_BUNDLE_SRC_FILE}: ${UI_SRC_FILES}
 
 ### Compile and prepare the UI #################################################
 # Prepare HTML-based UI.
-ui: ui-dev-dependencies ui-libs markup style script font
+ui: ui-dependencies markup style script font
 
 # Node.js packages.
-ui-dev-dependencies: ${UI_SRC_DIR_PATH}/node_modules
+ui-dependencies: ${UI_SRC_DIR_PATH}/node_modules ${UI_BUILD_DIR_PATH}/node_modules
 
 ${UI_SRC_DIR_PATH}/node_modules: ${UI_SRC_DIR_PATH}/package-lock.json
 	cd ${UI_SRC_DIR_PATH}; \
 	npm install
 	touch $@
 
-# Bower dependencies need to be installed in both UI src and UI build.  This
-# is because some libs are needed during the build process.
-ui-libs: ${UI_SRC_LIBS_DIR}/bower_components ${UI_BUILD_LIBS_DIR}/bower_components
+${UI_BUILD_DIR_PATH}/node_modules: ${UI_BUILD_DIR_PATH}/package.json ${UI_BUILD_DIR_PATH}/package-lock.json
+	cd ${UI_BUILD_DIR_PATH}; \
+	npm install --production
+	touch $@
 
-${UI_SRC_LIBS_DIR}/bower_components: ${UI_SRC_LIBS_DIR}/bower.json
-	cd ${UI_SRC_LIBS_DIR}; \
-	npx bower install
+${UI_BUILD_DIR_PATH}/package.json: ${UI_SRC_DIR_PATH}/package.json
+	mkdir -p ${UI_BUILD_DIR_PATH}
+	cp $< $@
 
-${UI_BUILD_LIBS_DIR}/bower_components: ${UI_BUILD_LIBS_DIR}/bower.json
-	cd ${UI_BUILD_LIBS_DIR}; \
-	npx bower install
-
-${UI_BUILD_LIBS_DIR}/bower.json: ${UI_SRC_LIBS_DIR}/bower.json
-	mkdir -p ${UI_BUILD_LIBS_DIR}
+${UI_BUILD_DIR_PATH}/package-lock.json: ${UI_SRC_DIR_PATH}/package-lock.json
+	mkdir -p ${UI_BUILD_DIR_PATH}
 	cp $< $@
 
 # Prepare CSS whenever *any* Sass file changes.
-style: ${UI_CSS_DIR}/ui.css
+style: ui-dependencies ${UI_CSS_DIR}/ui.css
 ${UI_CSS_DIR}/ui.css: ${UI_SASS_FILES}
+	# For the CSS Sourcemap to be of any use, our Sass files also have to be
+	# served by the web server.
+	mkdir -p ${UI_SASS_BUILD_DIR}
+	cp -r ${UI_SASS_DIR}/* ${UI_SASS_BUILD_DIR}
 	mkdir -p ${UI_CSS_DIR}
-	npx node-sass --indented-syntax --source-map true ${UI_SASS_DIR}/ui.sass $@
+	cd ${UI_SRC_DIR_PATH}; \
+	npx --no-install node-sass --indented-syntax --source-map true ../../${UI_SASS_BUILD_DIR}/ui.sass ../../$@
 
 # Copy index.html
 markup: ${UI_HTML_BUILD_PATH}
@@ -162,7 +161,7 @@ ${UI_SCRIPT_BUILD_DIR_PATH}: $(wildcard ${UI_SCRIPT_SRC_DIR_PATH} ${UI_SCRIPT_SR
 
 # Relocate uikit's "fonts" directory.  Otherwise it won't be found by the
 # web browser.
-font: ${UI_FONT_REQUIRED_DIR}
+font: ui-dependencies ${UI_FONT_REQUIRED_DIR}
 ${UI_FONT_REQUIRED_DIR}: ${UI_FONT_ORIG_DIR}
 	cp -r $< $@
 
@@ -192,27 +191,27 @@ dist: cross-compile doc-copy tarball
 
 cross-compile: embedded-ui linux32 linux64 freebsd64 macos64 win32 win64
 
-linux32: ${LINUX_32_BUILD_DIR_PATH}/footle
+linux32: godeps ${LINUX_32_BUILD_DIR_PATH}/footle
 ${LINUX_32_BUILD_DIR_PATH}/footle: ${GO_SRC_FILES}
 	GOPATH=${OUR_GO_PATH} GOOS=linux GOARCH=386 go build -o $@ ${SERVER_SRC_DIR_PATH}
 
-linux64: ${LINUX_64_BUILD_DIR_PATH}/footle
+linux64: godeps ${LINUX_64_BUILD_DIR_PATH}/footle
 ${LINUX_64_BUILD_DIR_PATH}/footle: ${GO_SRC_FILES}
 	GOPATH=${OUR_GO_PATH} GOOS=linux GOARCH=amd64 go build -o $@ ${SERVER_SRC_DIR_PATH}
 
-freebsd64: ${FREEBSD_64_BUILD_DIR_PATH}/footle
+freebsd64: godeps ${FREEBSD_64_BUILD_DIR_PATH}/footle
 ${FREEBSD_64_BUILD_DIR_PATH}/footle: ${GO_SRC_FILES}
 	GOPATH=${OUR_GO_PATH} GOOS=freebsd GOARCH=amd64 go build -o $@ ${SERVER_SRC_DIR_PATH}
 
-macos64: ${MACOS_64_BUILD_DIR_PATH}/footle
+macos64: godeps ${MACOS_64_BUILD_DIR_PATH}/footle
 ${MACOS_64_BUILD_DIR_PATH}/footle: ${GO_SRC_FILES}
 	GOPATH=${OUR_GO_PATH} GOOS=darwin GOARCH=amd64 go build -o $@  ${SERVER_SRC_DIR_PATH}
 
-win32: ${WIN_32_BUILD_DIR_PATH}/footle.exe
+win32: godeps ${WIN_32_BUILD_DIR_PATH}/footle.exe
 ${WIN_32_BUILD_DIR_PATH}/footle.exe: ${GO_SRC_FILES}
 	GOPATH=${OUR_GO_PATH} GOOS=windows GOARCH=386 go build -o $@ ${SERVER_SRC_DIR_PATH}
 
-win64: ${WIN_64_BUILD_DIR_PATH}/footle.exe
+win64: godeps ${WIN_64_BUILD_DIR_PATH}/footle.exe
 ${WIN_64_BUILD_DIR_PATH}/footle.exe: ${GO_SRC_FILES}
 	GOPATH=${OUR_GO_PATH} GOOS=windows GOARCH=amd64 go build -o $@ ${SERVER_SRC_DIR_PATH}
 

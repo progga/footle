@@ -14,14 +14,14 @@ import * as server from './server-commands.js'
  */
 function setupContinuationControls () {
   var commandsNSelectors = {
-    'step_over': '[name="button--step-over"]',
-    'step_into': '[name="button--step-in"]',
-    'step_out': '[name="button--step-out"]',
-    'run': '[name="button--run"]',
-    'continue': '[name="button--continue"]',
-    'stop': '[name="button--stop"]',
-    'on': '[name="button--on"]',
-    'off': '[name="button--off"]'
+    step_over: '[name="button--step-over"]',
+    step_into: '[name="button--step-in"]',
+    step_out: '[name="button--step-out"]',
+    run: '[name="button--run"]',
+    continue: '[name="button--continue"]',
+    stop: '[name="button--stop"]',
+    on: '[name="button--on"]',
+    off: '[name="button--off"]'
   }
 
   setupCommandNControl(commandsNSelectors)
@@ -34,9 +34,9 @@ function setupContinuationControls () {
  */
 function setupStateControl () {
   var commandsNSelectors = {
-    'context_get': '[name="button--variable__local"]',
+    context_get: '[name="button--variable__local"]',
     'context_get global': '[name="button--variable__global"]',
-    'stack_get': '[name="button--stacktrace"]'
+    stack_get: '[name="button--stacktrace"]'
   }
 
   setupCommandNControl(commandsNSelectors)
@@ -88,4 +88,4 @@ function enable () {
   jQuery('.button--control').attr('disabled', false)
 }
 
-export {setupContinuationControls, setupStateControl, toggleOnOffbuttons, disable, enable}
+export { setupContinuationControls, setupStateControl, toggleOnOffbuttons, disable, enable }
