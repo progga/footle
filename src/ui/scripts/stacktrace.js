@@ -9,10 +9,10 @@
  * @param array callStack
  */
 function display (callStack) {
-  jQuery('.stacktrace > .traces').empty()
+  jQuery('.stacktrace--tabular > .traces').empty()
 
   if (callStack.length === 0) {
-    jQuery('.stacktrace > .traces').append('<tr><td>Empty stack.</td></tr>')
+    jQuery('.stacktrace--tabular > .traces').append('<tr><td>Empty stack.</td></tr>')
   }
 
   for (var stackIndex in callStack) {
@@ -26,12 +26,12 @@ function display (callStack) {
                         '<td>' + lineNo + '</td>' +
                       '</tr>'
 
-    jQuery('.stacktrace > .traces').append(traceMarkup)
+    jQuery('.stacktrace--tabular > .traces').append(traceMarkup)
   }
 
   // Initially, the table remains hidden to avoid displaying table headers for
   // an empty table.
-  jQuery('.stacktrace').removeClass('uk-hidden')
+  jQuery('.stacktrace--tabular').removeClass('uk-hidden')
 }
 
 export { display }
