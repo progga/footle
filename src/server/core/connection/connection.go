@@ -182,7 +182,7 @@ func (c *Connection) signalActivation() {
 /**
  * Start listening for the DBGp engine.
  *
- * Listen on a port (default 9000) where the DBGp engine is expected to knock.
+ * Listen on a port (default 9003) where the DBGp engine is expected to knock.
  */
 func (c *Connection) startListeningForDBGpEngine() {
 
