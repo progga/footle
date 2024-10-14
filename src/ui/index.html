@@ -1,4 +1,4 @@
-<!docroot html>
+<!doctype html>
 <html>
   <head>
     <title>Footle the debugger</title>
@@ -52,10 +52,14 @@
         <!-- Stacktrace display -->
         <div class="stacktrace-wrapper uk-panel uk-panel-divider">
           <button type="button" class="button button--control" name="button--stacktrace">Stacktrace</button>
-          <table class="stacktrace uk-hidden uk-table uk-table-hover uk-table-striped uk-table-condensed">
-            <thead><th>Where</th><th>File</th><th>Line</th></thead>
-            <tbody class="traces"></tbody>
-          </table>
+
+          <!-- Horizontal overlay isn't working on a table.  Hence a wrapper. -->
+          <div class="stacktrace">
+            <table class="stacktrace--tabular uk-hidden uk-table uk-table-hover uk-table-striped uk-table-condensed">
+              <thead><th>Where</th><th>File</th><th>Line</th></thead>
+              <tbody class="traces"></tbody>
+            </table>
+          </div>
         </div>
       </div> <!-- /.execution-states -->
     </div> <!-- /.states-n-controls -->

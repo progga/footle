@@ -9,7 +9,7 @@
   "author": "Progga",
   "license": "BSD-2-Clause",
   "devDependencies": {
-    "node-sass": "^4.13.0",
+    "node-sass": "^9.0.0",
     "standard": "^14.3.1"
   },
   "standard": {

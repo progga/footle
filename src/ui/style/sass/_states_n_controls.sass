@@ -25,14 +25,23 @@
   padding-top: $panel-divider-gutter
   border-top: 2 * $panel-divider-border-width solid $panel-divider-border
 
-  // Scrollbar.
+  // Vertical scrollbar.
   max-height: 75vh
-  overflow: auto
+  overflow-y: auto
 
 .variables,
 .stacktrace
   margin-top: 1em
   background-color: $dotnav-contrast-hover-background
+
+  // Horizontal scrollbar.
+  overflow-x: auto
+
+/**
+ * Override bottom margin applied to last child of .uk-panel.
+ */
+.stacktrace-wrapper.uk-panel > .stacktrace:last-child
+  margin-bottom: 3em;
 
 /**
  * Highlight debugger status.
